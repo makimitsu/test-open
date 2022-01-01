@@ -1,10 +1,9 @@
 clear all
 
-date=211223;
-TF_shot = 30 ;
+date=211230;
+TF_shot = 15 ;
 offset_TF = true;
-
-shot = 39  ;
+shot = 17 ;
 
 % ********* ALWAYS RUN THIS FUNCTION FIRST ***********
 % parameters:(date,TF_shot,shot,offset_TF,offset_EF)
@@ -15,7 +14,7 @@ shot = 39  ;
 
 %########## Raed oscilloscope (DL716) file ##########
 % parameters:(date,shot,TF_shot,offset_TF)
-%[low_n_data] = low_n_mode(date,shot,TF_shot,offset_TF);
+[low_n_data] = low_n_mode(date,shot,TF_shot,offset_TF);
 
 % run this as well
 % (ignore a column of broken probes)
@@ -46,7 +45,7 @@ r_probe = r_probe([2,3,4,6,7,8]);
 % parameters:(B_z,ch_dist,start_time,end_time)
 %plot_B_z_in_time(B_z,ch_dist,350,600);
 
-plot_psi_multi(B_z,r_probe,z_probe,461:1:480,true,true,true,false,shot);
+%plot_psi_multi(B_z,r_probe,z_probe,461:1:480,true,true,true,false,shot);
 
 % parameters:(B_z,r_probe,z_probe,t,fitting,fill,fixed_Clayer,show_probe)
 % plot_psi_at_t(B_z,r_probe,z_probe,440,true,true,true,true);
