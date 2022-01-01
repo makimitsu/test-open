@@ -5,7 +5,7 @@ function [] = plot_fitrate(B_z,r_probe)
 %   1d array of double: r_probe, locations of probes along r
 %   1d array of double: z_probe, locations of probes along z
 
-time = 460:490;
+time = 460:500;
 x = 1:550;
 y = 1:550;
 
