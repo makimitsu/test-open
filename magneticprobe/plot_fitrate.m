@@ -1,4 +1,4 @@
-function [] = plot_fitrate(B_z,r_probe)
+function [] = plot_fitrate(B_z,r_probe,shot)
 % plot fit rate(not sure correct words) and magnetic surface
 % input:
 %   3d array of double: B_z (r,z,t), offsetted at zero and smoothed
@@ -54,11 +54,11 @@ hold off
 xlabel('r');
 ylabel('max_psi(Wb)');
 
-figure
+f = figure('name',['shot', num2str(shot)]);
 
 plot(x, y, '-o');
 title('');
 xlabel('time(us)');
 ylabel('fitrate');
-axis([465 490 0 1.0]);
+axis([460 500 0 1.0]);
 end
