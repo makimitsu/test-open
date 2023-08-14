@@ -3,30 +3,30 @@
 %ドップラープローブによるイオン速度分布関数、温度、フローとその瞬間の磁気面をプロット
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% clear all
+% close all
 
 %各PCのパスを定義
 run define_path.m
 
 %------【input】---------------------------------------------------
-date = 230523;%【input】実験日
-begin_cal = 13;%【input】磁気面&フロー計算始めshot番号(実験ログD列)
-end_cal = 13;%【input】磁気面&フロー計算終わりshot番号(実験ログD列)(0にするとbegin_cal以降の同日の全shot計算)
+date = 230524;%【input】実験日
+begin_cal = 15;%【input】磁気面&フロー計算始めshot番号(実験ログD列)
+end_cal = 24;%【input】磁気面&フロー計算終わりshot番号(実験ログD列)(0にするとbegin_cal以降の同日の全shot計算)
 int_r = 2.5;%【input】ドップラープローブ計測点r方向間隔[cm](2.5)
 int_z = 4.2;%【input】ドップラープローブ計測点z方向間隔[cm](4.2)
 ICCD.line = 'Ar';%【input】ドップラー発光ライン('Ar')
-n_CH = 28;%【input】ドップラープローブファイバーCH数(28)
+n_CH = 20;%【input】ドップラープローブファイバーCH数(28)
 n_z = 1;%【input】ドップラープローブz方向データ数(数値)(1)
 %-----------------------詳細設定【input】----------------------------
-cal_vdist = false;%【input】速度分布を計算(true,false)
-save_vdist = false;%【input】速度分布データを保存(true,false)
-load_vdist = true;%【input】速度分布データを読み込む(true,false)
+cal_vdist = true;%【input】速度分布を計算(true,false)
+save_vdist = true;%【input】速度分布データを保存(true,false)
+load_vdist = false;%【input】速度分布データを読み込む(true,false)
 
 cal_pcb = false;%【input】磁場を計算(true,false)
 save_pcb = false;%【input】磁場データを保存(true,false)
 load_pcb = true;%【input】磁場データを読み込む(true,false)
 
-plot_spectra = true;%【input】スペクトルをプロット(true,false)
+plot_spectra = false;%【input】スペクトルをプロット(true,false)
 plot_analisis = false;%【input】逆変換解析をプロット(true,false)
 plot_vdist = false;%【input】速度分布をプロット(true,false)
 plot_compare = false;%【input】再構成比較をプロット(true,false)
@@ -35,7 +35,6 @@ plot_psi = true;%【input】磁気面をプロット(true,false)
 overlay_plot = true;%【input】流速と磁気面を重ねる(true,false)
 plot_Br = false;
 
-save_fit = false;%【input】ガウスフィッティングpngを保存(true,false)
 save_fig = false;%【input】速度分布、フローpngを保存(true,false)
 
 plot_type = 'contour';%【input】速度分布プロット種類('contour','surf')
@@ -68,7 +67,7 @@ if start_i <= end_row
         error('end_cal must <= %d.', exp_log(end_row,4))
     end
     for i = start_i:end_i
-        ICCD.shot = exp_log(i,4);%ショット番号
+        ICCD.shot = exp_log(i,index.shot);%ショット番号
         a039shot = exp_log(i,index.a039);%a039ショット番号
         a039tfshot = exp_log(i,index.a039_TF);%a039TFショット番号
         expval.PF1 = exp_log(i,index.PF1);%PF1電圧(kv)

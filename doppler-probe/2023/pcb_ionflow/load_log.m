@@ -40,11 +40,11 @@ index.PF1 = find(strncmp('CB1[kV]', exp_index,7));%列番号を取得
 index.PF2 = find(strncmp('CB2[kV]', exp_index,7));%列番号を取得
 index.TF = find(strncmp('TF[kV]', exp_index,6));%列番号を取得
 index.EF = find(strncmp('EF[A]', exp_index,5));%列番号を取得
-index.ICCD_trg = find(strncmp('DopplerDelay[us]', exp_index,16));%列番号を取得
-index.ICCD_exp_w = find(strncmp('DopplerWidth[us]', exp_index,16));%列番号を取得
-index.ICCD_gain = find(strncmp('DopplerGain', exp_index,11));%列番号を取得
-index.minR = find(strncmp('IDSPminR[cm]', exp_index,12));%列番号を取得
-index.minZ = find(strncmp('IDSPminZ[cm]', exp_index,12));%列番号を取得
+index.IDSP_trg = find(strncmp('IDSPDelay[us]', exp_index,16));%列番号を取得
+index.IDSP_exp_w = find(strncmp('IDSPWidth[us]', exp_index,16));%列番号を取得
+index.IDSP_gain = find(strncmp('IDSPGain', exp_index,11));%列番号を取得
+index.IDSP_minR = find(strncmp('IDSPminR[cm]', exp_index,12));%列番号を取得
+index.IDSP_minZ = find(strncmp('IDSPminZ[cm]', exp_index,12));%列番号を取得
 
 exp_log = readmatrix('exp_log.xlsx','Sheet','log','Range', ['A' num2str(load_s) ':BC' num2str(load_f)]);
 [n_row,~] = size(exp_log);

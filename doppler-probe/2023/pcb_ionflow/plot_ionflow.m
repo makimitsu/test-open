@@ -12,7 +12,7 @@ mpoints.z = mpoints.z * unit;
 mpoints.r = mpoints.r * unit;
 factor = factor * unit;
 
-%温度カラーマップ
+% %温度カラーマップ
 % T_icon = repmat(T_i(:,1),1,5);%等高線図用平均イオン温度
 % zcon = mpoints.z(1,1);
 % s = pcolor([zcon-2*unit zcon-1*unit zcon zcon+1*unit zcon+2*unit],mpoints.r,T_icon);
@@ -24,7 +24,7 @@ factor = factor * unit;
 % hold on
 
 r_start = 1;
-r_end = 7;
+r_end = 5;
 % plot(mpoints.z,mpoints.r,'xr');%ドップラープローブ計測点を表示
 plot(mpoints.z(r_start:r_end,1),mpoints.r(r_start:r_end,1),'xk');%ドップラープローブ計測点を表示
 hold on

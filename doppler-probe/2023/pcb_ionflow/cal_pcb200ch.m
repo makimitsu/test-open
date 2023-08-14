@@ -76,7 +76,7 @@ end
 [bz, ok_bz, ok_bz_plot] = ng_replace(bz, ok_bz, sheet_date);
 % ok_bz_plot=ok_bz;
 % ok_bz([48 58 49 59])=false;
-ok_bt([4 5 6 7 8 9 10 15 21 27 30 42 43 49 53 69 84 87 92 94 95 96 97 98 99 100]) = false;
+ok_bt([4 5 6 7 8 9 10 21 94 95 96 97 98 99 100]) = false;
 
 [zq,rq]=meshgrid(linspace(min(zpos_bz),max(zpos_bz),mesh_rz),linspace(min(rpos_bz),max(rpos_bz),mesh_rz));
 

@@ -1,11 +1,11 @@
-function [V_i,absV,T_i] = cal_ionvdist(date,expval,ICCD,mpoints,pathname,show_offset,plot_spectra,inversion_method,plot_analisis,plot_vdist,plot_type,save_fig,plot_compare,save_vdist,Ti_type)
+xfunction [V_i,absV,T_i] = cal_ionvdist(date,expval,ICCD,mpoints,pathname,show_offset,plot_spectra,inversion_method,plot_analisis,plot_vdist,plot_type,save_fig,plot_compare,save_vdist,Ti_type)
 %------フィッティング、再構成調整用【input】-------
 l_mov = 7;%【input】波長方向移動平均長さ
 th_ratio = 0.8;%【input】フィッティング時閾値
 cut_l_L = 81;%【input】波長軸の切り取り長さ(奇数)
 cut_d_L = 30;%【input】波長方向位置ずれ調整
-cut_l_CH = 7;%【input】CH方向の切り取り長さ(奇数)
-cut_d_CH = -1;%【input】CH方向位置ずれ調整
+cut_l_CH = 9;%【input】CH方向の切り取り長さ(奇数)
+cut_d_CH = 2;%【input】CH方向位置ずれ調整
 n_L = 51;%【input】再構成用波長軸配列の長さ(奇数, cut_l_L以下にする)
 
 %物理定数
@@ -33,7 +33,7 @@ switch ICCD.line
 end
 center = load_calibration(date,ICCD);
 
-dir = [pathname.NIFS,'/Doppler/Andor/IDSP/',num2str(date)];%ディレクトリ1
+dir = [pathname.IDSP,'/',num2str(date)];%ディレクトリ1
 filename = [dir,'/shot',num2str(ICCD.shot),'_',num2str(ICCD.trg),'us_w=',num2str(ICCD.exp_w),'_gain=',num2str(ICCD.gain),'.asc'];%ICCDファイル名
 if not(exist(filename,"file"))
     warning([filename,' does not exist.']);

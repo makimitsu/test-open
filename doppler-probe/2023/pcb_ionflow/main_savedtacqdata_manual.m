@@ -14,10 +14,10 @@ addpath(fullfile(getenv('MDSPLUS_DIR'), 'matlab'));
 pathname.rawdata=[getenv("rsOnedrive") '/mat/pcb_raw']; %保存先
 
 dtacqlist=39;
-shotlist=1494;%【input】dtacqの保存番号
+shotlist=2019;%【input】dtacqの保存番号
 % tfshotlist=zeros(size(shotlist));
-tfshotlist = 1444;
-date = 230524;%【input】計測日
+tfshotlist = 2018;
+date = 230721;%【input】計測日
 n=numel(shotlist);%計測データ数
 
 %RC係数読み込み
@@ -28,6 +28,9 @@ for i=1:n
     % tfshot=tfshotlist(i);%変数の場合
     tfshot=tfshotlist;%固定値の場合
     [rawdata]=getMDSdata(dtacq_num,shot,tfshot);%測定した生信号
+    if not(exist([pathname.rawdata,'/',num2str(date)],'dir'))
+        mkdir(sprintf("%s", pathname.rawdata), sprintf("%s", num2str(date)));
+    end
     save(strcat(pathname.rawdata,'/',num2str(date),'/rawdata_dtacq',num2str(dtacq_num),'_shot',num2str(shot),'_tfshot',num2str(tfshot),'.mat'),'rawdata');
     if tfshot>0
         [rawdata0]=getMDSdata(dtacq_num,shot,0);

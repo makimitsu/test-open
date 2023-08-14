@@ -7,10 +7,10 @@ run define_path.m
 %------【input】---------------------------------------------------
 date = 230315;%【input】実験日%230315
 begin_cal = 4;%【input】磁気面&フロー計算始めshot番号(実験ログD列)%4
-end_cal = 35;%【input】磁気面&フロー計算終わりshot番号(実験ログD列)(0にするとbegin_cal以降の同日の全shot計算)%35
+end_cal = 5;%【input】磁気面&フロー計算終わりshot番号(実験ログD列)(0にするとbegin_cal以降の同日の全shot計算)%35
 int_r = 2.5;%【input】ドップラープローブ計測点r方向間隔[cm](2.5)
 int_z = 4.2;%【input】ドップラープローブ計測点z方向間隔[cm](4.2)
-ICCD.line = "Ar";%【input】ドップラー発光ライン("Ar")
+IDSP.line = "Ar";%【input】ドップラー発光ライン("Ar")
 n_CH = 28;%【input】ドップラープローブファイバーCH数(28)
 n_z = 1;%【input】ドップラープローブz方向データ数(数値)(1)
 dtacq.num = 39;%【input】磁気プローブdtacq番号(39)
@@ -24,7 +24,7 @@ y2_type = "none";%【input】y2軸の変数("Vz","Vr","|Vz|","|Vr|","Bz","Br","z
 g_type = "time";%【input】グループ化基準("time","r")
 
 %実験ログ読み取り
-[exp_log,begin_row,end_row] = load_log(date);
+[exp_log,index,begin_row,end_row] = load_log(date);
 if isempty(begin_row)
     return
 end
@@ -43,7 +43,7 @@ if start_i <= end_row
     end
 
     %配列を作成
-    n_scatter = (end_i - start_i) * mpoints.n_r;%散布図プロット数
+    n_scatter = end_i - start_i;%散布図プロット数
     sort = zeros(n_scatter,1);%範囲限定用
     V_z = zeros(n_scatter,1);%Vz
     V_r = zeros(n_scatter,1);%Vr
@@ -55,29 +55,28 @@ if start_i <= end_row
     rp = zeros(n_scatter,1);%計測点r座標
     for i = start_i:end_i
         step = i - start_i + 1;
-        ICCD.shot = exp_log(i,4);%ショット番号
+        IDSP.shot = exp_log(i,4);%ショット番号
         a039shot = exp_log(i,index.a039);%a039ショット番号
         a039tfshot = exp_log(i,index.a039_TF);%a039TFショット番号
         expval.PF1 = exp_log(i,index.PF1);%PF1電圧(kv)
         expval.PF2 = exp_log(i,index.PF2);%PF2電圧(kv)
         expval.TF = exp_log(i,index.TF);%PF2電圧(kv)
         expval.EF = exp_log(i,index.EF);%EF電流
-        ICCD.trg = exp_log(i,index.ICCD_trg);%ICCDトリガ時間
-        ICCD.exp_w = exp_log(i,index.ICCD_exp_w);%ICCD露光時間
-        ICCD.gain = exp_log(i,index.ICCD_gain);%Andor gain
-        time = round(ICCD.trg+ICCD.exp_w/2);%磁気面プロット時間
-
-        min_r = exp_log(i,index.minR);%【input】ドップラープローブ計測点最小r座標
-        min_z = exp_log(i,index.minZ);%【input】ドップラープローブ計測点最小z座標
+        IDSP.trg = exp_log(i,index.IDSP_trg);%IDSPトリガ時間
+        IDSP.exp_w = exp_log(i,index.IDSP_exp_w);%IDSP露光時間
+        IDSP.gain = exp_log(i,index.IDSP_gain);%Andor gain
+        time = round(IDSP.trg+IDSP.exp_w/2);%磁気面プロット時間
+        min_r = exp_log(i,index.IDSP_minR);%【input】ドップラープローブ計測点最小r座標
+        min_z = exp_log(i,index.IDSP_minZ);%【input】ドップラープローブ計測点最小z座標
         %ドップラープローブ計測点配列を生成
         mpoints = make_mpoints(n_CH,min_r,int_r,n_z,min_z,int_z);
         if dtacq.num == 39
             dtacq.shot = a039shot;
             dtacq.tfshot = a039tfshot;
         end
-        if time >= t_range(1) && time <= t_range(2) && isempty(intersect(ICCD.shot,ng_shotlist))
+        if time >= t_range(1) && time <= t_range(2) && isempty(intersect(IDSP.shot,ng_shotlist))
             %保存済みイオン温度、フローを読みこむ
-            [V_i,absV,T_i,F,W,P,Lambda,Vx,Vy,ppoints,Angle] = load_ionvdist(date,ICCD,pathname);
+            [V_i,absV,T_i,F,W,P,Lambda,Vx,Vy,ppoints,Angle] = load_ionvdist(date,IDSP,pathname);
             %磁場を読みこむ
             [grid2D,data2D,ok_z,ok_r] = load_pcb200ch(date,dtacq,pathname);
             for k = 1:mpoints.n_r

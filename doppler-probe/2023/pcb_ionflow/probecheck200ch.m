@@ -2,6 +2,7 @@
 %200ch用新規pcbプローブと装置の磁場信号極性チェック
 %dtacqのshot番号を直接指定する場合
 %%%%%%%%%%%%%%%%%%%%%%%%
+close all
 
 %各PCのパスを定義
 run define_path.m
@@ -21,9 +22,9 @@ pathname.rawdata=[getenv("rsOnedrive") '/mat/pcb_raw']; %保存先
 %%%%実験オペレーションの取得
 %直接入力の場合
 dtacqlist=39;
-shotlist=1417;%【input】dtacqの保存番号
+shotlist=1444;%【input】dtacqの保存番号
 tfshotlist=0;
-date = 230523;%【input】計測日
+date = 230524;%【input】計測日
 n=numel(shotlist);%計測データ数
 
 % %磁気面出す場合は適切な値を入力、磁場信号のみプロットする場合は変更不要
@@ -36,22 +37,22 @@ for i=1:n
     dtacq_num=dtacqlist(i);
     shot=shotlist(i);
     tfshot=tfshotlist(i);
-    check_signal(date, dtacq_num, shot, tfshot, pathname); 
+    [ok_bz,ok_bt] = check_signal(date, dtacq_num, shot, tfshot, pathname); 
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%
 %以下、local関数
 %%%%%%%%%%%%%%%%%%%%%%%%
 
-function check_signal(date, dtacq_num, shot, tfshot, pathname)
-filename=strcat(pathname.rawdata,'/rawdata_dtacq',num2str(dtacq_num),'_shot',num2str(shot),'_tfshot',num2str(tfshot),'.mat');
+function [ok_bz,ok_bt] = check_signal(date, dtacq_num, shot, tfshot, pathname)
+filename=strcat(pathname.rawdata,'/',num2str(date),'/rawdata_dtacq',num2str(dtacq_num),'_shot',num2str(shot),'_tfshot',num2str(tfshot),'.mat');
 % filename=strcat(pathname.rawdata,'rawdata_noTF_dtacq',num2str(d_tacq),'.mat');
 load(filename,'rawdata');%1000×192
 
 %正しくデータ取得できていない場合はreturn
-if numel(rawdata)< 500
-    return
-end
+% if numel(rawdata)< 500
+%     return
+% end
 
 %較正係数のバージョンを日付で判別
 sheets = sheetnames('coeff200ch.xlsx');
@@ -91,7 +92,7 @@ for i=1:192
     end
 end
 ok_bz_plot=ok_bz;
-ok_bt([4 5 6 7 8 9 10 15 21 27 30 42 43 49 53 69 84 87 92 94 95 96 97 98 99 100]) = false;
+ok_bt([4 5 6 7 8 9 10 21 94 95 96 97 98 99 100]) = false;
 
 % 221219ver
 % Pcheck=[1	-1	1	1	-1	-1	-1	1	1	1	1	1	1	-1	-1	0	-1	-1	1	-1	1	0	1	-1	-1	1	-1	-1	1	-1	-1	1	-1	1	-1	1	-1	-1	-1	1	-1	-1	1	1	-1	-1	-1	-1	-1	-1	1	-1	-1	-1	-1	-1	-1	-1	-1	-1	1	1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	-1	1	-1	1	-1	-1	-1	-1	1	-1	-1	1	-1	-1	1	-1	-1	1	1	1	-1	1	-1	-1	1	1	1	-1];
@@ -108,12 +109,11 @@ ok_bt([4 5 6 7 8 9 10 15 21 27 30 42 43 49 53 69 84 87 92 94 95 96 97 98 99 100]
 %生信号描画用パラメータ
 r = 5;%プローブ本数＝グラフ出力時の縦に並べる個数
 col = 10;%グラフ出力時の横に並べる個数
-y_upper_lim = 0.1;%3e-3;%0.1;%縦軸プロット領域（b_z上限）
-y_lower_lim = -0.1;%3e-3;%-0.1;%縦軸プロット領域（b_z下限）
-t_start=350;%430;%455;%横軸プロット領域（開始時間）
-t_end=600;%550;%横軸プロット領域（終了時間）
+y_upper_lim = 0.4;%3e-3;%0.1%0.4;%縦軸プロット領域（b_z上限）
+y_lower_lim = -0.4;%3e-3;%-0.1%-0.4;%縦軸プロット領域（b_z下限）
+t_start=1;%430;%455;%横軸プロット領域（開始時間）
+t_end=1000;%550;%横軸プロット領域（終了時間）
 % r_ch=col1+col2;%r方向から挿入した各プローブのチャンネル数
-
 f1=figure;
 f1.WindowState = 'maximized';
 for i=1:r
@@ -216,5 +216,4 @@ sgtitle('Bt signal probe6-10')
 % bz8=[bz(t,8) bz(t,18) bz(t,28) bz(t,38) bz(t,48) bz(t,58) bz(t,68) bz(t,78) bz(t,88) bz(t,98)];
 % bz9=[bz(t,9) bz(t,19) bz(t,29) bz(t,39) bz(t,49) bz(t,59) bz(t,69) bz(t,79) bz(t,89) bz(t,99)];
 % bz10=[bz(t,10) bz(t,20) bz(t,30) bz(t,40) bz(t,50) bz(t,60) bz(t,70) bz(t,80) bz(t,90) bz(t,100)];
-
 end

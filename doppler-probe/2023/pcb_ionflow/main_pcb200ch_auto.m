@@ -7,23 +7,23 @@
 run define_path.m
 
 %------【input】-------
-date = 230523;%【input】実験日(yymmdd)
-begin_cal = 2;%【input】計算始めshot番号(実験ログD列)
-end_cal = 2;%【input】計算終わりshot番号(実験ログD列)(0にするとbegin_cal以降同日の全shot計算)
-n_plot = 8;%【input】磁気面subplot枚数(16以下の4の倍数or3以下)
-t_start = 466;%【input】磁気面subplot開始時間(us)
+date = 230526;%【input】実験日(yymmdd)
+begin_cal = 7;%【input】計算始めshot番号(実験ログD列)
+end_cal = 12;%【input】計算終わりshot番号(実験ログD列)(0にするとbegin_cal以降同日の全shot計算)
+n_plot = 1;%【input】磁気面subplot枚数(16以下の4の倍数or3以下)
+t_start = 475;%【input】磁気面subplot開始時間(us)
 dt = 2;%【input】磁気面subplot時間間隔(us)
-cmap = 'Bt';%【input】磁気面カラーマップ('psi','Bz','Br','Bt','Jt','Et',false)
+cmap = false;%【input】磁気面カラーマップ('psi','Bz','Br','Bt','Jt','Et',false)
 cbar = true;%【input】カラーバー(true,false)
 %------詳細設定【input】-------
 cal_pcb = true;%【input】磁場を計算(true,false)
 
-save_pcb = false;%【input】磁場データを保存(true,false)
+save_pcb = true;%【input】磁場データを保存(true,false)
 load_pcb = false;%【input】磁場データを読み込む(true,false)
 
-tfoffset = false;%【input】tf真空磁場を含めるかどうか(true,false)
+tfoffset = true;%【input】tf真空磁場を含めるかどうか(true,false)
 
-plot_psi = true;%【input】磁気面をプロット(true,false)
+plot_psi = false;%【input】磁気面をプロット(true,false)
 
 plot_Br = false;%【input】Brをプロット(true,false)
 cut_z_Br = 2.1;%【input】Brプロットのz断面[cm]
@@ -56,16 +56,12 @@ if start_i <= end_row
         return
     end
     for i = start_i:end_i
-        ICCD.shot = exp_log(i,4);%ショット番号
         a039shot = exp_log(i,index.a039);%a039ショット番号
         a039tfshot = exp_log(i,index.a039_TF);%a039TFショット番号
         expval.PF1 = exp_log(i,index.PF1);%PF1電圧(kv)
         expval.PF2 = exp_log(i,index.PF2);%PF2電圧(kv)
         expval.TF = exp_log(i,index.TF);%PF2電圧(kv)
         expval.EF = exp_log(i,index.EF);%EF電流
-        ICCD.trg = exp_log(i,index.ICCD_trg);%ICCDトリガ時間
-        ICCD.exp_w = exp_log(i,index.ICCD_exp_w);%ICCD露光時間
-        ICCD.gain = exp_log(i,index.ICCD_gain);%Andor gain
         if dtacq.num == 39
             dtacq.shot = a039shot;
             dtacq.tfshot = a039tfshot;
@@ -75,6 +71,7 @@ if start_i <= end_row
                 [grid2D,data2D,ok_z,ok_r] = cal_pcb200ch(date,dtacq,pathname,mesh_rz,expval,trange,save_pcb);
             else
                 [grid2D,data2D_tfoffset,ok_z,ok_r] = cal_pcb200ch_with_tfoffset(date,dtacq,pathname,mesh_rz,expval,trange,save_pcb);
+                data2D = char.empty;
             end
         elseif load_pcb
             [grid2D,data2D,ok_z,ok_r] = load_pcb200ch(date,dtacq,pathname);
