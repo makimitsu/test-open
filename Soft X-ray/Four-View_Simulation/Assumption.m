@@ -1,4 +1,4 @@
-function [EE,Iwgn] = Assumption(N_projection,gm2d,plot_flag)
+function [EE,ImageWithGaussNoise] = Assumption(N_projection,gm2d,plot_flag)
 
 [~, N_g] = size(gm2d);
 % N_projection = sqrt(N_p);
@@ -17,7 +17,8 @@ r_grid = linspace(330,70,n);
 [r_space,z_space] = meshgrid(r,z); %rが横、zが縦の座標系（左上最小）
 r0_space = sqrt((z_space-z_0).^2+(r_space-r_0).^2);
 r1_space = abs(0.5*(z_space-z_0)+(r_space-r_0))/sqrt(1.25);
-EE = exp(-0.5*r0_space.^2).*exp(-5*r1_space)+1.5*exp(-r0_space.^2);
+% EE = exp(-0.5*r0_space.^2).*exp(-5*r1_space)+1.5*exp(-r0_space.^2);
+EE = exp(-r0_space.^2).*exp(-10*r1_space)+1.5*exp(-10*r0_space.^2);
 
 % EE = zeros(m,n);
 % for i=1:m
@@ -36,8 +37,8 @@ E = reshape(EE,1,[]);
 % whos gm2d
 % whos E
 I=gm2d*(E)';
-Iwgn=awgn(I,10*log10(10),'measured'); % 5 related to 20%; 10 related to 10%;
-Iwgn(Iwgn<0)=0;
+ImageWithGaussNoise=awgn(I,10*log10(10),'measured'); % 5 related to 20%; 10 related to 10%;
+ImageWithGaussNoise(ImageWithGaussNoise<0)=0;
 
 
 % 1D column vector is transformed to 2D matrix
@@ -46,8 +47,8 @@ II = zeros(n_p);
 IIwgn = zeros(n_p);
 k=FindCircle(n_p/2);
 II(k) = I;
-IIwgn(k) = Iwgn;
-Iwgn = Iwgn.';
+IIwgn(k) = ImageWithGaussNoise;
+ImageWithGaussNoise = ImageWithGaussNoise.';
 
 % I_check = II(75,:);
 % j = 1:numel(I_check);

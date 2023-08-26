@@ -2,8 +2,8 @@ function plot_SXR_test()
 
 NL = false;
 
-N_projection_new = 80;
-N_grid_new = 100;
+N_projection_new = 50;
+N_grid_new = 50;
 % N_projection_new = 40;
 % N_grid_new = 50;
 
@@ -11,7 +11,7 @@ N_grid_new = 100;
 % 基本N_projection>N_gridなので'econ'でいい
 
 % 再構成計算に必要なパラメータを計算するなら読み込む、しない場合も範囲に関しては読み込む
-filepath = '/Users/shinjirotakeda/Documents/GitHub/test-open/Soft X-ray/Four-View_Simulation/parameters.mat';
+filepath = '/Users/yuleo/Documents/GitHub/test-open/Soft X-ray/Four-View_Simulation/parameters.mat';
 
 if isfile(filepath)
     load(filepath, 'gm2d1', 'gm2d2', 'gm2d3', 'gm2d4', 'U1', 'U2', 'U3', 'U4', ...
@@ -31,14 +31,14 @@ end
     
 % number = (t-start)/interval+1;
 plot_flag = false;
-% [~,Iwgn1] = Assumption(N_projection,gm2d1,true);
-% [~,Iwgn2] = Assumption(N_projection,gm2d2,false);
-% [~,Iwgn3] = Assumption(N_projection,gm2d3,false);
-% [~,Iwgn4] = Assumption(N_projection,gm2d4,false);
-[~,Iwgn1] = Assumption_2(N_projection,gm2d1,true);
-[~,Iwgn2] = Assumption_2(N_projection,gm2d2,false);
-[~,Iwgn3] = Assumption_2(N_projection,gm2d3,false);
-[~,Iwgn4] = Assumption_2(N_projection,gm2d4,false);
+[~,Iwgn1] = Assumption(N_projection,gm2d1,true);
+[~,Iwgn2] = Assumption(N_projection,gm2d2,false);
+[~,Iwgn3] = Assumption(N_projection,gm2d3,false);
+[~,Iwgn4] = Assumption(N_projection,gm2d4,false);
+% [~,Iwgn1] = Assumption_2(N_projection,gm2d1,true);
+% [~,Iwgn2] = Assumption_2(N_projection,gm2d2,false);
+% [~,Iwgn3] = Assumption_2(N_projection,gm2d3,false);
+% [~,Iwgn4] = Assumption_2(N_projection,gm2d4,false);
 EE1 = clc_distribution(M,K,gm2d1,U1,s1,v1,Iwgn1,plot_flag,NL);
 EE2 = clc_distribution(M,K,gm2d2,U2,s2,v2,Iwgn2,plot_flag,NL);
 EE3 = clc_distribution(M,K,gm2d3,U3,s3,v3,Iwgn3,plot_flag,NL);
@@ -93,6 +93,5 @@ subplot(2,2,4);
 h4.LineStyle = 'none';
 c=colorbar;c.Label.String='Intensity [a.u.]';c.FontSize=18;
 title('4');
-
 
 end

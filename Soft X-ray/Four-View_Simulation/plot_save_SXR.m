@@ -143,12 +143,12 @@ ax.FontSize = 18;
 hold off
 
 if save
-    pathname = '/Users/shinjirotakeda/OneDrive - The University of Tokyo/Documents/ReconstructionResults/';
-    if filter & NL
+    pathname = 'G:\My Drive\X-ray\Data\SXROUT\';
+    if filter && NL
         directory = '/NLF_NLR/';
-    elseif ~filter & NL
+    elseif ~filter && NL
         directory = '/LF_NLR/';
-    elseif filter & ~NL
+    elseif filter && ~NL
         directory = '/NLF_LR/';
     else
         directory = '/LF_LR/';
