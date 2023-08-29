@@ -1,8 +1,0 @@
-%計測点配列を生成
-function [r_measured,z_measured] = make_mpoints(NofCH,min_r,int_r,nz,min_z,int_z)
-    r_measured = zeros(NofCH/4,nz);%ベクトルプロットr座標1列目data1、2列目data2
-    z_measured = zeros(NofCH/4,nz);%ベクトルプロットz座標1列目data1、2列目data2
-    r_measured(:,1) = [12.5, 15, 17.5, 20, 22.5, 25, 27.5];%data2のr座標
-    for i = 1:nz
-        z_measured(:,i) = min_z+int_z*(i-1);%dataiのz座標
-    end

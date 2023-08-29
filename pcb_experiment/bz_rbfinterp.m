@@ -5,9 +5,9 @@ function vq = bz_rbfinterp(rpos, zpos, grid2D, bz, ok, t)
 % vq(n×n) ：bzがn×nのグリッドにrbf補間されたもの
 
 %%スムージングと関数の選択
-smoothval=0.05;
-func='multiquadric';%Gaussian, Linear, Cubic,multiquadric, Thinplate から選べる
-const=0.015;
+smoothval=0;
+func='Linear';%Gaussian, Linear, Cubic,multiquadric, Thinplate から選べる
+const=0.015;%
 %%無視するチャンネルを除いたbzの散布データ（okのチャンネルのみ残す）
 x=zpos(ok);
 y=rpos(ok);

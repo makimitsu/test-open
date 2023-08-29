@@ -31,14 +31,14 @@ pathname.rawdata='/Users/yunhancai/Google Drive/Data/pcb/raw';%dtacqのrawdata�
 
 % %直接入力の場合
 dtacqlist=39;
-shotlist=989;%240;%【input】dtacqの保存番号
-tfshotlist=988;%0;
+shotlist=1238;%240;%【input】dtacqの保存番号
+tfshotlist=0;%0;
 date = 230217;%【input】計測日
 n_data=numel(shotlist);%計測データ数
-EFlist = 150;%150;%【input】EF電流
+EFlist = 60;%150;%【input】EF電流
 TFlist = 0;
 
-trange=430:590;%【input】計算時間範囲
+trange=400:590;%【input】計算時間範囲
 n=50; %【input】rz方向のメッシュ数
 
 for i=1:n_data
@@ -181,7 +181,7 @@ end
 % plot(440:489,minEt)
 
 figure('Position', [0 0 1500 1500],'visible','on');
-start=20;
+start=40;
 dt = 4;
 %  t_start=470+start;
  for m=1:16 %図示する時間
@@ -189,8 +189,8 @@ dt = 4;
      t=trange(i);
      subplot(4,4,m)
 %     contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bz(:,:,i),30,'LineStyle','none')
-%     contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.psi(:,:,i),40,'LineStyle','none')
-    contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bt(:,:,i),-100e-3:0.5e-3:100e-3,'LineStyle','none')
+    contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.psi(:,:,i),40,'LineStyle','none')
+%     contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bt(:,:,i),-50e-3:0.2e-3:50e-3,'LineStyle','none')
 %     contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Jt(:,:,i),30,'LineStyle','none')
 %     contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Et(:,:,i),20,'LineStyle','none')
     colormap(jet)
@@ -198,8 +198,8 @@ dt = 4;
     axis tight manual
 %     caxis([-0.8*1e+6,0.8*1e+6]) %jt%カラーバーの軸の範囲
 %     caxis([-0.01,0.01])%Bz
-     caxis([-0.1,0.1])%Bt
-%     caxis([-5e-3,5e-3])%psi
+%      caxis([-0.03,0.03])%Bt
+    caxis([-5e-3,5e-3])%psi
 %     caxis([-500,400])%Et
 %     colorbar('Location','eastoutside')
     %カラーバーのラベル付け

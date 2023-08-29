@@ -5,8 +5,10 @@ function [x]=getMDSdata(dtacq_num,shot,tfshot)
 clear x y
 if dtacq_num==38
     ch_num=128;
-else
+elseif dtacq_num == 39
     ch_num=192;
+elseif dtacq_num == 40
+    ch_num = 192;
 end
 post=1000;%t=0からの計測時間[us]
 dtacq=strcat('a',num2str(dtacq_num,'%03i'));%a038などの形式の文字列へ変換
@@ -17,7 +19,7 @@ import MDSplus.*
 %ツリーのdatafileがあるフォルダのパスをtreename_pathという形で環境変数に設定(a038_path, a039_path, a040_path)
 %mdsipのポートに接続して各デジタイザののツリーを開く。
 mdsconnect('192.168.1.140');
-mdsopen(dtacq, shot); 
+mdsopen(dtacq, shot);
 
 for i=1:ch_num
     %各チャンネルにおいて「.AI:CHXXX」というノードを指定するためのノード名を作る
@@ -30,7 +32,7 @@ for i=1:ch_num
     end
     x(:,i)=x(:,i)-x(1,i);% オフセット調整
 end
-if tfshot>0 
+if tfshot>0
     mdsopen(dtacq, tfshot);
     for i=1:ch_num
     %各チャンネルにおいて「.AI:CHXXX」というノードを指定するためのノード名を作る

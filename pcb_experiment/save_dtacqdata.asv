@@ -3,10 +3,10 @@
 clear all
 setenv('MDSPLUS_DIR','/usr/local/mdsplus');
 addpath(fullfile(getenv('MDSPLUS_DIR'), 'matlab'));
-pathname.rawdata=getenv('rawdata_path'); %保存先
+pathname.rawdata='/Users/yunhancai/Google Drive/Data/pcb_probe/raw'; %保存先
 
 dtacqlist=40;
-shotlist=138;%【input】dtacqの保存番号
+shotlist=128;%【input】dtacqの保存番号
 tfshotlist = 0*ones(size(shotlist));
 n=numel(shotlist);%計測データ数
 

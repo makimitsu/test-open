@@ -11,7 +11,7 @@ rbfcoeff  = (options.('rbfcoeff'))';
 
 if (dim~=dimPoints)
   error(sprintf('x should have the same number of rows as an array used to create RBF interpolation'));
-end;
+end
 
 f = zeros(1, nPoints);
 r = zeros(1, n);
