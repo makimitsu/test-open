@@ -14,3 +14,4 @@
 # 画像等をアップロードしても重いだけなのでこれでいいと思いますが、もし画像等をアップロードしたい場合はコメントアウトしてください。
 # VUV/*.png
 # oscilloscope/*.
+pcb_experiment/save_dtacqdata.asv
