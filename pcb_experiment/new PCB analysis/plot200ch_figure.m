@@ -3,9 +3,9 @@
 %%%%%%%%%%%%%%%%%%%%
 clear all
 pathname.processed_data = "C:\Users\uswk0\OneDrive\ドキュメント\data\pre_processed";%processed data の保管場所
-pathname.fig_psi = "C:\Users\uswk0\OneDrive\ドキュメント\data\figure"; % plot画像の保存先
+pathname.fig_psi = "C:\Users\uswk0\OneDrive\ドキュメント\data\figure\"; % plot画像の保存先
 
-shot = 2419; % 【input】shot number of a039
+shot = 2477; % 【input】shot number of a039
 colorplot = 'Psi'; % 【input】color plot parameter
 
 filename = strcat(pathname.processed_data,'/a039_',num2str(shot),'.mat');
@@ -27,7 +27,7 @@ end
 % figureウインドウを画面左下隅から右に$1ピクセル、上に$2ピクセルの位置に配置 幅$3ピクセル、高さ$4ピクセル
 figure('Position',[0 0 1600 900],'visible','on');
 
-start = 500;
+start = 450;
 dt = 4;
 
 tile = tiledlayout(4,4); % Figureを4行4列に分割。左上から右向きm番目の位置に図を描画
@@ -150,10 +150,10 @@ if strcmp(colorplot, 'Psi') == 1
     savename_psi = strcat(foldername_psi, '/shot', num2str(shot(1), '%04i'), '_', colorplot, '.png');
     exportgraphics(gcf,savename_psi, 'Resolution',300);
 end
-foldername = strcat(pathname.fig_psi, num2str(date),'/',num2str(shot(1)));
-if exist(foldername, 'dir') == 0
-    mkdir(foldername);
-end
-savename = strcat(foldername, '/shot', num2str(shot(1), '%04i'), '_', colorplot, '.png');
+% foldername = strcat(pathname.fig_psi, num2str(date),'/',num2str(shot(1)));
+% if exist(foldername, 'dir') == 0
+%     mkdir(foldername);
+% end
+% savename = strcat(foldername, '/shot', num2str(shot(1), '%04i'), '_', colorplot, '.png');
 % saveas(gcf, savename);
 % exportgraphics(gcf,savename, 'Resolution',300);
