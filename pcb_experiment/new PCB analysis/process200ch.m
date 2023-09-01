@@ -19,14 +19,14 @@ pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所
 
 
 % 直接入力の場合
-shot=[2419;898];%【input】dtacqの保存番号: shot_39 or [shot_39;shot_40]
-tfshot= [2417;896];
-%tfshot=zeros(size(shot));%【input】dtacqのTFのみ番号: tfshot_39 or [tfshot_39;tfshot_40]
-date = 230830;%【input】計測日
-i_EF = 150;%【input】EF電流
+shot=[2477;956];%【input】dtacqの保存番号: shot_39 or [shot_39;shot_40]
+%tfshot= [2417;896];
+tfshot=zeros(size(shot));%【input】dtacqのTFのみ番号: tfshot_39 or [tfshot_39;tfshot_40]
+date = 230831;%【input】計測日
+i_EF = 0;%【input】EF電流
 probecheck_mode = 0; % 【input】TF only の時は必ずtrue(1)にして生信号をcheck
 interp_method = 1;
-% 0: 'scatteredInterpolant', 1: 'bz_rbfinterp'
+% 0: 'scatteredInterpolant', 1: 'bz_rbfinterp', 2: 'spline'
 
 
 trange=400:800;%【input】計算時間範囲
@@ -268,6 +268,8 @@ for i=1:length(trange)
     B_t_ex_noncalib(i,:) = Ft_ex(zpos_bt, rpos_bt)';
 end
 
+
+
 for i=1:length(angle) % プローブ1本(10ch)ごとに角度較正
     idx = 10*(i-1)+1:10*i; % プローブのidxリスト
     cos_val = cos_lis(angle_zpos == zpos_bz(10*i));
@@ -278,8 +280,19 @@ for i=1:length(angle) % プローブ1本(10ch)ごとに角度較正
 end
 
 
+
+B_z_splined = zeros(length(grid2D.rprobepcb),length(grid2D.zprobepcb),length(trange));
+B_t_splined = zeros(length(grid2D.rprobepcb_t),length(grid2D.zprobepcb),length(trange));
+B_t_ex_splined = zeros(length(grid2D.rprobepcb_t),length(grid2D.zprobepcb),length(trange));
+
+for ch = 1:size(B_z_noncalib,2)
+    B_z_splined(grid2D.rprobepcb==rpos_bz(ch),grid2D.zprobepcb==zpos_bz(ch),:) = B_z_calibrated_restored(trange,ch);
+    B_t_splined(grid2D.rprobepcb_t==rpos_bt(ch),grid2D.zprobepcb==zpos_bt(ch),:) = B_t_calibrated_restored(trange,ch);
+    B_t_ex_splined(grid2D.rprobepcb_t==rpos_bt(ch),grid2D.zprobepcb==zpos_bt(ch),:) = B_t_ex_calibrated_restored(trange,ch);
+end
+
 %% **************** interpolation and grid 2D calculation **************** 
-% 2 methods:scatterInterpolant or bz_rbfinterp
+% 3 methods:scatterInterpolant or bz_rbfinterp or spline
 % bz_rbfinterp: linear, multiquadric...
 
 
@@ -311,6 +324,13 @@ end
             B_t = bz_rbfinterp(rpos_bt, zpos_bt, grid2D, bt, ok_bt, t);
             B_t_ex = bz_rbfinterp(rpos_bt-0.01, zpos_bt, grid2D, B_t_ex_calibrated_restored, ok_bt, t);
 
+    elseif interp_method == 2 %'spline'
+         vq = interp2(grid2D_probe.zq,grid2D_probe.rq,B_z_splined(:,:,i),grid2D.zq,grid2D.rq, 'spline');
+         B_z = -Bz_EF+vq;
+         B_t = interp2(grid2D_probe.zq,grid2D_probe.rq_t,B_t_splined(:,:,i),grid2D.zq,grid2D.rq, 'spline');
+         B_t_ex = interp2(grid2D_probe.zq,grid2D_probe.rq_t,B_t_ex_splined(:,:,i),grid2D.zq,grid2D.rq, 'spline');   
+    end
+
             
 
             % PSI計算
@@ -326,7 +346,7 @@ end
             data2D.Jt(:,:,i)= curl(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bz(:,:,i),data2D.Br(:,:,i))./(4*pi*1e-7);
             data2D.Lambda(:,:,i) = (2*pi*grid2D.rq.*data2D.Bt(:,:,i))./(data2D.psi(:,:,i));
             data2D.Babs(:,:,i) = sqrt(data2D.Br(:,:,i).^2 + data2D.Bz(:,:,i).^2 + (data2D.Bt(:,:,i)+data2D.Bt_ex(:,:,i)).^2);
-    end   
+ 
  end
 % ***********************************************
 
