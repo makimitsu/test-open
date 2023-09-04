@@ -6,7 +6,7 @@ function vq = bz_rbfinterp(rpos, zpos, grid2D, bz, ok, t)
 
 %%スムージングと関数の選択
 smoothval=0;
-func='multiquadric';%Gaussian, Linear, Cubic,multiquadric, Thinplate から選べる
+func='Linear';%Gaussian, Linear, Cubic,multiquadric, Thinplate から選べる
 const=0.015;%
 %%無視するチャンネルを除いたbzの散布データ（okのチャンネルのみ残す）
 x=zpos(ok);
