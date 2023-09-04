@@ -3,7 +3,7 @@
 %dtacqのshot番号を直接指定する場合
 %%%%%%%%%%%%%%%%%%%%%%%%
 
-figure_switch = ["off","off","off","off","on","on"];%bz1,bz2,bt1,bt2,bz_vs_z,bt_vs_z
+figure_switch = ["on","on","off","off","on","on"];%bz1,bz2,bt1,bt2,bz_vs_z,bt_vs_z
 
 r = 7;%プローブ本数＝グラフ出力時の縦に並べる個数
 col = 10;%グラフ出力時の横に並べる個数
@@ -32,7 +32,8 @@ for i=1:r
         ylim([y_lower_lim y_upper_lim]);
     end
 end
-sgtitle('Bz signal probe1-5') 
+sgtitle('Bz signal probe1-5')
+
 
 f2=figure(Visible=figure_switch(2));
 f2.WindowState = 'maximized';
@@ -99,6 +100,7 @@ sgtitle(strcat('t=',num2str(t),' us'))
 nexttile
 hold on
 for i=1:10
+    %14本のプローブの一番内側の点：zline == [1,11,21,31,41,51,61,71,81,91,101,111,121,131]
     zline=(1:10:n_z*10-9)+(i-1);
     bz_zline=bz(t,zline);
     bz_zline(ok_bz(zline)==false)=NaN;
@@ -162,7 +164,7 @@ for i=1:10
 end
 hold off
 xlabel('z [m]')
-ylabel('Bz')
+ylabel('Bt')
 yline(0,'k--')
 xline(z_probe_pcb,':','LineWidth',1.5)
 legend('r1','r2','r3','r4','r5','r6','r7','r8','r9','r10',Location='eastoutside')
@@ -175,3 +177,4 @@ figures = [f1,f2,f3,f4,f5,f6];
 for i = hidden
     close(figures(i));
 end
+
