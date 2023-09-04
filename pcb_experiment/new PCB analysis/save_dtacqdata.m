@@ -6,11 +6,12 @@ clear all
 pathname.rawdata=getenv('rawdata_path'); %保存先
 
 dtacqlist=[38 39 40];
-%shotlist=[11489:11514, 11516:11564];%【input】dtacqの保存番号
-shotlist=[11656 2477 956];%897;
-%tfshotlist = 896*ones(size(shotlist));
-tfshotlist=zeros(size(shotlist));%[11596 2417 896];
+%shotlist=[11725 2546 1025];%【input】dtacqの保存番号
+shotlist=[11795 2616 1095];
+tfshotlist = [11761 2582 1061];%896*ones(size(shotlist));
+%tfshotlist=zeros(size(shotlist));%[11596 2417 896];
 n=numel(shotlist);%計測データ数
+
 
 for i=1:n
     dtacq_num=dtacqlist(i);
