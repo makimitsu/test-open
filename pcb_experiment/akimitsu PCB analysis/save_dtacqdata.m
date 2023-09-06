@@ -5,16 +5,23 @@ clear all
 %addpath(fullfile(getenv('MDSPLUS_DIR'), 'matlab'));
 pathname.rawdata=getenv('rawdata_path'); %保存先
 
-dtacqlist=[38 39 40];
+%dtacqlist=[38 39 40];
+%dtacqlist=[38 39];
+dtacqlist=38;
+
 %shotlist=[11725 2546 1025];%【input】dtacqの保存番号
-shotlist=[11797 2618 1097];
-%tfshotlist = [11761 2582 1061];%896*ones(size(shotlist));
-tfshotlist=zeros(size(shotlist));%[11596 2417 896];
+shotlist=11797%[10650:10692];
+%shotlist=[10647 585];
+
+%tfshotlist = [11761 2582 1061];
+%tfshotlist=10646*ones(size(shotlist));
+tfshotlist=zeros(size(shotlist));
 n=numel(shotlist);%計測データ数
 
 
 for i=1:n
-    dtacq_num=dtacqlist(i);
+    dtacq_num=dtacqlist;
+    %dtacq_num=dtacqlist(i);
     shot=shotlist(i)
     tfshot=tfshotlist(i);
     [rawdata]=getMDSdata(dtacq_num,shot,tfshot);%測定した生信号

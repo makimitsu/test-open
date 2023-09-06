@@ -19,11 +19,11 @@ pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所
 
 
 % 直接入力の場合
-shot=[2618; 1097];%【input】dtacqの保存番号: shot_39 or [shot_39;shot_40]
-%tfshot= [2582; 1061];
-tfshot=zeros(size(shot));%【input】dtacqのTFのみ番号: tfshot_39 or [tfshot_39;tfshot_40]
-date = 230905;%【input】計測日
-i_EF = 0;%【input】EF電流
+shot=[2615; 1094];%【input】dtacqの保存番号: shot_39 or [shot_39;shot_40]
+tfshot= [2582; 1061];
+%tfshot=zeros(size(shot));%【input】dtacqのTFのみ番号: tfshot_39 or [tfshot_39;tfshot_40]
+date = 230903;%【input】計測日
+i_EF = 200;%【input】EF電流
 probecheck_mode = 0; % 【input】TF only の時は必ずtrue(1)にして生信号をcheck
     interp_method = 1;
     % 0: 'scatteredInterpolant', 1: 'bz_rbfinterp', 2: 'spline'
