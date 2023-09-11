@@ -223,8 +223,8 @@ dt = 4;
     hold on
 %     plot(grid2D.zq(1,squeeze(mid(:,:,i))),grid2D.rq(:,1))
 %     contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),20,'black')
-%     contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),20,'black')
-    contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),[-20e-3:0.2e-3:40e-3],'black','LineWidth',1)
+    contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),20,'black')
+    % contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),[-20e-3:0.2e-3:40e-3],'black','LineWidth',1)
 %     plot(grid2D.zq(1,squeeze(mid(opoint(:,:,i),:,i))),grid2D.rq(opoint(:,:,i),1),"bo")
 %     plot(grid2D.zq(1,squeeze(mid(xpoint(:,:,i),:,i))),grid2D.rq(xpoint(:,:,i),1),"bx")
      % plot(ok_z,ok_r,"k.",'MarkerSize', 6)%測定位置
@@ -234,12 +234,6 @@ dt = 4;
 %     ylabel('r [m]')
  end
 
- drawnow
-
-if doCalculation
-    clearvars -except data2D grid2D shot pathname;
-    filename = strcat(pathname.pre_processed_directory,'/a039_',num2str(shot(1)),'.mat');
-    save(filename)
-end
+ % drawnow
 
 end

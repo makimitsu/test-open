@@ -1,6 +1,6 @@
-clear
-% close all
-clearvars -except date IDXlist
+% clear
+close all
+clearvars -except date IDXlist doCheck
 addpath '/Users/shinjirotakeda/Documents/GitHub/test-open/pcb_experiment'; %getMDSdata.mとcoeff200ch.xlsxのあるフォルダへのパス
 
 %%%%%%%%%%%%%%%%%%%%%%%%
@@ -19,13 +19,20 @@ pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所
 pathname.pre_processed_directory = getenv('pre_processed_directory_path');%計算結果の保存先（どこでもいい）
 
 %%%%実験オペレーションの取得
-prompt = {'Date:','Shot number:'};
+prompt = {'Date:','Shot number:','doCheck:'};
 dlgtitle = 'Input';
 dims = [1 35];
-definput = {'',''};
+if exist('date','var') && exist('IDXlist','var') && exist('doCheck','var')
+    definput = {num2str(date),num2str(IDXlist),num2str(doCheck)};
+else
+    definput = {'','',''};
+end
+% definput = {'','',''};
+% definput = {num2str(date),num2str(IDXlist),num2str(doCheck)};
 answer = inputdlg(prompt,dlgtitle,dims,definput);
 date = str2double(cell2mat(answer(1)));
 IDXlist = str2num(cell2mat(answer(2)));
+doCheck = logical(str2num(cell2mat(answer(3))));
 
 DOCID='1wG5fBaiQ7-jOzOI-2pkPAeV6SDiHc_LrOdcbWlvhHBw';%スプレッドシートのID
 T=getTS6log(DOCID);
@@ -47,8 +54,8 @@ dtacqlist=39.*ones(n_data,1);
 trange=400:800;%【input】計算時間範囲
 n=40; %【input】rz方向のメッシュ数
 
-doCheck = false;
-doCheck = true;
+% doCheck = false;
+% doCheck = true;
 if ~doCheck
     figure('Position', [0 0 1500 1500],'visible','on');
 end

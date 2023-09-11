@@ -173,4 +173,10 @@ else
     load(filename,'data2D','grid2D');
 end
 
+if doCalculation
+    clearvars -except data2D grid2D shot pathname;
+    filename = strcat(pathname.pre_processed_directory,'/a039_',num2str(shot(1)),'.mat');
+    save(filename)
+end
+
 end
