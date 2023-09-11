@@ -1,4 +1,4 @@
-function [] = plot_sxr_multi(grid2D,data2D,date,shot,show_xpoint,show_localmax,start,interval,save,SXRfilename,filter,NL)
+function [] = plot_sxr_multi(grid2D,data2D,date,shot,show_xpoint,show_localmax,show_flux_surface,start,interval,save,SXRfilename,filter,NL)
 % plot SXR emission on psi in rz plane
 % input:
 %   3d array of double: B_z (r,z,t), offsetted at zero and smoothed
@@ -8,6 +8,7 @@ function [] = plot_sxr_multi(grid2D,data2D,date,shot,show_xpoint,show_localmax,s
 %   integer: shot, number of shot
 %   boolean: show_xpoint, option for showing the x-point
 %   boolean: show_localmax, option for showing the local maximum point
+%   boolean: show_flux_surface, option for showing the flux_surface
 %   integer: start, start time (us)
 %   integer: interval, interval time of the framing camera (us)
 %   boolean: save, option for saving the reconstruction result
@@ -121,7 +122,7 @@ for t = times
 
     end
     
-    plot_save_sxr(grid2D,data2D,range,date,shot,t,EE1,EE2,EE3,EE4,show_localmax,show_xpoint,save,filter,NL);
+    plot_save_sxr(grid2D,data2D,range,date,shot,t,EE1,EE2,EE3,EE4,show_localmax,show_flux_surface,show_xpoint,save,filter,NL);
 
 end
 

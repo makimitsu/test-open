@@ -1,4 +1,4 @@
-function plot_save_sxr(grid2D,data2D,range,date,shot,t,EE1,EE2,EE3,EE4,show_localmax,show_xpoint,save,filter,NL)
+function plot_save_sxr(grid2D,data2D,range,date,shot,t,EE1,EE2,EE3,EE4,show_localmax,show_flux_surface,show_xpoint,save,filter,NL)
 
 % f = figure;
 % f.Units = 'normalized';
@@ -23,14 +23,16 @@ EE2 = EE2(r_range,z_range);
 EE3 = EE3(r_range,z_range);
 EE4 = EE4(r_range,z_range);
 
-psi_mesh_z = grid2D.zq;
-psi_mesh_r = grid2D.rq;
-t_idx = find(data2D.trange==t);
-psi = data2D.psi(:,:,t_idx);
-
-psi_min = min(min(psi));
-psi_max = max(max(psi));
-contour_layer = linspace(psi_min,psi_max,20);
+if show_flux_surface
+    psi_mesh_z = grid2D.zq;
+    psi_mesh_r = grid2D.rq;
+    t_idx = find(data2D.trange==t);
+    psi = data2D.psi(:,:,t_idx);
+    
+    psi_min = min(min(psi));
+    psi_max = max(max(psi));
+    contour_layer = linspace(psi_min,psi_max,20);
+end
 
 subplot(2,2,1);
 [SXR_mesh_z,SXR_mesh_r] = meshgrid(z_space_SXR,r_space_SXR);
@@ -38,8 +40,6 @@ subplot(2,2,1);
 h1.LineStyle = 'none';
 c=colorbar;c.Label.String='Intensity [a.u.]';c.FontSize=18;
 hold on
-[~,hp1]=contourf(psi_mesh_z,psi_mesh_r,psi,contour_layer,'-k','Fill','off');
-hp1.LineWidth = 1.5;
 if show_localmax
     localmax_idx = imregionalmax(EE1);
     EE_localmax = EE1.*localmax_idx;
@@ -48,15 +48,19 @@ if show_localmax
     localmax_pos_z = SXR_mesh_z(localmax_idx);
     plot(localmax_pos_z,localmax_pos_r,'r*');
 end
-if show_xpoint
-    [~,~,pos_xz,pos_xr,~,~] = search_xo(psi,z_space,r_space);
-    dz = 0.02;
-    dr = 0.03;
-    pos_xz_lower = pos_xz - dz;
-    pos_xr_lower = pos_xr - dr;
-    r = rectangle('Position',[pos_xz_lower pos_xr_lower dz*2 dr*2]);
-    r.EdgeColor = 'red';
-    r.LineWidth = 1.5;
+if show_flux_surface
+    [~,hp1]=contourf(psi_mesh_z,psi_mesh_r,psi,contour_layer,'-k','Fill','off');
+    hp1.LineWidth = 1.5;
+    if show_xpoint
+        [~,~,pos_xz,pos_xr,~,~] = search_xo(psi,z_space,r_space);
+        dz = 0.02;
+        dr = 0.03;
+        pos_xz_lower = pos_xz - dz;
+        pos_xr_lower = pos_xr - dr;
+        r = rectangle('Position',[pos_xz_lower pos_xr_lower dz*2 dr*2]);
+        r.EdgeColor = 'red';
+        r.LineWidth = 1.5;
+    end
 end
 title('1');
 hold off;
@@ -66,8 +70,6 @@ subplot(2,2,2);
 h2.LineStyle = 'none';
 c=colorbar;c.Label.String='Intensity [a.u.]';c.FontSize=18;
 hold on
-[~,hp2]=contourf(psi_mesh_z,psi_mesh_r,psi,contour_layer,'-k','Fill','off');
-hp2.LineWidth = 1.5;
 if show_localmax
     localmax_idx = imregionalmax(EE2);
     EE_localmax = EE2.*localmax_idx;
@@ -76,15 +78,19 @@ if show_localmax
     localmax_pos_z = SXR_mesh_z(localmax_idx);
     plot(localmax_pos_z,localmax_pos_r,'r*');
 end
-if show_xpoint
-    [~,~,pos_xz,pos_xr,~,~] = search_xo(psi,z_space,r_space);
-    dz = 0.02;
-    dr = 0.03;
-    pos_xz_lower = pos_xz - dz;
-    pos_xr_lower = pos_xr - dr;
-    r = rectangle('Position',[pos_xz_lower pos_xr_lower dz*2 dr*2]);
-    r.EdgeColor = 'red';
-    r.LineWidth = 1.5;
+if show_flux_surface
+    [~,hp2]=contourf(psi_mesh_z,psi_mesh_r,psi,contour_layer,'-k','Fill','off');
+    hp2.LineWidth = 1.5;
+    if show_xpoint
+        [~,~,pos_xz,pos_xr,~,~] = search_xo(psi,z_space,r_space);
+        dz = 0.02;
+        dr = 0.03;
+        pos_xz_lower = pos_xz - dz;
+        pos_xr_lower = pos_xr - dr;
+        r = rectangle('Position',[pos_xz_lower pos_xr_lower dz*2 dr*2]);
+        r.EdgeColor = 'red';
+        r.LineWidth = 1.5;
+    end
 end
 title('2');
 hold off;
@@ -94,8 +100,6 @@ subplot(2,2,3);
 h3.LineStyle = 'none';
 c=colorbar;c.Label.String='Intensity [a.u.]';c.FontSize=18;
 hold on
-[~,hp3]=contourf(psi_mesh_z,psi_mesh_r,psi,contour_layer,'-k','Fill','off');
-hp3.LineWidth = 1.5;
 if show_localmax
     localmax_idx = imregionalmax(EE3);
     EE_localmax = EE3.*localmax_idx;
@@ -104,15 +108,19 @@ if show_localmax
     localmax_pos_z = SXR_mesh_z(localmax_idx);
     plot(localmax_pos_z,localmax_pos_r,'r*');
 end
-if show_xpoint
-    [~,~,pos_xz,pos_xr,~,~] = search_xo(psi,z_space,r_space);
-    dz = 0.02;
-    dr = 0.03;
-    pos_xz_lower = pos_xz - dz;
-    pos_xr_lower = pos_xr - dr;
-    r = rectangle('Position',[pos_xz_lower pos_xr_lower dz*2 dr*2]);
-    r.EdgeColor = 'red';
-    r.LineWidth = 1.5;
+if show_flux_surface
+    [~,hp3]=contourf(psi_mesh_z,psi_mesh_r,psi,contour_layer,'-k','Fill','off');
+    hp3.LineWidth = 1.5;
+    if show_xpoint
+        [~,~,pos_xz,pos_xr,~,~] = search_xo(psi,z_space,r_space);
+        dz = 0.02;
+        dr = 0.03;
+        pos_xz_lower = pos_xz - dz;
+        pos_xr_lower = pos_xr - dr;
+        r = rectangle('Position',[pos_xz_lower pos_xr_lower dz*2 dr*2]);
+        r.EdgeColor = 'red';
+        r.LineWidth = 1.5;
+    end
 end
 title('3');
 hold off;
@@ -122,8 +130,6 @@ subplot(2,2,4);
 h4.LineStyle = 'none';
 c=colorbar;c.Label.String='Intensity [a.u.]';c.FontSize=18;
 hold on
-[~,hp4]=contourf(psi_mesh_z,psi_mesh_r,psi,contour_layer,'-k','Fill','off');
-hp4.LineWidth = 1.5;
 if show_localmax
     localmax_idx = imregionalmax(EE4);
     EE_localmax = EE4.*localmax_idx;
@@ -132,15 +138,19 @@ if show_localmax
     localmax_pos_z = SXR_mesh_z(localmax_idx);
     plot(localmax_pos_z,localmax_pos_r,'r*');
 end
-if show_xpoint
-    [~,~,pos_xz,pos_xr,~,~] = search_xo(psi,z_space,r_space);
-    dz = 0.02;
-    dr = 0.03;
-    pos_xz_lower = pos_xz - dz;
-    pos_xr_lower = pos_xr - dr;
-    r = rectangle('Position',[pos_xz_lower pos_xr_lower dz*2 dr*2]);
-    r.EdgeColor = 'red';
-    r.LineWidth = 1.5;
+if show_flux_surface
+    [~,hp4]=contourf(psi_mesh_z,psi_mesh_r,psi,contour_layer,'-k','Fill','off');
+    hp4.LineWidth = 1.5;
+    if show_xpoint
+        [~,~,pos_xz,pos_xr,~,~] = search_xo(psi,z_space,r_space);
+        dz = 0.02;
+        dr = 0.03;
+        pos_xz_lower = pos_xz - dz;
+        pos_xr_lower = pos_xr - dr;
+        r = rectangle('Position',[pos_xz_lower pos_xr_lower dz*2 dr*2]);
+        r.EdgeColor = 'red';
+        r.LineWidth = 1.5;
+    end
 end
 title('4');
 hold off;
