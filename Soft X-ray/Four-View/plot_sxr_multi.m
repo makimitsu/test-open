@@ -122,7 +122,8 @@ for t = times
 
     end
     
-    plot_save_sxr(grid2D,data2D,range,date,shot,t,EE1,EE2,EE3,EE4,show_localmax,show_flux_surface,show_xpoint,save,filter,NL);
+    EE = cat(3,EE1,EE2,EE3,EE4);
+    plot_save_sxr(grid2D,data2D,range,date,shot,t,EE,show_localmax,show_flux_surface,show_xpoint,save,filter,NL);
 
 end
 

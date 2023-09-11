@@ -1,4 +1,4 @@
-function plot_save_sxr(grid2D,data2D,range,date,shot,t,EE1,EE2,EE3,EE4,show_localmax,show_flux_surface,show_xpoint,save,filter,NL)
+function plot_save_sxr(grid2D,data2D,range,date,shot,t,EE,show_localmax,show_flux_surface,show_xpoint,save,filter,NL)
 
 % f = figure;
 % f.Units = 'normalized';
@@ -9,8 +9,8 @@ zmin = range(1);
 zmax = range(2);
 rmin = range(5);
 rmax = range(6);
-r_space_SXR = linspace(rmin,rmax,size(EE1,1));
-z_space_SXR = linspace(zmin,zmax,size(EE1,2));
+r_space_SXR = linspace(rmin,rmax,size(EE,1));
+z_space_SXR = linspace(zmin,zmax,size(EE,2));
 
 r_range = find(0.060<=r_space_SXR & r_space_SXR<=0.330);
 r_space_SXR = r_space_SXR(r_range);
@@ -18,10 +18,10 @@ z_range = find(-0.17<=z_space_SXR & z_space_SXR<=0.17);
 
 z_space_SXR = z_space_SXR(z_range);
 
-EE1 = EE1(r_range,z_range);
-EE2 = EE2(r_range,z_range);
-EE3 = EE3(r_range,z_range);
-EE4 = EE4(r_range,z_range);
+EE1 = EE(r_range,z_range,1);
+EE2 = EE(r_range,z_range,2);
+EE3 = EE(r_range,z_range,3);
+EE4 = EE(r_range,z_range,4);
 
 if show_flux_surface
     psi_mesh_z = grid2D.zq;
