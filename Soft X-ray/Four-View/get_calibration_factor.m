@@ -2,7 +2,7 @@ function CalibrationFactor = get_calibration_factor(date,N_projection)
 
 CalibrationPath = strcat("G:\My Drive\X-ray\Data\TIF\",num2str(date));
 CalibrationImage = imread(strcat(CalibrationPath,'/PositionCheck.tif'));
-[centers,radii]=FindFibers(CalibrationImage);
+[centers,radii]=find_fibers2(CalibrationImage);
 IW = round(mean(radii));
 centers = round(centers);
 

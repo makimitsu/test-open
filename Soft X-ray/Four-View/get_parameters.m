@@ -1,31 +1,28 @@
-function [] = get_parameters(N_projection,N_grid,filepath)
-
-% filepath = '/Users/shinjirotakeda/Documents/GitHub/test-open/Soft X-ray/Four-View_Simulation/parameters.mat';
+function [] = get_parameters(N_before,N_after,SaveFilePath)
+% この関数は単体で機能し，再構成前後の画像サイズから，計算に用いる逆行列を計算します．
+% 逆行列は再構成前後の画像サイズと装置関数にのみ依存し，実験条件に依存しないことから，保存して再利用することが可能です．
 
 % 視線の分布、重み行列の作成
 zhole1=40;zhole2=-40;
 zmin1=-240;zmax1=320;zmin2=-320;zmax2=240;
 rmin=55;rmax=375;
 range = [zmin1,zmax1,zmin2,zmax2,rmin,rmax];
-l1 = MCPLine_up(N_projection,zhole1,false);
-gm2d1 = LineProjection(l1,N_grid,zmin1,zmax1,rmin,rmax,false);
-l2 = MCPLine_up(N_projection,zhole2,false);
-gm2d2 = LineProjection(l2,N_grid,zmin2,zmax2,rmin,rmax,false);
-l3 = MCPLine_down(N_projection,zhole1,false);
-gm2d3 = LineProjection(l3,N_grid,zmin1,zmax1,rmin,rmax,false);
-l4 = MCPLine_down(N_projection,zhole2,false);
-gm2d4 = LineProjection(l4,N_grid,zmin2,zmax2,rmin,rmax,false);
+l1 = MCPLine_up(N_before,zhole1,false);
+gm2d1 = LineProjection(l1,N_after,zmin1,zmax1,rmin,rmax,false);
+l2 = MCPLine_up(N_before,zhole2,false);
+gm2d2 = LineProjection(l2,N_after,zmin2,zmax2,rmin,rmax,false);
+l3 = MCPLine_down(N_before,zhole1,false);
+gm2d3 = LineProjection(l3,N_after,zmin1,zmax1,rmin,rmax,false);
+l4 = MCPLine_down(N_before,zhole2,false);
+gm2d4 = LineProjection(l4,N_after,zmin2,zmax2,rmin,rmax,false);
 
 % ラプラシアン行列の計算と特異値分解
-C = Laplacian(N_grid);
+C = Laplacian(N_after);
 [U1,S1,V1]=svd(gm2d1*(C^(-1)),'econ');
 [U2,S2,V2]=svd(gm2d2*(C^(-1)),'econ');
 [U3,S3,V3]=svd(gm2d3*(C^(-1)),'econ');
 [U4,S4,V4]=svd(gm2d4*(C^(-1)),'econ');
-% [U1,S1,V1]=svd(gm2d1*(C^(-1)));
-% [U2,S2,V2]=svd(gm2d2*(C^(-1)));
-% [U3,S3,V3]=svd(gm2d3*(C^(-1)));
-% [U4,S4,V4]=svd(gm2d4*(C^(-1)));
+
 v1=(C^(-1)*V1);
 v2=(C^(-1)*V2);
 v3=(C^(-1)*V3);
@@ -49,9 +46,9 @@ if M>K
     s4 = [s4 zeros(1,M-K)];
 end
 
-save(filepath,'gm2d1','gm2d2','gm2d3','gm2d4', ...
+save(SaveFilePath,'gm2d1','gm2d2','gm2d3','gm2d4', ...
     'U1','U2','U3','U4','s1','s2','s3','s4', ...
-    'v1','v2','v3','v4','M','K','range','N_projection','N_grid');
+    'v1','v2','v3','v4','M','K','range','N_before','N_after');
 
 end
 
