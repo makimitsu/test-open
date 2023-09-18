@@ -1,4 +1,6 @@
-function [centerInformation,radius]=find_fibers2(imageFile,radiusRange)
+function [centerInformation,radius]=find_fibers2(imageFile)
+
+radiusRange = [65, 75];
 
 % このブロックでは，ファイバーの較正画像から32個の円を漏れなく検出することを目指します.
 % 実行環境によって調整すべき変数は，較正画像pathであるFiberCalibrationImagePathです．
@@ -76,7 +78,7 @@ circleInformation = [circleInformation radii];
 circleInformation = circleInformation(I,:);
 % 次に横軸が近しい4つのデータの中で，縦軸を基準に並び替えます．
 % これで，右上から左下に五十音表と同じ順に整理されます．
-for i = 1:8
+for i = 1:4
     range = 1+4*(i-1):1:4+4*(i-1);
     [~,I] = sort(circleInformation(range,2),'descend');
     I = I + 4*(i-1);
@@ -87,11 +89,11 @@ end
 % CentersTimeRaps(3,:,:)はX線フィルタ3の時系列[8 2]行列です．
 % CentersTimeRaps(3,4,:)はX線フィルタ3の時系列4番目のxy座標です．
 % 蛇順のため原始的なコードが入りますが，次のブロックで上手くいっていることが確かめられます．
-centerInformation = zeros(4,8,3);
-centerInformation(1,:,:) = circleInformation([4,2,10,12,20,18,26,28],:);
-centerInformation(2,:,:) = circleInformation([3,1,9,11,19,17,25,27],:);
-centerInformation(3,:,:) = circleInformation([8,6,14,16,24,22,30,32],:);
-centerInformation(4,:,:) = circleInformation([7,5,13,15,23,21,29,31],:);
+centerInformation = zeros(4,4,3);
+centerInformation(1,:,:) = circleInformation([4,2,10,12],:);
+centerInformation(2,:,:) = circleInformation([3,1,9,11],:);
+centerInformation(3,:,:) = circleInformation([8,6,14,16],:);
+centerInformation(4,:,:) = circleInformation([7,5,13,15],:);
 % for i = 1:4
 %     % i = 1
 %     % 4,2,10,12,20,18,26,28

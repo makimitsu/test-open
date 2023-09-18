@@ -29,11 +29,11 @@ if doFilter
 end
 
 % ファイバーの位置を検索するための校正用画像を取得
-fiberPositionFile = strcat('/Users/shinjirotakeda/OneDrive - The University of Tokyo/Documents/SXR_Images/',num2str(date),'/PositionCheck.tif');
+fiberPositionFile = strcat('G:\My Drive\X-ray\Data\TIF\',num2str(date),'/PositionCheck.tif');
 calibrationImage = imread(fiberPositionFile);
 
 % 校正用画像からファイバーの位置（＋半径）を取得
-[centers,radii]=find_fibers(calibrationImage,[70,130]);
+[centers,radii]=find_fibers2(calibrationImage);
 IW = 85;
 % IW = round(mean(radii));
 centers = round(centers);
