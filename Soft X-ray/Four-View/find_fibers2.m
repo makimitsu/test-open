@@ -16,7 +16,7 @@ imageFile = imadjust(imageFile);
 % こちらを整理前のcentersとします．numberを調整したので検出に漏れはありませんがダブりがあります．
 
 % figure;hold on;
-% number = 60;
+number = 60;
 % imagesc(imageFile);viscircles(centers(1:number,:),radii(1:number,:));
 % plot(centers(1:number,1),centers(1:number,2),'*','Color','red');
 % hold off;

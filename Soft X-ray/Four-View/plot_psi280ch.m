@@ -195,8 +195,10 @@ if isstruct(grid2D)==0 %もしdtacqデータがない場合次のloopへ(デー�
 end
 
 % プロット部分
+figure('Position', [0 0 1500 1500],'visible','on');
+
 % figure('Position', [0 0 1500 1500],'visible','on');
-start=60;
+start=40;
 dt = 4;
 %  t_start=470+start;
  for m=1:16 %図示する時間
@@ -233,6 +235,8 @@ dt = 4;
 %     xlabel('z [m]')
 %     ylabel('r [m]')
  end
+
+ sgtitle(strcat('shot',num2str(shot)));
 
  % drawnow
 

@@ -2,9 +2,9 @@
 % Top-level file for calculating and plotting SXR emission for four-view
 % experimental setup
 %%%%%%%%%%%%%%%%%%%%%%%%
-clear
+% clear
 close all
-clearvars -except date IDXlist doCheck
+clearvars -except date IDXlist
 addpath '/Users/shinjirotakeda/Documents/GitHub/test-open/pcb_experiment'; %getMDSdata.mとcoeff200ch.xlsxのあるフォルダへのパス
 
 %%%%%ここが各PCのパス
@@ -14,18 +14,17 @@ pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所;
 pathname.pre_processed_directory = getenv('pre_processed_directory_path');%計算結果の保存先（どこでもいい）
 
 %%%%実験オペレーションの取得
-prompt = {'Date:','Shot number:','doCheck:'};
+prompt = {'Date:','Shot number:'};
 dlgtitle = 'Input';
 dims = [1 35];
-if exist('date','var') && exist('IDXlist','var') && exist('doCheck','var')
-    definput = {num2str(date),num2str(IDXlist),num2str(doCheck)};
+if exist('date','var') && exist('IDXlist','var')
+    definput = {num2str(date),num2str(IDXlist)};
 else
-    definput = {'','',''};
+    definput = {'',''};
 end
 answer = inputdlg(prompt,dlgtitle,dims,definput);
 date = str2double(cell2mat(answer(1)));
 IDXlist = str2num(cell2mat(answer(2)));
-doCheck = logical(str2num(cell2mat(answer(3))));
 
 DOCID='1wG5fBaiQ7-jOzOI-2pkPAeV6SDiHc_LrOdcbWlvhHBw';%スプレッドシートのID
 T=getTS6log(DOCID);
@@ -71,9 +70,9 @@ for i=1:n_data
     TF=TFlist(i);
     start = startlist(i);
     interval = intervallist(i);
-    [grid2D,data2D] = process_PCBdata_280ch(date, shot, tfshot, pathname, n,i_EF,trange);
-    % grid2D = NaN;
-    % data2D = NaN;
+    % [grid2D,data2D] = process_PCBdata_280ch(date, shot, tfshot, pathname, n,i_EF,trange);
+    grid2D = NaN;
+    data2D = NaN;
     shot_SXR = IDXlist(i);
     SXRfilename = strcat(getenv('SXR_IMAGE_DIR'),'/',num2str(date),'/shot',num2str(shot_SXR,'%03i'),'.tif');
     plot_sxr_multi(grid2D,data2D,date,shot_SXR,show_xpoint,show_localmax,show_flux_surface,start,interval,save,SXRfilename,filter,NL);

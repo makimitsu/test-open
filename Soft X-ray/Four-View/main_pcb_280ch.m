@@ -1,5 +1,5 @@
 % clear
-close all
+% close all
 clearvars -except date IDXlist doCheck
 addpath '/Users/shinjirotakeda/Documents/GitHub/test-open/pcb_experiment'; %getMDSdata.mとcoeff200ch.xlsxのあるフォルダへのパス
 
@@ -56,9 +56,9 @@ n=40; %【input】rz方向のメッシュ数
 
 % doCheck = false;
 % doCheck = true;
-if ~doCheck
-    figure('Position', [0 0 1500 1500],'visible','on');
-end
+% if ~doCheck
+%     figure('Position', [0 0 1500 1500],'visible','on');
+% end
 
 for i=1:n_data
     dtacq_num=dtacqlist;
