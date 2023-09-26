@@ -14,14 +14,14 @@ projectionNumber = 80;
 rawImage = imread(sxrFilename);
 
 
-% 校正用画像からファイバーの位置（＋半径）を取得
+% 位置情報ファイルからファイバーの位置（＋半径）を取得
 positionPath = '/Users/shinjirotakeda/Documents/GitHub/test-open/Soft X-ray/Four-View/fiberPositions.xlsx';
-centers = readmatrix(positionPath,'Sheet',num2str(date),'Range','C2:D33');
+positionData = readmatrix(positionPath,'Sheet',num2str(date),'Range','C2:E33');
 Center = zeros(4,8,2);
 for i = 1:4
-    Center(i,:,:) = centers(1+8*(i-1):8+8*(i-1),:);
+    Center(i,:,:) = positionData(1+8*(i-1):8+8*(i-1),1:2);
 end
-IW = 60;
+IW = positionData(1,3);
 
 Center = round(Center);
 

@@ -28,9 +28,9 @@ if doFilter
     figure;imagesc(rawImage);
 end
 
-% ファイバーの位置を検索するための校正用画像を取得
-fiberPositionFile = strcat('/Users/shinjirotakeda/OneDrive - The University of Tokyo/Documents/SXR_Images/',num2str(date),'/PositionCheck.tif');
-calibrationImage = imread(fiberPositionFile);
+% % ファイバーの位置を検索するための校正用画像を取得
+% fiberPositionFile = strcat('/Users/shinjirotakeda/OneDrive - The University of Tokyo/Documents/SXR_Images/',num2str(date),'/PositionCheck.tif');
+% calibrationImage = imread(fiberPositionFile);
 
 % % 校正用画像からファイバーの位置（＋半径）を取得
 % [centers,radii]=find_fibers(calibrationImage,[70,130]);
@@ -42,18 +42,28 @@ calibrationImage = imread(fiberPositionFile);
 % Center(1,:,:) = centers([1,3,6,8,9,11,14,16],:);
 % Center(2,:,:) = centers([2,4,5,7,10,12,13,15],:);
 
-% 校正用画像からファイバーの位置（＋半径）を取得
-if date == 230721
-    positionPath = '/Users/shinjirotakeda/Documents/GitHub/test-open/Soft X-ray/Four-View/fiberPositions.xlsx';
-    centers = readmatrix(positionPath,'Sheet','230721','Range','C2:D33');
-    Center = zeros(4,8,2);
-    for i = 1:4
-        Center(i,:,:) = centers(1+8*(i-1):8+8*(i-1),:);
-    end
-    IW = 60;
-else
-    [Center,IW] = find_fibers2(calibrationImage,[65,75]);
+% % 校正用画像からファイバーの位置（＋半径）を取得
+% if date == 230721
+%     positionPath = '/Users/shinjirotakeda/Documents/GitHub/test-open/Soft X-ray/Four-View/fiberPositions.xlsx';
+%     centers = readmatrix(positionPath,'Sheet','230721','Range','C2:D33');
+%     Center = zeros(4,8,2);
+%     for i = 1:4
+%         Center(i,:,:) = centers(1+8*(i-1):8+8*(i-1),:);
+%     end
+%     IW = 60;
+% else
+%     [Center,IW] = find_fibers2(calibrationImage,[65,75]);
+% end
+
+% 位置情報ファイルからファイバーの位置（＋半径）を取得
+positionPath = '/Users/shinjirotakeda/Documents/GitHub/test-open/Soft X-ray/Four-View/fiberPositions.xlsx';
+positionData = readmatrix(positionPath,'Sheet',num2str(date),'Range','C2:E33');
+Center = zeros(4,8,2);
+for i = 1:4
+    Center(i,:,:) = positionData(1+8*(i-1):8+8*(i-1),1:2);
 end
+IW = positionData(1,3);
+
 Center = round(Center);
 
 % 切り取った画像を格納するための配列

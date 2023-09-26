@@ -61,7 +61,7 @@ n=40; %【input】rz方向のメッシュ数
 % end
 
 for i=1:n_data
-    dtacq_num=dtacqlist;
+    % dtacq_num=dtacqlist;
     shot=shotlist(i,:);
     tfshot=tfshotlist(i,:);
     if shot == tfshot

@@ -1,4 +1,4 @@
-function plot_save_sxr(grid2D,data2D,range,date,shot,t,EE,show_localmax,show_flux_surface,show_xpoint,save,filter,NL)
+function plot_save_sxr(grid2D,data2D,range,date,shot,t,EE,show_localmax,show_flux_surface,show_xpoint,doSave,doFilter,NL)
 
 % f = figure;
 % f.Units = 'normalized';
@@ -35,6 +35,11 @@ if show_flux_surface
 end
 
 [SXR_mesh_z,SXR_mesh_r] = meshgrid(z_space_SXR,r_space_SXR);
+
+% f = figure;
+% f.Units = 'normalized';
+% f.Position = [0.1,0.2,0.8,0.8];
+
 for i = 1:4
     EE_plot = EE(r_range,z_range,i);
     subplot(2,2,i);
@@ -63,11 +68,12 @@ for i = 1:4
             r.EdgeColor = 'red';
             r.LineWidth = 1.5;
         end
-    end
-    title(num2str(i));
+    end    
     hold off;
+    title(num2str(i));
 end
 
+sgtitle(strcat(num2str(t),'us'));
 
 % subplot(2,2,1);
 % [SXR_mesh_z,SXR_mesh_r] = meshgrid(z_space_SXR,r_space_SXR);
@@ -190,13 +196,13 @@ end
 % title('4');
 % hold off;
 
-if save
+if doSave
     pathname = getenv('SXR_RECONSTRUCTED_DIR');
-    if filter & NL
+    if doFilter & NL
         directory = '/NLF_NLR/';
-    elseif ~filter & NL
+    elseif ~doFilter & NL
         directory = '/LF_NLR/';
-    elseif filter & ~NL
+    elseif doFilter & ~NL
         directory = '/NLF_LR/';
     else
         directory = '/LF_LR/';

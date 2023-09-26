@@ -3,7 +3,7 @@
 % experimental setup
 %%%%%%%%%%%%%%%%%%%%%%%%
 % clear
-close all
+% close all
 clearvars -except date IDXlist
 addpath '/Users/shinjirotakeda/Documents/GitHub/test-open/pcb_experiment'; %getMDSdata.mとcoeff200ch.xlsxのあるフォルダへのパス
 
@@ -51,29 +51,33 @@ intervallist = T.SXRInterval(IDXlist);
 % n_data=numel(shotlist);%計測データ数
 % EFlist = 150;%【input】EF電流
 
-trange=440:500;%【input】計算時間範囲
+trange=400:800;%【input】計算時間範囲
 n=50; %【input】rz方向のメッシュ数
 
-t = 475;
+t = 470;
 show_xpoint = false;
 show_localmax = false;
-show_flux_surface = false;
-save = true;
-filter = false;
+show_flux_surface = true;
+doSave = false;
+doFilter = false;
 NL = false;
 
 for i=1:n_data
-    dtacq_num=dtacqlist(i);
-    shot=shotlist(i);
-    tfshot=tfshotlist(i);
+    % dtacq_num=dtacqlist;
+    shot=shotlist(i,:);
+    tfshot=tfshotlist(i,:);
+    if shot == tfshot
+        tfshot = [0,0];
+    end
     i_EF=EFlist(i);
     TF=TFlist(i);
     start = startlist(i);
     interval = intervallist(i);
-    % [grid2D,data2D] = process_PCBdata_280ch(date, shot, tfshot, pathname, n,i_EF,trange);
-    grid2D = NaN;
-    data2D = NaN;
+    [grid2D,data2D] = process_PCBdata_280ch(date, shot, tfshot, pathname, n,i_EF,trange);
+    % grid2D = NaN;
+    % data2D = NaN;
     shot_SXR = IDXlist(i);
     SXRfilename = strcat(getenv('SXR_IMAGE_DIR'),'/',num2str(date),'/shot',num2str(shot_SXR,'%03i'),'.tif');
-    plot_sxr_multi(grid2D,data2D,date,shot_SXR,show_xpoint,show_localmax,show_flux_surface,start,interval,save,SXRfilename,filter,NL);
+    plot_sxr_multi(grid2D,data2D,date,shot_SXR,show_xpoint,show_localmax,show_flux_surface,start,interval,doSave,SXRfilename,doFilter,NL);
+    % plot_sxr_at_t(grid2D,data2D,date,shot,t,show_xpoint,show_localmax,show_flux_surface,start,interval,doSave,SXRfilename,doFilter,NL)
 end

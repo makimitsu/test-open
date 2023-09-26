@@ -1,4 +1,4 @@
-function plot_sxr_at_t()
+function plot_sxr_at_t(grid2D,data2D,date,shot,t,show_xpoint,show_localmax,show_flux_surface,start,interval,save,SXRfilename,filter,NL)
 
 newProjectionNumber = 80;
 newGridNumber = 100;
@@ -48,7 +48,7 @@ number = (t-start)/interval+1;
 doPlot = false;
 
 if doCalculation
-    [Iwgn1,Iwgn2,Iwgn3,Iwgn4] = get_sxr_image();
+    [Iwgn1,Iwgn2,Iwgn3,Iwgn4] = get_sxr_image(date,number,newProjectionNumber,SXRfilename,filter);
     
     EE1 = get_distribution(M,K,gm2d1,U1,s1,v1,Iwgn1,doPlot,NL);
     EE2 = get_distribution(M,K,gm2d2,U2,s2,v2,Iwgn2,doPlot,NL);
@@ -61,8 +61,9 @@ end
 
 f = figure;
 f.Units = 'normalized';
-f.Position = [0.1,0.2,0.8,0.4];
+f.Position = [0.1,0.2,0.8,0.8];
 
-plot_save_sxr(range,EE1,EE2,EE3,EE4);
+EE = cat(3,EE1,EE2,EE3,EE4);
+plot_save_sxr(grid2D,data2D,range,date,shot,t,EE,show_localmax,show_flux_surface,show_xpoint,save,filter,NL);
 
 end
