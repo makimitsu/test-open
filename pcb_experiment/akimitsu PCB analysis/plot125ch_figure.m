@@ -2,16 +2,16 @@
 % ポロイダル磁気面の時間発展プロット
 %%%%%%%%%%%%%%%%%%%%
 clear all
-pathname.processed_data = "C:\Users\uswk0\OneDrive\ドキュメント\data\pre_processed";%processed data の保管場所
-pathname.fig_psi = "C:\Users\uswk0\OneDrive\ドキュメント\data\figure\"; % plot画像の保存先
+pathname.processed_data = "C:\Users\uswk0\OneDrive - The University of Tokyo\data\pre_processed";%processed data の保管場所
+pathname.fig_psi = "C:\Users\uswk0\OneDrive - The University of Tokyo\data\figure\"; % plot画像の保存先
 
-shotlist = 10650:10692; % 【input】shot number of a038
+shotlist = 12250 % 【input】shot number of a038
 
-for i =1:length(shotlist)
-shot = shotlist(i)
-colorplot = 'Jt'; % 【input】color plot parameter
+for num =1:length(shotlist)
+shot = shotlist(num)
+colorplot = 'Psi'; % 【input】color plot parameter
 
-filename = strcat(pathname.processed_data,'/a038_',num2str(shot),'.mat');
+filename = strcat(pathname.processed_data,'\a038_',num2str(shot),'.mat');
 
 
 if exist(filename,'file') == 0
@@ -31,7 +31,7 @@ end
 figure('Position',[0 0 600 600],'visible','on');
 
 start = 460;
-dt = 2;
+dt = 3;
 
 tile = tiledlayout(4,4); % Figureを4行4列に分割。左上から右向きm番目の位置に図を描画
 for m=1:16
@@ -48,8 +48,8 @@ for m=1:16
             contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bz(:,:,i),30,'LineStyle','none'); clim([-0.1, 0.1]); % Bz
             label = 'Bz [T]';
         case 'Bt'
-            contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bt(:,:,i),-50e-3:0.2e-3:50e-3,'LineStyle','none'); clim([-0.06, 0.06]); % Bt
-            % contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bt(:,:,i),0.05:0.01:0.3,'LineStyle','none'); clim([0.05, 0.3]); % TF only の場合
+            %contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bt(:,:,i),-50e-3:0.2e-3:50e-3,'LineStyle','none'); clim([-0.06, 0.06]); % Bt
+            contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bt(:,:,i),0.05:0.01:0.3,'LineStyle','none'); clim([0.05, 0.3]); % TF only の場合
             label = 'Bt [T]';
         case 'Bt_ex'
             contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bt_ex(:,:,i),0.05:0.01:0.3,'LineStyle','none'); clim([0.05, 0.3]); % Bt_ex
@@ -58,7 +58,7 @@ for m=1:16
             contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Babs(:,:,i),0:0.04:0.5,'LineStyle', 'none'); clim([0, 0.5]); % Babs
             label = '|B| [T]';
         case 'Jt'
-            contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Jt(:,:,i),30,'LineStyle','none'); clim([-0.8*1e+6, 0.8*1e+6]); % Jt
+            contourf(grid2D.zq(1,:),grid2D.rq(:,1),-data2D.Jt(:,:,i),30,'LineStyle','none'); clim([-0.8*1e+6, 0.8*1e+6]); % Jt
             label = 'Jt [A/m^2]';
         case 'Jz'
             contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Jz(:,:,i),30,'LineStyle','none'); clim([-0.8*1e+6, 0.8*1e+6]); % Jt
@@ -154,7 +154,7 @@ if strcmp(colorplot, 'Psi') == 1
     exportgraphics(gcf,savename_psi, 'Resolution',300);
 end
 
-foldername = strcat(pathname.fig_psi, num2str(date),'/',num2str(shot(1)));
+foldername = strcat(pathname.fig_psi, num2str(date));
 if exist(foldername, 'dir') == 0
     mkdir(foldername);
 end

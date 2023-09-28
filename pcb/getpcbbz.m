@@ -80,7 +80,7 @@ ok=ok&okp;
 %ok([66,87,107])=true;
 
 elseif date>=211212 
-    load('ok211212.mat');
+    load('C:\Users\uswk0\OneDrive - The University of Tokyo\GitHub\test-open\pcb\2021\ok211212.mat');
     if  date>=211214
         ok(63)=true;
     end

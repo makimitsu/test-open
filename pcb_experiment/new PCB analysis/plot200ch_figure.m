@@ -2,14 +2,16 @@
 % ポロイダル磁気面の時間発展プロット
 %%%%%%%%%%%%%%%%%%%%
 clear all
-pathname.processed_data = "C:\Users\uswk0\OneDrive\ドキュメント\data\pre_processed";%processed data の保管場所
-pathname.fig_psi = "C:\Users\uswk0\OneDrive\ドキュメント\data\figure\"; % plot画像の保存先
+pathname.processed_data = "C:\Users\uswk0\OneDrive - The University of Tokyo\data\pre_processed";%processed data の保管場所
+pathname.fig_psi = "C:\Users\uswk0\OneDrive - The University of Tokyo\data\figure\"; % plot画像の保存先
 
-shot = 2616; % 【input】shot number of a039
+shotlist = [3125,3127:3164];
+for shot = shotlist
+shot % 【input】shot number of a039
 colorplot = 'Psi'; % 【input】color plot parameter
 
-filename = strcat(pathname.processed_data,'/a039_',num2str(shot),'.mat');
-
+filename = strcat(pathname.processed_data,'\a039_',num2str(shot),'.mat');
+%filename = strcat(pathname.processed_data,'\a03839_',num2str(shot),'.mat');
 
 if exist(filename,'file') == 0
     disp(['File:',filename,' does not exist']);
@@ -25,8 +27,8 @@ end
 %%%%%%%%%%%%%%%%%%%%%
 % 図面の作成
 % figureウインドウを画面左下隅から右に$1ピクセル、上に$2ピクセルの位置に配置 幅$3ピクセル、高さ$4ピクセル
-figure('Position',[0 0 1600 900],'visible','on');
-
+%figure('Position',[0 0 1600 900],'visible','on');
+figure('Position',[0 0 600 600],'visible','on');
 start = 460;
 dt = 2;
 
@@ -120,17 +122,25 @@ for m=1:16
     for i=1:size(grid2D.zprobepcb,2)
         for j=1:size(grid2D.rprobepcb_t,2)
             if grid2D.ok_bz_matrix(j,i) == 1 % bz測定点の表示
-                plot(grid2D.zprobepcb(i),grid2D.rprobepcb(j),'k.','MarkerSize',6);
+                plot(grid2D.zprobepcb(i),grid2D.rprobepcb(j),'b.','MarkerSize',5);
             end
             if grid2D.ok_bt_matrix(j,i) == 1 % bt測定点の表示
                 %plot(grid2D.zprobepcb(i),grid2D.rprobepcb_t(j),'k.','MarkerSize',6);
             end
         end
     end
+
+   
+  
     % viscircles([0.2135,0.31],0.02,'Color','k');
     % viscircles([-0.2135,0.31],0.02,'Color','k');
     % viscircles([0.35,0.22],0.0375,'Color','k');
     % viscircles([-0.35,0.22],0.0375,'Color','k');
+    %xlim([-0.0525 0.0525])
+    xlim([-0.15 0.15])
+    %ylim([0.06 0.245])
+
+    %([-0.0525 0.0525])
     hold off
 
     title(string(t) + 'us')
@@ -147,7 +157,7 @@ if strcmp(colorplot, 'Psi') == 1
     if exist(foldername_psi, 'dir') == 0
         mkdir(foldername_psi);
     end
-    savename_psi = strcat(foldername_psi, '/shot', num2str(shot(1), '%04i'), '_', colorplot, '.png');
+    savename_psi = strcat(foldername_psi, '/shot', num2str(shot(2), '%04i'), '_', colorplot, '.png');
     exportgraphics(gcf,savename_psi, 'Resolution',300);
 end
 % foldername = strcat(pathname.fig_psi, num2str(date),'/',num2str(shot(1)));
@@ -157,3 +167,4 @@ end
 % savename = strcat(foldername, '/shot', num2str(shot(1), '%04i'), '_', colorplot, '.png');
 % saveas(gcf, savename);
 % exportgraphics(gcf,savename, 'Resolution',300);
+end

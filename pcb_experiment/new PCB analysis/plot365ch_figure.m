@@ -2,16 +2,14 @@
 % ポロイダル磁気面の時間発展プロット
 %%%%%%%%%%%%%%%%%%%%
 clear all
-pathname.processed_data = "C:\Users\uswk0\OneDrive\ドキュメント\data\pre_processed";%processed data の保管場所
-pathname.fig_psi = "C:\Users\uswk0\OneDrive\ドキュメント\data\figure\"; % plot画像の保存先
+pathname.processed_data = "C:\Users\uswk0\OneDrive - The University of Tokyo\data\pre_processed";%processed data の保管場所
+pathname.fig_psi = "C:\Users\uswk0\OneDrive - The University of Tokyo\data\figure\"; % plot画像の保存先
 
-shotlist = 10650:10692; % 【input】shot number of a038
-
-for shot i
+shot = 3125; % 【input】shot number of a039
 colorplot = 'Psi'; % 【input】color plot parameter
 
-filename = strcat(pathname.processed_data,'/a038_',num2str(shot),'.mat');
-
+%filename = strcat(pathname.processed_data,'\a039_',num2str(shot),'.mat');
+filename = strcat(pathname.processed_data,'\a03839_',num2str(shot),'.mat');
 
 if exist(filename,'file') == 0
     disp(['File:',filename,' does not exist']);
@@ -27,10 +25,10 @@ end
 %%%%%%%%%%%%%%%%%%%%%
 % 図面の作成
 % figureウインドウを画面左下隅から右に$1ピクセル、上に$2ピクセルの位置に配置 幅$3ピクセル、高さ$4ピクセル
-figure('Position',[0 0 600 600],'visible','on');
-
-start = 440;
-dt = 2;
+figure('Position',[0 0 1600 900],'visible','on');
+%figure('Position',[0 0 600 600],'visible','on');
+start = 460;
+dt = 4;
 
 tile = tiledlayout(4,4); % Figureを4行4列に分割。左上から右向きm番目の位置に図を描画
 for m=1:16
@@ -57,7 +55,7 @@ for m=1:16
             contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Babs(:,:,i),0:0.04:0.5,'LineStyle', 'none'); clim([0, 0.5]); % Babs
             label = '|B| [T]';
         case 'Jt'
-            contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Jt(:,:,i),30,'LineStyle','none'); clim([-0.8*1e+6, 0.8*1e+6]); % Jt
+            contourf(grid2D.zq(1,:),grid2D.rq(:,1),-data2D.Jt(:,:,i),30,'LineStyle','none'); clim([-0.8*1e+6, 0.8*1e+6]); % Jt
             label = 'Jt [A/m^2]';
         case 'Jz'
             contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Jz(:,:,i),30,'LineStyle','none'); clim([-0.8*1e+6, 0.8*1e+6]); % Jt
@@ -119,20 +117,37 @@ for m=1:16
     % psi等高線の表示
     contour(grid2D.zq(1,:),grid2D.rq(:,1),data2D.psi(:,:,i),-20e-3:0.3e-3:40e-3,'black','LineWidth',1) % psi
 
-    for i=1:size(grid2D.zprobepcb,2)
-        for j=1:size(grid2D.rprobepcb,2)
-            if grid2D.ok_bz_matrix(j,i) == 1 % bz測定点の表示
-                plot(grid2D.zprobepcb(i),grid2D.rprobepcb(j),'k.','MarkerSize',6);
+    for i=1:size(grid2D.zprobepcb_a39,2)
+        for j=1:size(grid2D.rprobepcb_t,2)
+            if grid2D.ok_bz_matrix_a39(j,i) == 1 % bz測定点の表示
+                plot(grid2D.zprobepcb_a39(i),grid2D.rprobepcb_a39(j),'b.','MarkerSize',8);
             end
-            %if grid2D.ok_bt_matrix(j,i) == 1 % bt測定点の表示
+            if grid2D.ok_bt_matrix_a39(j,i) == 1 % bt測定点の表示
                 %plot(grid2D.zprobepcb(i),grid2D.rprobepcb_t(j),'k.','MarkerSize',6);
-            %end
+            end
         end
     end
+
+    for i=1:size(grid2D.zprobepcb_a38,2)
+        for j=1:size(grid2D.rprobepcb_a38,2)
+            if grid2D.ok_bz_matrix_a38(j,i) == 1 % bz測定点の表示
+                plot(grid2D.zprobepcb_a38(i),grid2D.rprobepcb_a38(j),'g.','MarkerSize',6);
+            end
+            if grid2D.ok_bt_matrix_a38(j,i) == 1 % bt測定点の表示
+                %plot(grid2D.zprobepcb(i),grid2D.rprobepcb_t(j),'k.','MarkerSize',6);
+            end
+        end
+    end
+
+  
     % viscircles([0.2135,0.31],0.02,'Color','k');
     % viscircles([-0.2135,0.31],0.02,'Color','k');
     % viscircles([0.35,0.22],0.0375,'Color','k');
     % viscircles([-0.35,0.22],0.0375,'Color','k');
+
+   % xlim([-0.0525 0.0525])
+   % ylim([0.06 0.245])
+   xlim([-0.13 0.13])
     hold off
 
     title(string(t) + 'us')
@@ -141,21 +156,14 @@ cb = colorbar;
 cb.Layout.Tile = 'east';
 cb.Label.String = label;
 tile.TileSpacing = 'compact'; % 各tileの間隔を縮める
-tile.Padding = 'compact'; % 各title内の余白を縮める
+% tile.Padding = 'compact'; % 各title内の余白を縮める
 
 %%% save plot image
-if strcmp(colorplot, 'Psi') == 1
-    foldername_psi = strcat(pathname.fig_psi, num2str(date));
-    if exist(foldername_psi, 'dir') == 0
-        mkdir(foldername_psi);
-    end
-    savename_psi = strcat(foldername_psi, '/shot', num2str(shot(1), '%04i'), '_', colorplot, '.png');
-    exportgraphics(gcf,savename_psi, 'Resolution',300);
+
+foldername_psi = strcat(pathname.fig_psi, num2str(date));
+if exist(foldername_psi, 'dir') == 0
+   mkdir(foldername_psi);
 end
-% foldername = strcat(pathname.fig_psi, num2str(date),'/',num2str(shot(1)));
-% if exist(foldername, 'dir') == 0
-%     mkdir(foldername);
-% end
-% savename = strcat(foldername, '/shot', num2str(shot(1), '%04i'), '_', colorplot, '.png');
-% saveas(gcf, savename);
-% exportgraphics(gcf,savename, 'Resolution',300);
+savename_psi = strcat(foldername_psi, '/shot', num2str(shot(1), '%04i'), '_', colorplot, '_unified','.png');
+exportgraphics(gcf,savename_psi, 'Resolution',300);
+

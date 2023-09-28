@@ -1,60 +1,28 @@
-%%%%%%%%%%%%%%%%%%%%%%%%
-% 125ch用 akimitsu pcbプローブのみでの磁気面（Bz）
-% dtacqのshot番号を直接指定する場合
-% 補間手順（scatteredInterpolant)
-% 測定データ→死んだチャンネルを補間→プロット用meshgridに補間
-%%%%%%%%%%%%%%%%%%%%%%%%
+%% save dtacqdata
 
-%%%%%ここが各PCのパス
-%【※コードを使用する前に】環境変数を設定しておくか、matlab内のコマンドからsetenv('パス名','アドレス')で指定してから動かす
+%デジタイザ別の保存(2022/11/17)
+%個別に環境変数a038_path, a039_path, a040_pathを設定する必要あり
 clear all
-pathname.ts3u=getenv('ts3u_path');%old-koalaのts-3uまでのパス（mrdなど）
-pathname.fourier=getenv('fourier_path');%fourierのmd0（データックのショットが入ってる）までのpath
-pathname.NIFS=getenv('NIFS_path');%resultsまでのpath（ドップラー、SXR）
-pathname.save=getenv('savedata_path');%outputデータ保存先
-pathname.rawdata38=getenv('rawdata038_path');%dtacq a038のrawdataの保管場所
-pathname.woTFdata=getenv('woTFdata_path');%rawdata（TFoffset引いた）の保管場所
-pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所
+%setenv('MDSPLUS_DIR','/usr/local/mdsplus');
+%addpath(fullfile(getenv('MDSPLUS_DIR'), 'matlab'));
+pathname.rawdata=getenv('rawdata_path'); %保存先
 
 
-%% 直接入力の場合
-%{
-shotlist=[11946]; %[10650:10692];%【input】dtacqの保存番号: shot_38
-%tfshot=10646*ones(size(shotlist));
-%tfshot= [10646];
-tfshot=zeros(size(shotlist));%【input】dtacqのTFのみ番号: tfshot_38
-date = 230914;%【input】計測日
-i_EF = 120;%【input】EF電流
-probecheck_mode = 1; % 【input】TF only の時は必ずtrue(1)にして生信号をcheck
-interp_method = 1; % 0: 'scatteredInterpolant', 1: 'bz_rbfinterp', 2: 'spline'
-trange=400:800;%【input】計算時間範囲
-n=40; %【input】rz方向のメッシュ数
-r_shift = 0.00; %【input】プローブの差し込み具合を変更した場合は記入
-%{
-​probecheck_mode=1;%【input】TF only の時は必ず1にして生信号をcheck
-interp_method = 1; %【input】0: 'scatteredInterpolant', 1: 'bz_rbfinterp', 2: 'spline'
-%}
-for i = 1:length(shotlist)
-    shot = shotlist(i)
-    process_psi125ch(date,shot,tfshot,pathname,n,i_EF,trange,r_shift,probecheck_mode,interp_method);
-    disp('pcb:1/1')
-end
-%}
-
-
-%%　実験オペレーションの取得　自動入力の場合
+%% 自動入力の場合
+disp('now saving the rawdata');
 prompt = {'Date:','Shot number:'};
 dlgtitle = 'Input';
 dims = [1 35];
 definput = {'',''};
 answer = inputdlg(prompt,dlgtitle,dims,definput);
 date = str2double(cell2mat(answer(1)));
-IDXlist = str2num(cell2mat(answer(2)));
+IDXlist = str2double(cell2mat(answer(2)));
 DOCID='1wG5fBaiQ7-jOzOI-2pkPAeV6SDiHc_LrOdcbWlvhHBw';%スプレッドシートのID
 T=getTS6log(DOCID);
 node='date';
 T=searchlog(T,node,date);
 n_data=numel(IDXlist);%計測データ数
+dtacqlist=[38 39 40].*ones(n_data,1);
 shotlist_a038 =T.a038(IDXlist);
 shotlist_a039 =T.a039(IDXlist);
 shotlist_a040 = T.a040(IDXlist);
@@ -65,13 +33,59 @@ tfshotlist_a040 =T.a040_TF(IDXlist);
 tfshotlist = [tfshotlist_a038, tfshotlist_a039, tfshotlist_a040];
 EFlist=T.EF_A_(IDXlist);
 TFlist=T.TF_kV_(IDXlist);
-dtacqlist=38.*ones(n_data,1);
 
-probecheck_mode = 1; %【input】TF only の時は必ずtrue(1)にして生信号をcheck
+
+%% 直接入力の場合
+%{
+dtacqlist=[38 39 40];
+%dtacqlist=38;
+
+shotlist=[11946 2820 1298];%【input】dtacqの保存番号
+%shotlist=11839%[10650:10692];
+%shotlist=[10647 585];
+
+%tfshotlist = [11761 2582 1061];
+%tfshotlist=10646*ones(size(shotlist));
+tfshotlist=zeros(size(shotlist));
+n=numel(shotlist);%計測データ数
+n_data = 1;
+
+%}
+%% 保存計算パート
+
+for i=1:n_data
+
+    dtacq_num_col=dtacqlist(i,:);
+    shot_col=shotlist(i,:);
+    tfshot_col=tfshotlist(i,:);
+    if shot_col == tfshot_col
+        tfshot_col = [0,0,0];
+    end
+   
+    
+    for j = 1:length(dtacq_num_col)
+        disp(dtacq_num_col(j));
+        dtacq_num = dtacq_num_col(j);
+        shot = shot_col(j);
+        tfshot = tfshot_col(j);
+
+        [rawdata]=getMDSdata(dtacq_num,shot,tfshot);%測定した生信号
+        save(strcat(pathname.rawdata,'/rawdata_dtacq',num2str(dtacq_num),'_shot',num2str(shot),'_tfshot',num2str(tfshot),'.mat'),'rawdata');
+        if tfshot>0
+            [rawdata0]=getMDSdata(dtacq_num,shot,0);
+            save(strcat(pathname.rawdata,'/rawdata_dtacq',num2str(dtacq_num),'_shot',num2str(shot),'_tfshot0.mat'),'rawdata');
+        end
+    end
+
+end
+
+%% process 125ch
+disp('now processing the data');
+probecheck_mode = 0; %【input】TF only の時は必ずtrue(1)にして生信号をcheck
 interp_method = 1;   % 【input】0: 'scatteredInterpolant', 1: 'bz_rbfinterp', 2: 'spline'
 trange=400:800;%【input】計算時間範囲
 n=40; %【input】rz方向のメッシュ数
-r_shift = 0; % 【input】プローブの差し込み具合を変更した場合は記入​
+r_shift = 0.00; % 【input】プローブの差し込み具合を変更した場合は記入​
 for i=1:n_data
     dtacq_num=dtacqlist;
     shot=shotlist(i,:);
@@ -84,6 +98,179 @@ for i=1:n_data
     process_psi125ch(date,shot,tfshot,pathname,n,i_EF,trange,r_shift,probecheck_mode,interp_method);
     disp('pcb:1/1')  
 end
+
+
+%% plot figure
+%%%%%%%%%%%%%%%%%%%%
+% ポロイダル磁気面の時間発展プロット
+%%%%%%%%%%%%%%%%%%%%
+disp('now plotting the data')
+clearvars -except shotlist
+pathname.processed_data = "C:\Users\uswk0\OneDrive - The University of Tokyo\data\pre_processed";%processed data の保管場所
+pathname.fig_psi = "C:\Users\uswk0\OneDrive - The University of Tokyo\data\figure\"; % plot画像の保存先
+
+% 【input】shot number of a038
+shot = shotlist(1);
+colorplot = 'Psi'; % 【input】color plot parameter
+
+filename = strcat(pathname.processed_data,'\a038_',num2str(shot),'.mat');
+
+
+if exist(filename,'file') == 0
+    disp(['File:',filename,' does not exist']);
+    return
+end
+load(filename);
+
+if isstruct(grid2D) == 0 || isstruct(data2D) == 0
+    disp('data incomplete/corrupted');
+    return
+end
+
+%%%%%%%%%%%%%%%%%%%%%
+% 図面の作成
+% figureウインドウを画面左下隅から右に$1ピクセル、上に$2ピクセルの位置に配置 幅$3ピクセル、高さ$4ピクセル
+figure('Position',[0 0 600 600],'visible','on');
+
+start = 480;
+dt = 4;
+
+tile = tiledlayout(4,4); % Figureを4行4列に分割。左上から右向きm番目の位置に図を描画
+for m=1:16
+    i = start + (m-1).*dt + 1 - 400;
+    t = data2D.trange(i); % trange = 400:600
+    nexttile
+
+    % flag_Ip_area = 0;
+    switch colorplot
+        case 'Psi'
+            contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.psi(:,:,i),40,'LineStyle','none'); clim([-8e-3,8e-3]); % psi
+            label = 'Psi [Wb]';
+        case 'Bz'
+            contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bz(:,:,i),30,'LineStyle','none'); clim([-0.1, 0.1]); % Bz
+            label = 'Bz [T]';
+        case 'Bt'
+            contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bt(:,:,i),-50e-3:0.2e-3:50e-3,'LineStyle','none'); clim([-0.06, 0.06]); % Bt
+            % contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bt(:,:,i),0.05:0.01:0.3,'LineStyle','none'); clim([0.05, 0.3]); % TF only の場合
+            label = 'Bt [T]';
+        case 'Bt_ex'
+            contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bt_ex(:,:,i),0.05:0.01:0.3,'LineStyle','none'); clim([0.05, 0.3]); % Bt_ex
+            label = 'Bt_{ex} [T]';
+        case 'Babs'
+            contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Babs(:,:,i),0:0.04:0.5,'LineStyle', 'none'); clim([0, 0.5]); % Babs
+            label = '|B| [T]';
+        case 'Jt'
+            contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Jt(:,:,i),30,'LineStyle','none'); clim([-0.8*1e+6, 0.8*1e+6]); % Jt
+            label = 'Jt [A/m^2]';
+        case 'Jz'
+            contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Jz(:,:,i),30,'LineStyle','none'); clim([-0.8*1e+6, 0.8*1e+6]); % Jt
+            label = 'Jz [A/m^2]';
+        case 'Et'
+            contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Et(:,:,i),20,'LineStyle','none'); clim([-500, 400]); % Et
+            label = 'Et [V/m]';
+        case 'q'
+            contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.q(:,:,i),10,'LineStyle','none'); clim([-2, 2]); % q
+            label = 'q';
+        case 'p'
+            contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.P(:,:,i),20,'LineStyle','none'); clim([0, 3000]); % P
+            label = 'P [Pa]';
+        case 'dpdr'
+            contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.dPdr(:,:,i),10,'LineStyle','none'); %clim([-3000, 3000]); % dPdr
+            label = 'dP/dr [Pa/m]';
+        case 'Ip_area'
+            zpos = grid2D.zq(1,:);
+            rpos = grid2D.rq(:,1);
+            %%% セパラトリクスとなるpsiを求める
+            max_psi = zeros(size(zpos));
+            for j = 1:size(zpos,2)
+                max_psi(j) = max(data2D.psi(:,j,i));
+            end
+            max_psi_zng = max_psi(1:size(zpos,2)/2);
+            max_psi_zpos = max_psi(size(zpos,2)/2+1:size(zpos,2));
+            min_psi_zng = min(max_psi_zng(max_psi_zng>=0));
+            min_psi_zpos = min(max_psi_zpos(max_psi_zpos>=0));
+            for j = 1:size(zpos,2)
+                if max_psi(j) == min_psi_zng
+                    z_sep_idx_ng = j;
+                elseif max_psi(j) == min_psi_zpos
+                    z_sep_idx_pos = j;
+                end
+            end
+            psi_sep = max(min_psi_zng,min_psi_zpos);
+            for k = 1:size(rpos,1)
+                r = rpos(k);
+                for j = 1:size(zpos,2)
+                    z = zpos(j);
+                    if data2D.psi(k,j,i) >= psi_sep && j>=z_sep_idx_ng && j <= z_sep_idx_pos
+                        plot(z,r,'r.','MarkerSize',6);
+                        hold on
+                    end
+                end
+            end
+            % hold off
+            label = 'None';
+        otherwise
+            disp('error: incorrect input for colorplot')
+            return
+    end
+    
+    colormap(whitejet)
+    axis image % 各軸のデータ単位を合わせる
+    axis tight manual % 軸の範囲をデータ範囲と合わせて固定
+
+    hold on
+    % psi等高線の表示
+    contour(grid2D.zq(1,:),grid2D.rq(:,1),data2D.psi(:,:,i),-20e-3:0.3e-3:40e-3,'black','LineWidth',1) % psi
+
+    for i=1:size(grid2D.zprobepcb,2)
+        for j=1:size(grid2D.rprobepcb,2)
+            if grid2D.ok_bz_matrix(j,i) == 1 % bz測定点の表示
+                plot(grid2D.zprobepcb(i),grid2D.rprobepcb(j),'k.','MarkerSize',6);
+            end
+            %if grid2D.ok_bt_matrix(j,i) == 1 % bt測定点の表示
+                %plot(grid2D.zprobepcb(i),grid2D.rprobepcb_t(j),'k.','MarkerSize',6);
+            %end
+        end
+    end
+    % viscircles([0.2135,0.31],0.02,'Color','k');
+    % viscircles([-0.2135,0.31],0.02,'Color','k');
+    % viscircles([0.35,0.22],0.0375,'Color','k');
+    % viscircles([-0.35,0.22],0.0375,'Color','k');
+    hold off
+
+    title(string(t) + 'us')
+end
+cb = colorbar;
+cb.Layout.Tile = 'east';
+cb.Label.String = label;
+tile.TileSpacing = 'compact'; % 各tileの間隔を縮める
+tile.Padding = 'compact'; % 各title内の余白を縮める
+
+%%% save plot image
+if strcmp(colorplot, 'Psi') == 1
+    foldername_psi = strcat(pathname.fig_psi, num2str(date));
+    if exist(foldername_psi, 'dir') == 0
+        mkdir(foldername_psi);
+    end
+    savename_psi = strcat(foldername_psi, '/shot', num2str(shot(1), '%04i'), '_', colorplot, '.png');
+    exportgraphics(gcf,savename_psi, 'Resolution',300);
+end
+
+foldername = strcat(pathname.fig_psi, num2str(date));
+if exist(foldername, 'dir') == 0
+    mkdir(foldername);
+end
+savename = strcat(foldername, '/shot', num2str(shot(1), '%04i'), '_', colorplot, '.png');
+saveas(gcf, savename);
+exportgraphics(gcf,savename, 'Resolution',300);
+
+
+
+
+
+
+%% definition of function
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%
 %以下、local関数
@@ -99,8 +286,6 @@ C = readmatrix('coeff125ch.xlsx', 'Sheet', num2str(sheet_date)); % 較正係数�
 ok = logical(C(:,14)); % chが生きていれば1，死んでいれば0
 dtacq_num_list = C(:,1);
 dtaq_ch = C(:,2);
-probe_num_list = C(:,5);
-probe_ch = C(:,6);
 polarity=C(:,13); % 極性
 coeff=C(:,12); % 較正係数 RC/NS
 zpos=C(:,9); % z位置[m]
@@ -145,22 +330,10 @@ end
 %% 今３本目と４本目のプローブを入れ替えている2023/08/31~
 
 if date > 230831
-    [real_probe3_d_ch,Locb3] = find(probe_num_list==3);
-    [real_probe4_d_ch,Locb4] = find(probe_num_list==4);
-    probe3_ch = probe_ch(real_probe3_d_ch);
-    probe4_ch = probe_ch(real_probe4_d_ch);
-
-    tmp = raw;
-    for i = 1:length(probe3_ch)
-        %probe3のch1~ch25をそれぞれprobe4のch1~ch25に対応させてrawdataを入れ替える
-        ind3 = find(probe3_ch == probe4_ch(i));
-        raw(:,real_probe3_d_ch(ind3)) = tmp(:,real_probe4_d_ch(i));
-        ind4 = find(probe4_ch == probe3_ch(i));
-        raw(:,real_probe4_d_ch(ind4)) = tmp(:,real_probe3_d_ch(i));
-
-        % real_probe3にはprobe3のd_chが入る
-        clear ind3 ind4
-    end
+    real_probe3 = raw(:,77:101);
+    real_probe4 = raw(:,[51:62,64:76]);
+    raw(:,77:101) = real_probe4;
+    raw(:,[51:62,64:76]) = real_probe3;
 end
 
 
@@ -239,8 +412,8 @@ clear zq rq zprobepcb rprobepcb zq_probepcb rq_probepcb ok_bz_matrix
 %% probecheck_script
 
 if probecheck_mode
-   %probecheck_script125ch;
-   probecheck_script_test;
+   probecheck_script125ch;
+   %probecheck_script_test;
 end
 
 %% calculate data
@@ -271,11 +444,10 @@ data2D=struct(...
     'Lambda',zeros(size(grid2D.rq,1),size(grid2D.rq,2),size(trange,2)),...
     'trange',trange);
 
-
+%{
 %% **************** angle correction **************** 
 % 死んだchの内挿 → プローブ1本ごとに角度補正 → プロット用gridへの内挿
 % 内挿は Delaunay 三角形分割による
-%{
 sheets_angle = sheetnames('angle.xlsx');sheets_angle = str2double(sheets_angle);
 sheet_angle_date=max(sheets_angle(sheets_angle<=date));
 angle_file = readmatrix('angle.xlsx','Sheet',num2str(sheet_angle_date));
@@ -285,8 +457,10 @@ sin_lis = sin(angle);
 cos_lis = cos(angle);
 sin_matrix = repmat(sin(angle),10,1);%sin_matrix(1:10,:) = zeros(10,10);
 cos_matrix = repmat(cos(angle),10,1);%cos_matrix(1:10,:) = ones(10,10);
-%}
-B_z_calibrated = zeros(length(grid2D.rprobepcb),length(grid2D.zprobepcb),length(trange));
+
+% B_z_calibrated = zeros(length(grid2D.rprobepcb),length(grid2D.zprobepcb),length(trange));
+% B_t_calibrated = zeros(length(grid2D.rprobepcb_t),length(grid2D.zprobepcb),length(trange));
+% B_t_ex_calibrated = zeros(length(grid2D.rprobepcb_t),length(grid2D.zprobepcb),length(trange));
 
 bz_ok = bz(:,ok_bz);
 zpos_bz_ok = zpos_bz(ok_bz);
@@ -322,13 +496,13 @@ end
 % end
 
 
-%}
 
 B_z_splined = zeros(length(grid2D.rprobepcb),length(grid2D.zprobepcb),length(trange));
 
 for ch = 1:size(B_z_noncalib,2)
     B_z_splined(grid2D.rprobepcb==rpos_bz(ch),grid2D.zprobepcb==zpos_bz(ch),:) = B_z_calibrated_restored(trange,ch);
 end
+%}
 
 
 %% **************** interpolation and grid 2D calculation **************** 
@@ -337,15 +511,16 @@ end
 
 
 
- Fz_grid = scatteredInterpolant(zpos_bz, rpos_bz, B_z_calibrated_restored(1,:)');
- Fz_grid.Method = 'natural';
- Fz.Method = 'natural';
+ %Fz_grid = scatteredInterpolant(zpos_bz, rpos_bz, B_z_calibrated_restored(1,:)');
+ 
 
  for i=1:length(trange)
     t=trange(i);
     
     if interp_method == 0 %'scatteredInterpolant'
             Fz_grid.Values = B_z_calibrated_restored(t,:)';
+          
+
             grid_z_lis = reshape(grid2D.zq,[],1);
             grid_r_lis = reshape(grid2D.rq,[],1);
             vq = reshape(Fz_grid(grid_z_lis,grid_r_lis),[n,n]);
@@ -362,12 +537,13 @@ end
     elseif interp_method == 2 %'spline'
          vq = interp2(grid2D_probe.zq,grid2D_probe.rq,B_z_splined(:,:,i),grid2D.zq,grid2D.rq, 'spline');
          B_z = -Bz_EF+vq;
+        
     end
 
             
 
             % PSI計算
-            %data2D.psi(:,:,i) = cumtrapz(grid2D.rq(:,1),2*pi*B_z.*grid2D.rq(:,1),1);
+            % data2D.psi(:,:,i) = cumtrapz(grid2D.rq(:,1),2*pi*B_z.*grid2D.rq(:,1),1);
             data2D.psi(:,:,i) = flip(get_psi(flip(B_z,1),flip(grid2D.rq(:,1)),1),1);
 
             %このままだと1/2πrが計算されてないので

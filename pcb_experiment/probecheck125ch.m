@@ -11,7 +11,7 @@ pathname.NIFS=getenv('NIFS_path');%resultsまでのpath（ドップラー、SXR�
 pathname.save=getenv('savedata_path');%outputデータ保存先
 pathname.rawdata38=getenv('rawdata038_path');%dtacq a038のrawdataの保管場所
 pathname.woTFdata=getenv('woTFdata_path');%rawdata（TFoffset引いた）の保管場所
-pathname.rawdata='/Users/yunhancai/Google Drive/Data/pcb/raw/';%dtacqのrawdataの保管場所
+pathname.rawdata=getenv('rawdata_path');%/Users/yunhancai/Google Drive/Data/pcb/raw/';%dtacqのrawdataの保管場所
 
 %%%%実験オペレーションの取得
 %直接入力の場合
@@ -49,7 +49,7 @@ if numel(rawdata)< 500
 end
 
 %較正係数のバージョンを日付で判別
-sheets = sheetnames('/Users/yunhancai/Google Drive/磁気プローブ/matlab磁気プローブ解析new/pcb_experiment/coeff125ch.xlsx');
+sheets = sheetnames('coeff125ch.xlsx');
 sheets = str2double(sheets);
 sheet_date=max(sheets(sheets<=date));
 
