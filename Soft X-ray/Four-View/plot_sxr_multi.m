@@ -85,9 +85,9 @@ doPlot = false;
 % f.Units = 'normalized';
 % f.Position = [0.1,0.2,0.8,0.4];
 
-% f = figure;
-% f.Units = 'normalized';
-% f.Position = [0.1,0.2,0.8,0.8];
+f = figure;
+f.Units = 'normalized';
+f.Position = [0.1,0.2,0.8,0.8];
 
 for t = times
     number = (t-start)/interval+1;
@@ -134,12 +134,14 @@ for t = times
     
     EE = cat(3,EE1,EE2,EE3,EE4);
 
-    f = figure;
-    f.Units = 'normalized';
-    f.Position = [0.1,0.2,0.8,0.8];
+    % f = figure;
+    % f.Units = 'normalized';
+    % f.Position = [0.1,0.2,0.8,0.8];
 
     plot_save_sxr(grid2D,data2D,range,date,shot,t,EE,show_localmax,show_flux_surface,show_xpoint,doSave,doFilter,NL);
 
 end
+
+close(f);
 
 end

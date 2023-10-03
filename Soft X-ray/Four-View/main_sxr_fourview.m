@@ -58,9 +58,9 @@ t = 470;
 show_xpoint = false;
 show_localmax = false;
 show_flux_surface = true;
-doSave = false;
+doSave = true;
 doFilter = false;
-NL = false;
+doNLR = false; %do non-linear reconstruction
 
 for i=1:n_data
     % dtacq_num=dtacqlist;
@@ -78,6 +78,6 @@ for i=1:n_data
     % data2D = NaN;
     shot_SXR = IDXlist(i);
     SXRfilename = strcat(getenv('SXR_IMAGE_DIR'),'/',num2str(date),'/shot',num2str(shot_SXR,'%03i'),'.tif');
-    plot_sxr_multi(grid2D,data2D,date,shot_SXR,show_xpoint,show_localmax,show_flux_surface,start,interval,doSave,SXRfilename,doFilter,NL);
+    plot_sxr_multi(grid2D,data2D,date,shot_SXR,show_xpoint,show_localmax,show_flux_surface,start,interval,doSave,SXRfilename,doFilter,doNLR);
     % plot_sxr_at_t(grid2D,data2D,date,shot,t,show_xpoint,show_localmax,show_flux_surface,start,interval,doSave,SXRfilename,doFilter,NL)
 end

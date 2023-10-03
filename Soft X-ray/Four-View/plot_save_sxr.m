@@ -1,4 +1,4 @@
-function plot_save_sxr(grid2D,data2D,range,date,shot,t,EE,show_localmax,show_flux_surface,show_xpoint,doSave,doFilter,NL)
+function plot_save_sxr(grid2D,data2D,range,date,shot,t,EE,show_localmax,show_flux_surface,show_xpoint,doSave,doFilter,doNLR)
 
 % f = figure;
 % f.Units = 'normalized';
@@ -40,9 +40,17 @@ end
 % f.Units = 'normalized';
 % f.Position = [0.1,0.2,0.8,0.8];
 
+positionList = [2,4,1,3];
+nameList = {'1um Al', '2.5um Al', '2um Mylar', '1um Mylar'};
+
+% 負の要素を0で置換
+negativeEE = find(EE<0);
+EE(negativeEE) = zeros(size(negativeEE));
+
 for i = 1:4
     EE_plot = EE(r_range,z_range,i);
-    subplot(2,2,i);
+    p = positionList(i);
+    subplot(2,2,p);
     [~,h] = contourf(SXR_mesh_z,SXR_mesh_r,EE_plot,20);
     h.LineStyle = 'none';
     c=colorbar;c.Label.String='Intensity [a.u.]';c.FontSize=18;
@@ -70,10 +78,11 @@ for i = 1:4
         end
     end    
     hold off;
-    title(num2str(i));
+    title(string(nameList(i)));
 end
 
 sgtitle(strcat(num2str(t),'us'));
+drawnow;
 
 % subplot(2,2,1);
 % [SXR_mesh_z,SXR_mesh_r] = meshgrid(z_space_SXR,r_space_SXR);
@@ -198,16 +207,16 @@ sgtitle(strcat(num2str(t),'us'));
 
 if doSave
     pathname = getenv('SXR_RECONSTRUCTED_DIR');
-    if doFilter & NL
+    if doFilter & doNLR
         directory = '/NLF_NLR/';
-    elseif ~doFilter & NL
+    elseif ~doFilter & doNLR
         directory = '/LF_NLR/';
-    elseif doFilter & ~NL
+    elseif doFilter & ~doNLR
         directory = '/NLF_LR/';
     else
         directory = '/LF_LR/';
     end
-    foldername = strcat(pathname,directory,'/',num2str(date),'/shot',num2str(shot),'_wide');
+    foldername = strcat(pathname,directory,'/',num2str(date),'/shot',num2str(shot));
     if exist(foldername,'dir') == 0
         mkdir(foldername);
     end

@@ -1,7 +1,7 @@
-function CalibrationFactor = get_calibration_factor(date,N_projection)
+function calibrationFactor = get_calibration_factor(date,N_projection)
 
-CalibrationPath = strcat(getenv('SXR_IMAGE_DIR'),'/',num2str(date));
-calibrationImage = imread(strcat(CalibrationPath,'/PositionCheck.tif'));
+calibrationPath = strcat(getenv('SXR_IMAGE_DIR'),'/',num2str(date));
+calibrationImage = imread(strcat(calibrationPath,'/PositionCheck.tif'));
 % [centers,radii]=find_fibers(CalibrationImage);
 % IW = round(mean(radii));
 % centers = round(centers);
@@ -93,10 +93,33 @@ for i=1:8
     imageVectors(4,i,:) = roughImage4(k);
 end
 
-MeanIntensity = mean(imageVectors,'all');
-CalibrationFactor = MeanIntensity./imageVectors;
-CalibrationSavePath = strcat(CalibrationPath,'/CalibrationFactor.mat');
-save(CalibrationSavePath,'CalibrationFactor');
+meanIntensity = mean(imageVectors,'all');
+calibrationFactor = meanIntensity./imageVectors;
+% CalibrationSavePath = strcat(CalibrationPath,'/CalibrationFactor.mat');
+% save(CalibrationSavePath,'CalibrationFactor');
+
+% 角度補正（今のままだと上下逆＠231003）
+% imagescとpplotで上下が反転してるせい→どっちが正しい？
+theta1 = pi*3/4;
+theta2 = pi*1/4;
+theta3 = -pi*3/4;
+theta4 = -pi*1/4;
+correctionTerm1 = get_angle_correction(N_projection,theta1);
+correctionTerm2 = get_angle_correction(N_projection,theta2);
+correctionTerm3 = get_angle_correction(N_projection,theta3);
+correctionTerm4 = get_angle_correction(N_projection,theta4);
+
+angleCorrection = ones(size(calibrationFactor));
+for i = 1:8
+    angleCorrection(1,i,:) = correctionTerm1;
+    angleCorrection(2,i,:) = correctionTerm2;
+    angleCorrection(3,i,:) = correctionTerm3;
+    angleCorrection(4,i,:) = correctionTerm4;
+end
+
+calibrationFactor = calibrationFactor.*angleCorrection;
+calibrationSavePath = strcat(calibrationPath,'/calibrationFactor.mat');
+save(calibrationSavePath,'calibrationFactor');
 
 end
 

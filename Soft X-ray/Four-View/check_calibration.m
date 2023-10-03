@@ -1,4 +1,4 @@
-function check_position(date,sxrFilename)
+function check_calibration(date)
 
 % ファイバー位置の校正用コード
 % エクセルからファイバー位置を読み込んで画像を切り取り、切り取った画像をsubplot等で表示
@@ -14,17 +14,13 @@ projectionNumber = 80;
 
 
 % 生画像の取得
-rawImage = imread(sxrFilename);
+% rawImage = imread(sxrFilename);
 
+fiberPositionFile = strcat(getenv('SXR_IMAGE_DIR'),'/',num2str(date),'/PositionCheck.tif');
+calibrationImage = imread(fiberPositionFile);
 
-% 位置情報ファイルからファイバーの位置（＋半径）を取得
-positionPath = '/Users/shinjirotakeda/Documents/GitHub/test-open/Soft X-ray/Four-View/fiberPositions.xlsx';
-positionData = readmatrix(positionPath,'Sheet',num2str(date),'Range','C2:E33');
-Center = zeros(4,8,2);
-for i = 1:4
-    Center(i,:,:) = positionData(1+8*(i-1):8+8*(i-1),1:2);
-end
-IW = positionData(1,3);
+% 校正用画像からファイバーの位置（＋半径）を取得
+[Center,IW] = find_fibers2(calibrationImage,[65,75]);
 
 Center = round(Center);
 
@@ -32,7 +28,7 @@ Center = round(Center);
 timeSeries = zeros(4,8,2*IW,2*IW);
 
 % バックグラウンドノイズのデータを取得
-backgroundImage = cast(rawImage(1:2*IW,1:2*IW,1),'double');
+backgroundImage = cast(calibrationImage(1:2*IW,1:2*IW,1),'double');
 backgroundNoise = ones(size(backgroundImage))*mean(backgroundImage,'all');
 
 % 切り取った画像のうち実際に使う部分（ファイバー部分）を切り出し
@@ -47,6 +43,8 @@ f1.Position = [200,250,1060,500];
 % 再構成計算に使用可能なサイズに変換するための解像度を取得
 resolution = projectionNumber/(IW*2);
 
+calibrationFactor = get_calibration_factor(date,projectionNumber);
+
 % 画像データの行列化
 for i=1:8
     % 画像切り取りの縦方向・横方向範囲を指定
@@ -59,10 +57,10 @@ for i=1:8
     horizontalRange4 = Center(4,i,1)-IW+1:Center(4,i,1)+IW;
     verticalRange4 = Center(4,i,2)-IW+1:Center(4,i,2)+IW;
     % 生画像を切り取ってファイバー数×フレーム数×IW×IWの配列に格納
-    timeSeries(1,i,:,:) = rawImage(verticalRange1,horizontalRange1,1);
-    timeSeries(2,i,:,:) = rawImage(verticalRange2,horizontalRange2,1);
-    timeSeries(3,i,:,:) = rawImage(verticalRange3,horizontalRange3,1);
-    timeSeries(4,i,:,:) = rawImage(verticalRange4,horizontalRange4,1);
+    timeSeries(1,i,:,:) = calibrationImage(verticalRange1,horizontalRange1,1);
+    timeSeries(2,i,:,:) = calibrationImage(verticalRange2,horizontalRange2,1);
+    timeSeries(3,i,:,:) = calibrationImage(verticalRange3,horizontalRange3,1);
+    timeSeries(4,i,:,:) = calibrationImage(verticalRange4,horizontalRange4,1);
 
     % バックグラウンドノイズ成分を差し引く
     singleImage1 = squeeze(timeSeries(1,i,:,:))-backgroundNoise;
@@ -87,6 +85,14 @@ for i=1:8
     roughImage4 = imresize(grayImage4, resolution, 'nearest');
     roughImage4 = cast(roughImage4,'double');
 
+    % 校正データを用いた明るさの修正（カメラの影の補正とか）や入射角度の補正をここでやりたい
+    % figure;imagesc(roughImage1);
+    roughImage1(k) = roughImage1(k).*squeeze(calibrationFactor(1,i,:));
+    roughImage2(k) = roughImage2(k).*squeeze(calibrationFactor(2,i,:));
+    roughImage3(k) = roughImage3(k).*squeeze(calibrationFactor(3,i,:));
+    roughImage4(k) = roughImage4(k).*squeeze(calibrationFactor(4,i,:));
+    % figure;imagesc(roughImage1);
+
 % 切り出した画像を表示
     figure(f1);
     i_str = num2str(i);
@@ -95,11 +101,13 @@ for i=1:8
     title3 = strcat('3,',i_str);
     title4 = strcat('4,',i_str);
     subplot(4,8,4*(i-1)+1);imagesc(roughImage1);title(title1);
-%         caxis([50,60]);
+    clim([40,60]);
     subplot(4,8,4*(i-1)+2);imagesc(roughImage2);title(title2);
-%         caxis([50,60]);
+    clim([40,60]);
     subplot(4,8,4*(i-1)+3);imagesc(roughImage3);title(title3);
+    clim([40,60]);
     subplot(4,8,4*(i-1)+4);imagesc(roughImage4);title(title4);
+    clim([40,60]);
 
     % ベクトル化
     imageVectors(1,i,:) = roughImage1(k);
@@ -108,13 +116,13 @@ for i=1:8
     imageVectors(4,i,:) = roughImage4(k);
 end
 
-% 整理後のcentersです．ただし時系列には整列されていません．
-f2=figure;hold on;
-f2.Position = [200,250,1060,800];
-imagesc(rawImage,[40,70]);
-viscircles(positionData(:,1:2),positionData(:,3));
-plot(positionData(:,1),positionData(:,2),'*','Color','red');
-hold off;
+% % 整理後のcentersです．ただし時系列には整列されていません．
+% f2=figure;hold on;
+% f2.Position = [200,250,1060,800];
+% imagesc(rawImage,[40,70]);
+% viscircles(positionData(:,1:2),positionData(:,3));
+% plot(positionData(:,1),positionData(:,2),'*','Color','red');
+% hold off;
 
 
 end
