@@ -1,29 +1,34 @@
-function plot_save_sxr(grid2D,data2D,range,date,shot,t,EE,show_localmax,show_flux_surface,show_xpoint,doSave,doFilter,doNLR)
+function plot_save_sxr(grid2D,data2D,range,date,shot,t,EE,show_localmax,show_xpoint,doSave,doFilter,doNLR)
 
 % f = figure;
 % f.Units = 'normalized';
 % f.Position = [0.1,0.2,0.8,0.8];
 
 range = range./1000;
-zmin = range(1);
-zmax = range(2);
+zmin1 = range(1);
+zmax1 = range(2);
+zmin2 = range(3);
+zmax2 = range(4);
 rmin = range(5);
 rmax = range(6);
 r_space_SXR = linspace(rmin,rmax,size(EE,1));
-z_space_SXR = linspace(zmin,zmax,size(EE,2));
+z_space_SXR1 = linspace(zmin1,zmax1,size(EE,2));
+z_space_SXR2 = linspace(zmin2,zmax2,size(EE,2));
 
 r_range = find(0.060<=r_space_SXR & r_space_SXR<=0.330);
 r_space_SXR = r_space_SXR(r_range);
-z_range = find(-0.17<=z_space_SXR & z_space_SXR<=0.17);
+z_range1 = find(-0.17<=z_space_SXR1 & z_space_SXR1<=0.17);
+z_range2 = find(-0.17<=z_space_SXR2 & z_space_SXR2<=0.17);
 
-z_space_SXR = z_space_SXR(z_range);
+z_space_SXR1 = z_space_SXR1(z_range1);
+z_space_SXR2 = z_space_SXR2(z_range2);
 
 % EE1 = EE(r_range,z_range,1);
 % EE2 = EE(r_range,z_range,2);
 % EE3 = EE(r_range,z_range,3);
 % EE4 = EE(r_range,z_range,4);
 
-if show_flux_surface
+% if show_flux_surface
     psi_mesh_z = grid2D.zq;
     psi_mesh_r = grid2D.rq;
     t_idx = find(data2D.trange==t);
@@ -32,9 +37,11 @@ if show_flux_surface
     psi_min = min(min(psi));
     psi_max = max(max(psi));
     contour_layer = linspace(psi_min,psi_max,20);
-end
+% end
 
-[SXR_mesh_z,SXR_mesh_r] = meshgrid(z_space_SXR,r_space_SXR);
+[SXR_mesh_z1,SXR_mesh_r] = meshgrid(z_space_SXR1,r_space_SXR);
+[SXR_mesh_z2,~] = meshgrid(z_space_SXR2,r_space_SXR);
+
 
 % f = figure;
 % f.Units = 'normalized';
@@ -42,18 +49,27 @@ end
 
 positionList = [2,4,1,3];
 nameList = {'1um Al', '2.5um Al', '2um Mylar', '1um Mylar'};
+cLimList = {[0 0.15],[0 0.15],[0 0.05],[0 0.2]};
 
 % 負の要素を0で置換
 negativeEE = find(EE<0);
 EE(negativeEE) = zeros(size(negativeEE));
 
 for i = 1:4
+    if i <= 2
+        z_range = z_range1;
+        SXR_mesh_z = SXR_mesh_z1;
+    else
+        z_range = z_range2;
+        SXR_mesh_z = SXR_mesh_z2;
+    end
     EE_plot = EE(r_range,z_range,i);
     p = positionList(i);
     subplot(2,2,p);
     [~,h] = contourf(SXR_mesh_z,SXR_mesh_r,EE_plot,20);
     h.LineStyle = 'none';
     c=colorbar;c.Label.String='Intensity [a.u.]';c.FontSize=18;
+    clim(cell2mat(cLimList(i)));
     hold on
     if show_localmax
         localmax_idx = imregionalmax(EE_plot);
@@ -63,7 +79,7 @@ for i = 1:4
         localmax_pos_z = SXR_mesh_z(localmax_idx);
         plot(localmax_pos_z,localmax_pos_r,'r*');
     end
-    if show_flux_surface
+    % if show_flux_surface
         [~,hp]=contourf(psi_mesh_z,psi_mesh_r,psi,contour_layer,'-k','Fill','off');
         hp.LineWidth = 1.5;
         if show_xpoint
@@ -76,7 +92,7 @@ for i = 1:4
             r.EdgeColor = 'red';
             r.LineWidth = 1.5;
         end
-    end    
+    % end    
     hold off;
     title(string(nameList(i)));
 end

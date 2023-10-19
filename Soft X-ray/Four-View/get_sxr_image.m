@@ -98,11 +98,14 @@ if doCheck
 end
 
 % 校正用データ（matファイル）が存在する場合はそれを取得、しなければ計算
-CalibrationPath = strcat(getenv('SXR_IMAGE_DIR'),'/',num2str(date),'/CalibrationFactor.mat');
-if exist(CalibrationPath,'file')
-    load(CalibrationPath,'CalibrationFactor');
+calibrationPath = strcat(getenv('SXR_IMAGE_DIR'),'/',num2str(date),'/calibrationFactor.mat');
+if exist(calibrationPath,'file')
+    load(calibrationPath,'calibrationFactor');
+    if numel(calibrationFactor(1,1,:)) ~= numel(k)
+        calibrationFactor = get_calibration_factor(date,projectionNumber);
+    end
 else
-    CalibrationFactor = get_calibration_factor(date,projectionNumber);
+    calibrationFactor = get_calibration_factor(date,projectionNumber);
 end
 
 % 再構成計算に使用可能なサイズに変換するための解像度を取得
@@ -149,9 +152,12 @@ for i=1:8
     roughImage4 = cast(roughImage4,'double');
 
     % 校正データを用いた明るさの修正（カメラの影の補正とか）や入射角度の補正をここでやりたい
-    % figure;imagesc(RoughImage1);
-    % RoughImage1(k) = RoughImage1(k).*squeeze(CalibrationFactor(1,i,:));
-    % figure;imagesc(RoughImage1);
+    % figure;imagesc(roughImage1);
+    roughImage1(k) = roughImage1(k).*squeeze(calibrationFactor(1,i,:));
+    roughImage2(k) = roughImage2(k).*squeeze(calibrationFactor(2,i,:));
+    roughImage3(k) = roughImage3(k).*squeeze(calibrationFactor(3,i,:));
+    roughImage4(k) = roughImage4(k).*squeeze(calibrationFactor(4,i,:));
+    % figure;imagesc(roughImage1);
 
     % 切り出した画像を表示
     if doCheck

@@ -1,4 +1,4 @@
-function [] = plot_sxr_multi(grid2D,data2D,date,shot,show_xpoint,show_localmax,show_flux_surface,start,interval,doSave,SXRfilename,doFilter,NL)
+function [] = plot_sxr_multi(grid2D,data2D,date,shot,show_xpoint,show_localmax,start,interval,doSave,SXRfilename,doFilter,NL)
 % plot SXR emission on psi in rz plane
 % input:
 %   3d array of double: B_z (r,z,t), offsetted at zero and smoothed
@@ -52,9 +52,11 @@ end
 % 再構成計算に必要なパラメータを計算するなら読み込む
 parameterFile = 'parameters.mat';
 if doCalculation
-    newProjectionNumber = 80;
+    disp('No matrix data -- Start calculation');
+    newProjectionNumber = 50;
     newGridNumber = 100;
     if isfile(parameterFile)
+        disp(strcat('Loading parameter from ',which(parameterFile)))
         load(parameterFile,'gm2d1','gm2d2','gm2d3','gm2d4', ...
                 'U1','U2','U3','U4','s1','s2','s3','s4', ...
                 'v1','v2','v3','v4','M','K','range','N_projection','N_grid');
@@ -74,6 +76,7 @@ if doCalculation
                 'v1','v2','v3','v4','M','K','range');
     end
 else
+    disp(strcat('Loading matrix from ',which(matrixFolder)))
     load(parameterFile,'range');
 end
 
@@ -119,6 +122,7 @@ for t = times
         
     else
         matrixPath = strcat(matrixFolder,'/',num2str(number),'.mat');
+        % disp(strcat('Loading result matrix from ',which(matrixPath)));
         load(matrixPath,'EE1','EE2','EE3','EE4');
 
         % loadpath_one = strcat(savefolder,'/',num2str(number),'_one.txt');
@@ -138,7 +142,7 @@ for t = times
     % f.Units = 'normalized';
     % f.Position = [0.1,0.2,0.8,0.8];
 
-    plot_save_sxr(grid2D,data2D,range,date,shot,t,EE,show_localmax,show_flux_surface,show_xpoint,doSave,doFilter,NL);
+    plot_save_sxr(grid2D,data2D,range,date,shot,t,EE,show_localmax,show_xpoint,doSave,doFilter,NL);
 
 end
 

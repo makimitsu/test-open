@@ -1,4 +1,4 @@
-function plot_sxr_at_t(grid2D,data2D,date,shot,t,show_xpoint,show_localmax,show_flux_surface,start,interval,save,SXRfilename,filter,NL)
+function plot_sxr_at_t(grid2D,data2D,date,shot,t,show_xpoint,show_localmax,start,interval,save,SXRfilename,filter,NL)
 
 newProjectionNumber = 80;
 newGridNumber = 100;
@@ -64,6 +64,6 @@ f.Units = 'normalized';
 f.Position = [0.1,0.2,0.8,0.8];
 
 EE = cat(3,EE1,EE2,EE3,EE4);
-plot_save_sxr(grid2D,data2D,range,date,shot,t,EE,show_localmax,show_flux_surface,show_xpoint,save,filter,NL);
+plot_save_sxr(grid2D,data2D,range,date,shot,t,EE,show_localmax,show_xpoint,save,filter,NL);
 
 end

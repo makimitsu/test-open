@@ -100,10 +100,10 @@ calibrationFactor = meanIntensity./imageVectors;
 
 % 角度補正（今のままだと上下逆＠231003）
 % imagescとpplotで上下が反転してるせい→どっちが正しい？
-theta1 = pi*3/4;
-theta2 = pi*1/4;
-theta3 = -pi*3/4;
-theta4 = -pi*1/4;
+theta1 = -pi*3/4;
+theta2 = -pi*1/4;
+theta3 = pi*3/4;
+theta4 = pi*1/4;
 correctionTerm1 = get_angle_correction(N_projection,theta1);
 correctionTerm2 = get_angle_correction(N_projection,theta2);
 correctionTerm3 = get_angle_correction(N_projection,theta3);
@@ -118,6 +118,8 @@ for i = 1:8
 end
 
 calibrationFactor = calibrationFactor.*angleCorrection;
+outlier = calibrationFactor>=3;
+calibrationFactor(outlier) = 3;
 calibrationSavePath = strcat(calibrationPath,'/calibrationFactor.mat');
 save(calibrationSavePath,'calibrationFactor');
 

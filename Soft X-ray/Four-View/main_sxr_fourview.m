@@ -31,11 +31,11 @@ T=getTS6log(DOCID);
 node='date';
 T=searchlog(T,node,date);
 n_data=numel(IDXlist);%計測データ数
-shotlist_a039 =T.a039(IDXlist);
+shotlist_a039 = T.a039(IDXlist);
 shotlist_a040 = T.a040(IDXlist);
 shotlist = [shotlist_a039, shotlist_a040];
-tfshotlist_a039 =T.a039_TF(IDXlist);
-tfshotlist_a040 =T.a040_TF(IDXlist);
+tfshotlist_a039 = T.a039_TF(IDXlist);
+tfshotlist_a040 = T.a040_TF(IDXlist);
 tfshotlist = [tfshotlist_a039, tfshotlist_a040];
 EFlist=T.EF_A_(IDXlist);
 TFlist=T.TF_kV_(IDXlist);
@@ -57,12 +57,12 @@ n=50; %【input】rz方向のメッシュ数
 t = 470;
 show_xpoint = false;
 show_localmax = false;
-show_flux_surface = true;
-doSave = true;
+doSave = false;
 doFilter = false;
 doNLR = false; %do non-linear reconstruction
 
 for i=1:n_data
+    disp(strcat('(',num2str(i),'/',num2str(n_data),')'));
     % dtacq_num=dtacqlist;
     shot=shotlist(i,:);
     tfshot=tfshotlist(i,:);
@@ -78,6 +78,6 @@ for i=1:n_data
     % data2D = NaN;
     shot_SXR = IDXlist(i);
     SXRfilename = strcat(getenv('SXR_IMAGE_DIR'),'/',num2str(date),'/shot',num2str(shot_SXR,'%03i'),'.tif');
-    plot_sxr_multi(grid2D,data2D,date,shot_SXR,show_xpoint,show_localmax,show_flux_surface,start,interval,doSave,SXRfilename,doFilter,doNLR);
-    % plot_sxr_at_t(grid2D,data2D,date,shot,t,show_xpoint,show_localmax,show_flux_surface,start,interval,doSave,SXRfilename,doFilter,NL)
+    plot_sxr_multi(grid2D,data2D,date,shot_SXR,show_xpoint,show_localmax,start,interval,doSave,SXRfilename,doFilter,doNLR);
+    % plot_sxr_at_t(grid2D,data2D,date,shot,t,show_xpoint,show_localmax,start,interval,doSave,SXRfilename,doFilter,NL)
 end

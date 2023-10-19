@@ -67,12 +67,15 @@ k = find(R<L);
 end
 
 function l = MCPLine_up(N_projection,Z_hole,plot_flag)
-d_hole =24.4; % distance between the hole and the MCP
+d_hole = 24.4; % distance between the hole and the MCP
 r_mcp=10;  % radius of the MCP plate
-% Y_hole=425.24;  X_hole=195.13;          % position of the hole
-Y_hole = 427.85+12; 
-X_hole = 209.62; 
-% X_hole_new_down = X_hole_new_up - 64;
+
+% Y_hole = 427.85+12; 
+Y_hole = 413.24+12; %?
+
+% X_hole = 209.62;
+X_hole = 208.13; %?
+
 Y_initial=Y_hole+d_hole;  X_initial=X_hole-r_mcp;  Z_initial=Z_hole+r_mcp;    %CCD position
 X_end=X_hole+r_mcp;      Z_end=Z_hole-r_mcp;
 
@@ -139,10 +142,13 @@ function l = MCPLine_down(N_projection,Z_hole,plot_flag)
 d_hole =24.4; % distance between the hole and the MCP
 r_mcp=10;  %radius of the MCP plate
 % Y_hole=425.24;  X_hole=195.13;          % position of the hole
-Y_hole = 427.85+12; 
-% X_hole = 209.62; 
-% X_hole_new_down = X_hole_new_up - 64;
-X_hole = 145.62;
+
+% Y_hole = 427.85+12; %
+Y_hole = 413.24+12; %?
+
+% X_hole = 145.62; 
+X_hole = 144.13; %?
+
 Y_initial=Y_hole+d_hole;  X_initial=X_hole-r_mcp;  Z_initial=Z_hole+r_mcp;    %CCD position
 X_end=X_hole+r_mcp;      Z_end=Z_hole-r_mcp;
 
@@ -165,7 +171,7 @@ if plot_flag
 end
 for i=1:N_projection
     for j=1:N_projection
-        ll(i,j).y=Y(j):-10:-400;
+        ll(i,j).y=Y(j):-10:-400; %大から小
         length = numel(ll(i,j).y);
         ll(i,j).x=(ll(i,j).y-Y_hole)*(X(i)-X_hole)/(Y(j)-Y_hole)+X_hole;
         ll(i,j).z=(ll(i,j).y-Y_hole)*(Z(j)-Z_hole)/(Y(j)-Y_hole)+Z_hole;

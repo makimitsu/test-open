@@ -124,6 +124,25 @@ end
 % plot(positionData(:,1),positionData(:,2),'*','Color','red');
 % hold off;
 
+for i = 1:8
+    A = zeros(projectionNumber);
+    A(k) = squeeze(calibrationFactor(1,i,:));
+    B = zeros(projectionNumber);
+    B(k) = squeeze(calibrationFactor(2,i,:));
+    C = zeros(projectionNumber);
+    C(k) = squeeze(calibrationFactor(3,i,:));
+    D = zeros(projectionNumber);
+    D(k) = squeeze(calibrationFactor(4,i,:));
+    
+    f2 = figure;
+    f2.Units = 'normalized';
+    f2.Position = [0.1,0.2,0.8,0.8];
+    subplot(2,2,1);imagesc(A);title('A');clim([0 3]);%colorbar;
+    subplot(2,2,2);imagesc(B);title('B');clim([0 3]);%colorbar;
+    subplot(2,2,3);imagesc(C);title('C');clim([0 3]);%colorbar;
+    subplot(2,2,4);imagesc(D);title('D');clim([0 3]);%colorbar;
+end
+
 
 end
 
