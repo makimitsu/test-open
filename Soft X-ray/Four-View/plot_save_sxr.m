@@ -17,8 +17,8 @@ z_space_SXR2 = linspace(zmin2,zmax2,size(EE,2));
 
 r_range = find(0.060<=r_space_SXR & r_space_SXR<=0.330);
 r_space_SXR = r_space_SXR(r_range);
-z_range1 = find(-0.17<=z_space_SXR1 & z_space_SXR1<=0.17);
-z_range2 = find(-0.17<=z_space_SXR2 & z_space_SXR2<=0.17);
+z_range1 = find(-0.12<=z_space_SXR1 & z_space_SXR1<=0.12);
+z_range2 = find(-0.12<=z_space_SXR2 & z_space_SXR2<=0.12);
 
 z_space_SXR1 = z_space_SXR1(z_range1);
 z_space_SXR2 = z_space_SXR2(z_range2);
@@ -57,11 +57,11 @@ EE(negativeEE) = zeros(size(negativeEE));
 
 for i = 1:4
     if i <= 2
-        z_range = z_range1;
-        SXR_mesh_z = SXR_mesh_z1;
-    else
         z_range = z_range2;
         SXR_mesh_z = SXR_mesh_z2;
+    else
+        z_range = z_range1;
+        SXR_mesh_z = SXR_mesh_z1;
     end
     EE_plot = EE(r_range,z_range,i);
     p = positionList(i);

@@ -54,7 +54,7 @@ parameterFile = 'parameters.mat';
 if doCalculation
     disp('No matrix data -- Start calculation');
     newProjectionNumber = 50;
-    newGridNumber = 100;
+    newGridNumber = 90;
     if isfile(parameterFile)
         disp(strcat('Loading parameter from ',which(parameterFile)))
         load(parameterFile,'gm2d1','gm2d2','gm2d3','gm2d4', ...

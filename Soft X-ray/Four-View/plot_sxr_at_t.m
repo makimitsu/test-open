@@ -1,7 +1,7 @@
 function plot_sxr_at_t(grid2D,data2D,date,shot,t,show_xpoint,show_localmax,start,interval,save,SXRfilename,filter,NL)
 
-newProjectionNumber = 80;
-newGridNumber = 100;
+newProjectionNumber = 50;
+newGridNumber = 90;
 
 if filter & NL
     options = 'NLF_NLR';

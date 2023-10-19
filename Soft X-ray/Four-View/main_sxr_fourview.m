@@ -57,7 +57,7 @@ n=50; %【input】rz方向のメッシュ数
 t = 470;
 show_xpoint = false;
 show_localmax = false;
-doSave = false;
+doSave = true;
 doFilter = false;
 doNLR = false; %do non-linear reconstruction
 

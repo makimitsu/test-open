@@ -1,12 +1,16 @@
-function [] = get_parameters(N_projection,N_grid,filepath)
+clear
+N_projection = 50; % projection number
+N_grid = 90; % grid number
+z_plot_lim = 120; % plot area
 
-% filepath = '/Users/shinjirotakeda/Documents/GitHub/test-open/Soft X-ray/Four-View_Simulation/parameters.mat';
-
-% 視線の分布、重み行列の作成
 zhole1=40;zhole2=-40;                                  
 zmin1=-240;zmax1=320;zmin2=-320;zmax2=240;             
 rmin=55;rmax=375;
-range = [zmin1,zmax1,zmin2,zmax2,rmin,rmax];            
+
+f = figure;
+f.Units = 'normalized';
+f.Position = [0.1,0.2,0.8,0.8];
+
 l1 = MCPLine_up(N_projection,zhole2,false);
 gm2d1 = LineProjection(l1,N_grid,zmin2,zmax2,rmin,rmax,false,true); 
 l2 = MCPLine_down(N_projection,zhole2,false);
@@ -16,44 +20,45 @@ gm2d3 = LineProjection(l3,N_grid,zmin1,zmax1,rmin,rmax,false,true);
 l4 = MCPLine_down(N_projection,zhole1,false);
 gm2d4 = LineProjection(l4,N_grid,zmin1,zmax1,rmin,rmax,false,false);
 
-% ラプラシアン行列の計算と特異値分解
-C = Laplacian(N_grid);
-[U1,S1,V1]=svd(gm2d1*(C^(-1)),'econ');
-[U2,S2,V2]=svd(gm2d2*(C^(-1)),'econ');
-[U3,S3,V3]=svd(gm2d3*(C^(-1)),'econ');
-[U4,S4,V4]=svd(gm2d4*(C^(-1)),'econ');
-% [U1,S1,V1]=svd(gm2d1*(C^(-1)));
-% [U2,S2,V2]=svd(gm2d2*(C^(-1)));
-% [U3,S3,V3]=svd(gm2d3*(C^(-1)));
-% [U4,S4,V4]=svd(gm2d4*(C^(-1)));
-v1=(C^(-1)*V1);
-v2=(C^(-1)*V2);
-v3=(C^(-1)*V3);
-v4=(C^(-1)*V4);
+FOV = zeros(N_grid+1,N_grid+1,4);
+FOV(:,:,1) = reshape(sum(gm2d1),N_grid+1,[]); % 縦軸r, 横軸zで左下最小
+FOV(:,:,2) = reshape(sum(gm2d2),N_grid+1,[]);
+FOV(:,:,3) = reshape(sum(gm2d3),N_grid+1,[]);
+FOV(:,:,4) = reshape(sum(gm2d4),N_grid+1,[]);
 
-[M,K] = size(gm2d1);
-if K>M
-    v1 = v1(:,1:M);
-    v2 = v2(:,1:M);
-    v3 = v3(:,1:M);
-    v4 = v4(:,1:M);
-end
-s1 = (diag(S1)).';
-s2 = (diag(S2)).';
-s3 = (diag(S3)).';
-s4 = (diag(S4)).';
-if M>K
-    s1 = [s1 zeros(1,M-K)];
-    s2 = [s2 zeros(1,M-K)];
-    s3 = [s3 zeros(1,M-K)];
-    s4 = [s4 zeros(1,M-K)];
+r_space_SXR = linspace(rmin,rmax,N_grid+1);
+z_space_SXR1 = linspace(zmin1,zmax1,N_grid+1);
+z_space_SXR2 = linspace(zmin2,zmax2,N_grid+1);
+
+r_range = find(60<=r_space_SXR & r_space_SXR<=330);
+r_space_SXR = r_space_SXR(r_range);
+z_range1 = find(-1*z_plot_lim<=z_space_SXR1 & z_space_SXR1<=z_plot_lim);
+z_range2 = find(-1*z_plot_lim<=z_space_SXR2 & z_space_SXR2<=z_plot_lim);
+
+z_space_SXR1 = z_space_SXR1(z_range1);
+z_space_SXR2 = z_space_SXR2(z_range2);
+
+[SXR_mesh_z1,SXR_mesh_r] = meshgrid(z_space_SXR1,r_space_SXR);
+[SXR_mesh_z2,~] = meshgrid(z_space_SXR2,r_space_SXR);
+
+positionList = [2,4,1,3];
+
+for i = 1:4
+    if i <= 2
+        z_range = z_range2;
+        SXR_mesh_z = SXR_mesh_z2;
+    else
+        z_range = z_range1;
+        SXR_mesh_z = SXR_mesh_z1;
+    end
+    FOV_plot = flipud(FOV(r_range,z_range,i)); % 縦軸r, 横軸zで左上最小
+    p = positionList(i);
+    subplot(2,2,p);
+    [~,h] = contourf(SXR_mesh_z,SXR_mesh_r,FOV_plot,20);
+    h.LineStyle = 'none';
+    clim([0 1]);
 end
 
-save(filepath,'gm2d1','gm2d2','gm2d3','gm2d4', ...
-    'U1','U2','U3','U4','s1','s2','s3','s4', ...
-    'v1','v2','v3','v4','M','K','range','N_projection','N_grid');
-
-end
 
 function k = FindCircle(L)
 R = zeros(2*L);
@@ -211,72 +216,6 @@ if plot_flag
 end
 end
 
-function l = MCPLine(N_projection,Z_hole,plot_flag)
-d_hole =24.4; % distance between the hole and the MCP
-r_mcp=10;  %radius of the MCP plate
-Y_hole=425.24;  X_hole=195.13;          % position of the hole
-% Y_hole_new = 427.85+12; 
-% X_hole_new_up = 209.62; X_hole_new_down = X_hole_new_up - 64;
-Y_initial=Y_hole+d_hole;  X_initial=X_hole-r_mcp;  Z_initial=Z_hole+r_mcp;    %CCD position
-X_end=X_hole+r_mcp;      Z_end=Z_hole-r_mcp;
-
-Nh=N_projection-1; 
-Dhx=(X_end-X_initial)/Nh;
-Dhz=(Z_end-Z_initial)/Nh;
-
-X=X_initial:Dhx:X_end;
-Z=Z_initial:Dhz:Z_end;
-Y=repelem(Y_initial,N_projection);
-
-r_center = 55;
-r_device = 375;
-ll(N_projection,N_projection) = struct('x',[],'y',[],'z',[]);
-if plot_flag
-    f1=figure;
-    f2=figure;
-end
-for i=1:N_projection
-    for j=1:N_projection
-        ll(i,j).y=Y(j):-10:-400;
-        length = numel(ll(i,j).y);
-        ll(i,j).x=(ll(i,j).y-Y_hole)*(X(i)-X_hole)/(Y(j)-Y_hole)+X_hole;
-        ll(i,j).z=(ll(i,j).y-Y_hole)*(Z(j)-Z_hole)/(Y(j)-Y_hole)+Z_hole;
-        %中心軸で視線が遮られることを考慮
-        r = sqrt(ll(i,j).y.^2+ll(i,j).x.^2);
-        A = find(r<=r_center);
-        if isempty(A) == 0
-            obs1 = A(1)-1;
-            ll(i,j).x = [repelem(ll(i,j).x(1),length-obs1) ll(i,j).x(1:obs1)];
-            ll(i,j).y = [repelem(ll(i,j).y(1),length-obs1) ll(i,j).y(1:obs1)];
-            ll(i,j).z = [repelem(ll(i,j).z(1),length-obs1) ll(i,j).z(1:obs1)];
-        end
-        B = find(r>=r_device & ll(i,j).y<=0);
-        if isempty(B) == 0
-            obs2 = B(1)-1;
-            ll(i,j).x = [repelem(ll(i,j).x(1),length-obs2) ll(i,j).x(1:obs2)];
-            ll(i,j).y = [repelem(ll(i,j).y(1),length-obs2) ll(i,j).y(1:obs2)];
-            ll(i,j).z = [repelem(ll(i,j).z(1),length-obs2) ll(i,j).z(1:obs2)];
-        end
-        %plot the lightline
-        if plot_flag
-            figure(f1);plot3(X(i),Y(j),Z(j),'*',ll(i,j).x,ll(i,j).y,ll(i,j).z);  
-            hold on;grid on; 
-        end
-    end
-end
-
-%視線の行列のうち円の内部に含まれるものだけをベクトル化
-L = N_projection/2;
-k = FindCircle(L);
-l = ll(k);
-if plot_flag
-    for i = 1:numel(l)
-        figure(f2);plot3(l(i).x,l(i).y,l(i).z);
-        hold on;grid on;
-    end
-end
-end
-
 function gm2d = LineProjection(l,N_grid,zmin,zmax,rmin,rmax,plot_flag,up_flag)
 % rmin=70;rmax=330;
 % rmin=55;rmax=375;
@@ -334,28 +273,3 @@ for i = 1:N_p
 end
 end
 
-function C = Laplacian(N_grid)
-k=N_grid+1;
-K=k*k;
-C=zeros(K);
-for i=1:1:k
-    for j=1:1:k
-           C((i-1)*k+j,(i-1)*k+j)=-4;
-        if j+1<=k
-            C((i-1)*k+j,(i-1)*k+j+1)=1;
-        end
-        
-        if j-1>=1
-            C((i-1)*k+j,(i-1)*k+j-1)=1;
-        end
-        
-        if i-1-1>=0
-            C((i-1)*k+j,(i-1-1)*k+j)=1;
-        end
-        
-        if i-1+1<=k-1
-            C((i-1)*k+j,(i-1+1)*k+j)=1;
-        end
-    end
-end
-end
