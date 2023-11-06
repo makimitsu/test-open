@@ -40,6 +40,16 @@ if doCalculation
         load(parameterFile, 'gm2d1', 'gm2d2', 'gm2d3', 'gm2d4', 'U1', 'U2', 'U3', 'U4', ...
             's1', 's2', 's3', 's4', 'v1', 'v2', 'v3', 'v4', 'M', 'K', 'range','N_projection', 'N_grid');   
     end
+
+    % 生画像の取得
+    rawImage = imread(SXRfilename);
+    
+    % 非線形フィルターをかける（必要があれば）
+    if doFilter
+        % figure;imagesc(rawImage);
+        [rawImage,~] = imnlmfilt(rawImage,'SearchWindowSize',91,'ComparisonWindowSize',15);
+        % figure;imagesc(rawImage);
+    end
 else
     load(parameterFile,'range');
 end
@@ -48,7 +58,7 @@ number = (t-start)/interval+1;
 doPlot = false;
 
 if doCalculation
-    [Iwgn1,Iwgn2,Iwgn3,Iwgn4] = get_sxr_image(date,number,newProjectionNumber,SXRfilename,filter);
+    [Iwgn1,Iwgn2,Iwgn3,Iwgn4] = get_sxr_image(date,number,newProjectionNumber,rawImage);
     
     EE1 = get_distribution(M,K,gm2d1,U1,s1,v1,Iwgn1,doPlot,NL);
     EE2 = get_distribution(M,K,gm2d2,U2,s2,v2,Iwgn2,doPlot,NL);

@@ -20,13 +20,22 @@ pathname.pre_processed_directory = getenv('pre_processed_directory_path');%計�
 
 %%%%実験オペレーションの取得
 prompt = {'Date:','Shot number:','doCheck:'};
+if exist('date','var')
+    definput{1} = num2str(date);
+end
+if exist('IDXlist','var')
+    definput{2} = num2str(IDXlist);
+end
+if exist('doCheck','var')
+    definput{3} = num2str(doCheck);
+end
 dlgtitle = 'Input';
 dims = [1 35];
-if exist('date','var') && exist('IDXlist','var') && exist('doCheck','var')
-    definput = {num2str(date),num2str(IDXlist),num2str(doCheck)};
-else
-    definput = {'','',''};
-end
+% if exist('date','var') && exist('IDXlist','var') && exist('doCheck','var')
+%     definput = {num2str(date),num2str(IDXlist),num2str(doCheck)};
+% else
+%     definput = {'','',''};
+% end
 % definput = {'','',''};
 % definput = {num2str(date),num2str(IDXlist),num2str(doCheck)};
 answer = inputdlg(prompt,dlgtitle,dims,definput);

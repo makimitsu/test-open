@@ -75,8 +75,18 @@ if doCalculation
                 'U1','U2','U3','U4','s1','s2','s3','s4', ...
                 'v1','v2','v3','v4','M','K','range');
     end
+
+    % 生画像の取得
+    rawImage = imread(SXRfilename);
+    
+    % 非線形フィルターをかける（必要があれば）
+    if doFilter
+        % figure;imagesc(rawImage);
+        [rawImage,~] = imnlmfilt(rawImage,'SearchWindowSize',91,'ComparisonWindowSize',15);
+        % figure;imagesc(rawImage);
+    end
 else
-    disp(strcat('Loading matrix from ',which(matrixFolder)))
+    disp(strcat('Loading matrix from :',matrixFolder))
     load(parameterFile,'range');
 end
 
@@ -88,9 +98,12 @@ doPlot = false;
 % f.Units = 'normalized';
 % f.Position = [0.1,0.2,0.8,0.4];
 
-f = figure;
-f.Units = 'normalized';
-f.Position = [0.1,0.2,0.8,0.8];
+
+if doSave
+    f = figure;
+    f.Units = 'normalized';
+    f.Position = [0.1,0.2,0.8,0.8];
+end
 
 for t = times
     number = (t-start)/interval+1;
@@ -98,7 +111,7 @@ for t = times
     
     if doCalculation
 %         ベクトル形式の画像データの読み込み
-        [VectorImage1,VectorImage2, VectorImage3, VectorImage4] = get_sxr_image(date,number,newProjectionNumber,SXRfilename,doFilter);
+        [VectorImage1,VectorImage2, VectorImage3, VectorImage4] = get_sxr_image(date,number,newProjectionNumber,rawImage);
 
 %         再構成計算
         EE1 = get_distribution(M,K,gm2d1,U1,s1,v1,VectorImage1,doPlot,NL);
@@ -138,14 +151,18 @@ for t = times
     
     EE = cat(3,EE1,EE2,EE3,EE4);
 
-    % f = figure;
-    % f.Units = 'normalized';
-    % f.Position = [0.1,0.2,0.8,0.8];
+    if ~doSave
+        f = figure;
+        f.Units = 'normalized';
+        f.Position = [0.1,0.2,0.8,0.8];
+    end
 
     plot_save_sxr(grid2D,data2D,range,date,shot,t,EE,show_localmax,show_xpoint,doSave,doFilter,NL);
 
 end
 
-close(f);
+if doSave
+    close(f);
+end
 
 end

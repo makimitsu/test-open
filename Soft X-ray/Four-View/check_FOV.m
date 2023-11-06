@@ -1,7 +1,8 @@
 clear
 N_projection = 50; % projection number
 N_grid = 90; % grid number
-z_plot_lim = 120; % plot area
+z_plot_lim = 120; % plot
+% z_plot_lim = 320; % plot areaarea
 
 zhole1=40;zhole2=-40;                                  
 zmin1=-240;zmax1=320;zmin2=-320;zmax2=240;             
@@ -54,8 +55,9 @@ for i = 1:4
     FOV_plot = flipud(FOV(r_range,z_range,i)); % 縦軸r, 横軸zで左上最小
     p = positionList(i);
     subplot(2,2,p);
-    [~,h] = contourf(SXR_mesh_z,SXR_mesh_r,FOV_plot,20);
-    h.LineStyle = 'none';
+    % [~,h] = contourf(SXR_mesh_z,SXR_mesh_r,FOV_plot,20);
+    % h.LineStyle = 'none';
+    pcolor(SXR_mesh_z,SXR_mesh_r,FOV_plot);
     clim([0 1]);
 end
 

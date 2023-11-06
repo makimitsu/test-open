@@ -49,7 +49,9 @@ z_space_SXR2 = z_space_SXR2(z_range2);
 
 positionList = [2,4,1,3];
 nameList = {'1um Al', '2.5um Al', '2um Mylar', '1um Mylar'};
-cLimList = {[0 0.15],[0 0.15],[0 0.05],[0 0.2]};
+% cLimList = {[0 0.15],[0 0.15],[0 0.05],[0 0.2]};
+cLimList = {[0 0.15],[0 0.075],[0 0.05],[0 0.075]};
+% cLimList = {[0 0.5],[0 0.5],[0 0.1],[0 0.5]};
 
 % 負の要素を0で置換
 negativeEE = find(EE<0);

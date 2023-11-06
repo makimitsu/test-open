@@ -4,7 +4,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%
 % clear
 % close all
-clearvars -except date IDXlist
+clearvars -except date IDXlist doSave doFilter doNLR
 addpath '/Users/shinjirotakeda/Documents/GitHub/test-open/pcb_experiment'; %getMDSdata.mとcoeff200ch.xlsxのあるフォルダへのパス
 
 %%%%%ここが各PCのパス
@@ -14,17 +14,36 @@ pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所;
 pathname.pre_processed_directory = getenv('pre_processed_directory_path');%計算結果の保存先（どこでもいい）
 
 %%%%実験オペレーションの取得
-prompt = {'Date:','Shot number:'};
+prompt = {'Date:','Shot number:','doSave:','doFilter:','doNLR:'};
+definput = {'','','','',''};
+if exist('date','var')
+    definput{1} = num2str(date);
+end
+if exist('IDXlist','var')
+    definput{2} = num2str(IDXlist);
+end
+if exist('doSave','var')
+    definput{3} = num2str(doSave);
+end
+if exist('doFilter','var')
+    definput{4} = num2str(doFilter);
+end
+if exist('doNLR','var')
+    definput{5} = num2str(doNLR);
+end
 dlgtitle = 'Input';
 dims = [1 35];
-if exist('date','var') && exist('IDXlist','var')
-    definput = {num2str(date),num2str(IDXlist)};
-else
-    definput = {'',''};
-end
+% if exist('date','var') && exist('IDXlist','var')
+%     definput = {num2str(date),num2str(IDXlist)};
+% else
+%     definput = {'',''};
+% end
 answer = inputdlg(prompt,dlgtitle,dims,definput);
 date = str2double(cell2mat(answer(1)));
 IDXlist = str2num(cell2mat(answer(2)));
+doSave = logical(str2num(cell2mat(answer(3))));
+doFilter = logical(str2num(cell2mat(answer(4))));
+doNLR = logical(str2num(cell2mat(answer(5))));
 
 DOCID='1wG5fBaiQ7-jOzOI-2pkPAeV6SDiHc_LrOdcbWlvhHBw';%スプレッドシートのID
 T=getTS6log(DOCID);
@@ -57,9 +76,9 @@ n=50; %【input】rz方向のメッシュ数
 t = 470;
 show_xpoint = false;
 show_localmax = false;
-doSave = true;
-doFilter = false;
-doNLR = false; %do non-linear reconstruction
+% doSave = false;
+% doFilter = true;
+% doNLR = false; %do non-linear reconstruction
 
 for i=1:n_data
     disp(strcat('(',num2str(i),'/',num2str(n_data),')'));

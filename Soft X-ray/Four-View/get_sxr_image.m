@@ -1,4 +1,4 @@
-function [imageVector1,imageVector2,imageVector3,imageVector4] = get_sxr_image(date,number,projectionNumber,sxrFilename,doFilter)
+function [imageVector1,imageVector2,imageVector3,imageVector4] = get_sxr_image(date,number,projectionNumber,rawImage)
 
 % 画像を切り取ってベクトル形式で出力
 % 全時間帯の画像を全て出力するかどうか
@@ -18,15 +18,15 @@ function [imageVector1,imageVector2,imageVector3,imageVector4] = get_sxr_image(d
 % doCheck = true;
 doCheck = false;
 
-% 生画像の取得
-rawImage = imread(sxrFilename);
-
-% 非線形フィルターをかける（必要があれば）
-if doFilter
-    figure;imagesc(rawImage);
-    [rawImage,~] = imnlmfilt(rawImage,'SearchWindowSize',91,'ComparisonWindowSize',15);
-    figure;imagesc(rawImage);
-end
+% % 生画像の取得
+% rawImage = imread(sxrFilename);
+% 
+% % 非線形フィルターをかける（必要があれば）
+% if doFilter
+%     figure;imagesc(rawImage);
+%     [rawImage,~] = imnlmfilt(rawImage,'SearchWindowSize',91,'ComparisonWindowSize',15);
+%     figure;imagesc(rawImage);
+% end
 
 % % ファイバーの位置を検索するための校正用画像を取得
 % fiberPositionFile = strcat('/Users/shinjirotakeda/OneDrive - The University of Tokyo/Documents/SXR_Images/',num2str(date),'/PositionCheck.tif');
