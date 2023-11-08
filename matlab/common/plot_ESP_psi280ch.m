@@ -1,4 +1,4 @@
-function [] = plot_ESP(ESP,ESPdata2D,colorplot)
+function [] = plot_ESP_psi280ch(ESP,ESPdata2D,grid2D,data2D,colorplot,PCB_t_idx)
 switch colorplot
     case {'phi','Ez','Er'}
         figure('Position', [0 0 1500 1500],'visible','on');
@@ -34,9 +34,10 @@ switch colorplot
                 q.Color = "k";
             end
             hold on
+            contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,PCB_t_idx)),20,'black','LineWidth',3);
             title([num2str(ESPdata2D.trange(idx_t)) 'us'])
             xlim([-0.1 0.1])
-            ylim([0.07 0.3])
+            ylim([0.07 0.35])
             daspect([1 1 1])
         end
     otherwise

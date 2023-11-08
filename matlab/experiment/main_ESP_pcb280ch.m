@@ -2,9 +2,23 @@
 % 磁気プローブ、静電プローブによる
 % 磁気面、静電ポテンシャル、ExBドリフトをプロット
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-clear all
-addpath '/Users/rsomeya/Documents/lab/matlab/common';
-run define_path.m
+clear
+addpath '/Users/shinjirotakeda/Documents/GitHub/test-open/matlab/common';
+addpath '/Users/shinjirotakeda/Documents/GitHub/test-open/Soft X-ray/Four-View';
+
+% run define_path.m
+%【※コードを使用する前に】環境変数を設定しておくか、matlab内のコマンドからsetenv('パス名','アドレス')で指定してから動かす
+pathname.ts3u=getenv('ts3u_path');%old-koalaのts-3uまでのパス（mrdなど）
+pathname.fourier=getenv('fourier_path');%fourierのmd0（データックのショットが入ってる）までのpath
+pathname.NIFS=getenv('NIFS_path');%resultsまでのpath（ドップラー、SXR）
+pathname.save=getenv('savedata_path');%outputデータ保存先
+pathname.rawdata38=getenv('rawdata038_path');%dtacq a038のrawdataの保管場所
+pathname.woTFdata=getenv('woTFdata_path');%rawdata（TFoffset引いた）の保管場所
+pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所
+pathname.pre_processed_directory = getenv('pre_processed_directory_path');%計算結果の保存先（どこでもいい）
+pathname.ESP=getenv('NIFS_ESP');%smb接続
+pathname.fig=[getenv('PROBE_DATA_DIR') '/figure'];%figure保存先
+pathname.mat=[getenv('PROBE_DATA_DIR') '/mat'];%mat保存先
 
 % ESP.date = 230826;%計測日
 % ESP.shotlist = [6 8 10 11 12 16 17 19 20 22 24 25 26 29 32 34 35 37 38 43 45 47 49 51 53 55];%shot番号
@@ -38,11 +52,17 @@ FIG.yoko = 1;%【input】プロット枚数(横)
 ESP.mesh = 21;%【input】静電プローブ補間メッシュ数(21)
 % ESP.mesh = 40;%【input】静電プローブ補間メッシュ数
 ESP.trange = 460:0.1:500;%【input】計算時間範囲(0.1刻み)
-ESP.vector = true;%【input】電場ベクトルをプロット
+ESP.vector = false;%【input】電場ベクトルをプロット
+colorplot = 'phi';%【input】カラープロット種類('phi','Er','Ez')
+ESP.tate = 1;%【input】プロット枚数(縦)
+ESP.yoko = 1;%【input】プロット枚数(横)
+ESP.dt = 2;%【input】プロット時間間隔[us]
+ESP.start = 474;%【input】プロット開始時刻[us]
 
-colorplot = 'none';%【input】カラープロット種類('phi','psi','Ez','Er','Et',...
-% 'Bz','Br','Bt_ext','Bt_plasma','absB','absB2','Jt','VExBr','VExBz','|VExB|')
-profileplot = 'VExBz';%【input】一次元プロット種類('VExBr','VExBz','|VExB|')
+% 
+% colorplot = 'none';%【input】カラープロット種類('phi','psi','Ez','Er','Et',...
+% % 'Bz','Br','Bt_ext','Bt_plasma','absB','absB2','Jt','VExBr','VExBz','|VExB|')
+% profileplot = 'VExBz';%【input】一次元プロット種類('VExBr','VExBz','|VExB|')
 
 PCB.mesh = 40; %【input】psiのrz方向メッシュ数
 PCB.trange = 400:800;%【input】psi計算時間範囲
@@ -68,12 +88,16 @@ IDSP.r = (IDSPminRlist:2.5:IDSPminRlist+6*2.5)*1E-2;
 %静電プローブ計算
 ESPdata2D = cal_ESP(pathname,ESP);
 %磁気プローブ計算
-[PCBgrid2D,PCBdata2D] = cal_psi(PCB,pathname);
-%ExBドリフト計算
-[ExBdata2D,newPCBdata2D] = cal_ExB(pathname,PCBgrid2D,PCBdata2D,ESPdata2D,ESP,PCB,FIG);
+[PCBgrid2D,PCBdata2D] = process_PCBdata_280ch(ESP.date, PCB.shot, PCB.tfshot, pathname, PCB.mesh,PCB.i_EF,PCB.trange);
 
-%磁気面、ExBドリフト2次元プロット
-plot_ExB(PCBgrid2D,PCBdata2D,ESPdata2D,ExBdata2D,newPCBdata2D,IDSP,FIG,colorplot,false)
+PCB_t_idx = knnsearch(PCB.trange',ESP.start);
+plot_ESP_psi280ch(ESP,ESPdata2D,PCBgrid2D,PCBdata2D,colorplot,PCB_t_idx);
+
+% %ExBドリフト計算
+% [ExBdata2D,newPCBdata2D] = cal_ExB(pathname,PCBgrid2D,PCBdata2D,ESPdata2D,ESP,PCB,FIG);
+% 
+% %磁気面、ExBドリフト2次元プロット
+% plot_ExB(PCBgrid2D,PCBdata2D,ESPdata2D,ExBdata2D,newPCBdata2D,IDSP,FIG,colorplot,false)
 %ExBドリフト1次元プロット
 % plot_flow_profile(ExBdata2D,IDSP,FIG,profileplot)
 
