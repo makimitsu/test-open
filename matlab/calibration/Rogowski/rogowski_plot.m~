@@ -1,0 +1,67 @@
+function [] = rogowski_plot(date,shot,ch_cal,ch_rogo,discharge)
+%yymmdd,shot,çZê≥äÌch,ÉçÉSÉXÉLÅ[ch,TFo
+
+if 
+t_start = 1;
+t_end = 10001;
+
+t_start = 1;
+t_end = 10001;
+
+
+folder_directory_rogo = '/Users/Ryo/mountpoint/';
+date_str = num2str(date);
+
+
+if shot < 10
+    data_dir = [folder_directory_rogo,date_str,'/',date_str,'00',num2str(shot)];
+    shot_str = ['00',num2str(shot)];
+elseif shot < 100
+    data_dir = [folder_directory_rogo,date_str,'/',date_str,'0',num2str(shot)];
+    shot_str = ['0',num2str(shot)];
+elseif shot < 1000
+    data_dir = [folder_directory_rogo,date_str,'/',date_str,num2str(shot)];
+    shot_str = num2str(shot);
+else
+    disp('More than 999 shots! You need some rest!!!')
+    return
+end
+
+txt_name= strcat(data_dir,'.txt');
+rgw = importdata(txt_name);
+t_ax = rgw.data(t_start:t_end,2);
+data_cal = rgw.data(t_start:t_end,ch_cal+2);
+data_rogo = rgw.data(t_start:t_end,ch_rogo+2);
+
+offset_cal = mean(data_cal(1:50));
+data_cal = data_cal - offset_cal;
+offset_rogo = mean(data_rogo(1:50));
+data_rogo = data_rogo - offset_rogo;
+
+f1 = figure;
+plot(t_ax,data_cal,t_ax,data_rogo)
+title('TF: Before calibration')
+legend('Calibrator','Target Rogowski')
+xlabel('us')
+ylabel('V')
+% savefig('TF_Before')
+% close(f1)
+
+peak_cal = mean(data_cal(4000:6000));
+peak_rogo = mean(data_rogo(4000:6000));
+
+cal_value = peak_cal*10/peak_rogo%çZê≥åWêîkA/V
+
+data_cal = data_cal*10;
+data_rogo = data_rogo*cal_value;
+
+f2 = figure;
+plot(t_ax,data_cal,t_ax,data_rogo)
+title('TF: After calibration')
+legend('Calibrator','Target Rogowski')
+xlabel('us')
+ylabel('kA')
+% savefig('TF_After')
+% close(f2)
+
+end

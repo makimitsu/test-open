@@ -13,7 +13,7 @@ dtacq_num=39;
 
 cal_begin = 1;%計算開始shot番号
 
-date = 230523;%【input】計測日
+date = 230526;%【input】計測日
 
 %実験ログ読み取り
 [exp_log,index,begin_row,end_row] = load_log(date);
@@ -36,6 +36,9 @@ for i = begin_row+(cal_begin-1) : end_row
     end
     if shot>0 && tfshot>0
         [rawdata]=getMDSdata(dtacq_num,shot,tfshot);%測定した生信号
+        if not(exist([pathname.rawdata,'/',num2str(date)],'dir'))
+            mkdir(sprintf("%s", pathname.rawdata), sprintf("%s", num2str(date)));
+        end
         save(strcat(pathname.rawdata,'/',num2str(date),'/rawdata_dtacq',num2str(dtacq_num),'_shot',num2str(shot),'_tfshot',num2str(tfshot),'.mat'),'rawdata');
         if tfshot>0
             [rawdata0]=getMDSdata(dtacq_num,shot,0);

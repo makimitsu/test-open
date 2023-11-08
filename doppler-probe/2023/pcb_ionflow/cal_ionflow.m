@@ -2,12 +2,12 @@ function [V_i,absV,T_i] = cal_ionflow(date,ICCD,mpoints,pathname,show_offset,plo
 %実験日/ICCD変数/計測点配列/pathname/offsetを表示/ガウスフィッティングをプロット/流速を保存
 
 %------フィッティング調整用【input】-------
-w_CH = 3;%【input】チャンネル方向(Y方向)足し合わせ幅
+w_CH = 4;%【input】チャンネル方向(Y方向)足し合わせ幅
 l_mov = 7;%【input】波長方向移動平均長さ
 th_ratio = 0.8;%【input】フィッティング時閾値
 l_L1 = 41;%【input】波長軸の切り取り長さ
 d_L1 = 25;%【input】波長方向位置ずれ調整
-d_CH = -1;%【input】CH方向位置ずれ調整
+d_CH = 2;%【input】CH方向位置ずれ調整
 
 %物理定数
 Vc = 299792.458;%光速(km/s)
@@ -29,7 +29,7 @@ switch ICCD.line
 end
 center = load_calibration(date,ICCD);
 
-dir1 = [pathname.NIFS '/Doppler/Andor/IDSP/' num2str(date)];%ディレクトリ1
+dir1 = [pathname.IDSP '/' num2str(date)];%ディレクトリ1
 if mpoints.n_z == 1
     filename1 = [dir1 '/shot' num2str(ICCD.shot) '_' num2str(ICCD.trg) 'us_w=' num2str(ICCD.exp_w) '_gain=' num2str(ICCD.gain) '.asc'];%ICCDファイル名
     if not(exist(filename1,"file"))
@@ -206,7 +206,7 @@ for k = 1:mpoints.n_r
                 amp(i_CH,1) = coef(1);
                 shift(i_CH,1) = coef(2)-lambda0;
                 sigma(i_CH,1) = sqrt(coef(3)^2-(center(i_CH,5)*px2nm(i_CH,1))^2);
-                T_CH(i_CH,1) = 1.69e8*A*(2*sigma(i_CH,1)*sqrt(2*log(2))/lambda0)^2;
+                T_CH(i_CH,1) = 1.69e8*A*(2*sigma(i_CH,1)*sqrt(log(2))/lambda0)^2;
                 if plot_fit
                     subplot(mpoints.n_r,4,i_CH);
                     plot(f,S1(:,1),S1(:,2));
@@ -283,7 +283,7 @@ end
 %             amp(i_CH,2) = coef(1);
 %             shift(i_CH,2) = coef(2)-lambda0;
 %             sigma(i_CH,2) = sqrt(coef(3)^2-(center(i_CH,5)*px2nm(i_CH,1))^2);
-%             T_CH(i_CH,2) = 1.69e8*A*(2*sigma(i_CH,2)*sqrt(2*log(2))/lambda0)^2;
+%             T_CH(i_CH,2) = 1.69e8*A*(2*sigma(i_CH,2)*sqrt(log(2))/lambda0)^2;
 %         end
 %         offset(k,2) = (shift((k-1)*4+1,2) + shift((k-1)*4+2,2))/2;%対向視線から得られたオフセット[nm]
 %         if show_offset
@@ -309,7 +309,7 @@ end
 %             amp(i_CH,2) = coef(1);
 %             shift(i_CH,2) = coef(2)-lambda0;
 %             sigma(i_CH,2) = sqrt(coef(3)^2-(center(i_CH,5)*px2nm(i_CH,1))^2);
-%             T_CH(i_CH,2) = 1.69e8*A*(2*sigma(i_CH,2)*sqrt(2*log(2))/lambda0)^2;
+%             T_CH(i_CH,2) = 1.69e8*A*(2*sigma(i_CH,2)*sqrt(log(2))/lambda0)^2;
 %             if plot_fit
 %                 subplot(mpoints.n_r,4,i_CH);
 %                 plot(f,S2(:,1),S2(:,2));
