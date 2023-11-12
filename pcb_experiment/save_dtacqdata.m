@@ -1,41 +1,59 @@
 %デジタイザ別の保存(2022/11/17)
 %個別に環境変数a038_path, a039_path, a040_pathを設定する必要あり
 clear all
-
 pathname.rawdata=getenv('rawdata_path'); %保存先
 
 %%%%実験オペレーションの取得
 DOCID='1wG5fBaiQ7-jOzOI-2pkPAeV6SDiHc_LrOdcbWlvhHBw';%スプレッドシートのID
 T=getTS6log(DOCID);
 node='date';
-pat=230317;
+% --ここいじる
+pat=230929;
+% --
 T=searchlog(T,node,pat);
-IDXlist=[1:36];%[4:6 8:11 13 15:19 21:23 24:30 33:37 39:40 42:51 53:59 61:63 65:69 71:74];
-n_data=numel(IDXlist);%計測データ数
-shotlist=T.a039(IDXlist);
-tfshotlist=T.a039_TF(IDXlist);
+IDXlist = T.shot;% すべてのshotについて保存している，選択したければ配列で渡せばOK．
+n_data=numel(IDXlist);% 計測データ数
+shotlist_38=T.a038(IDXlist);% DTACQ番号リスト
+shotlist_39=T.a039(IDXlist);% DTACQ番号リスト
+shotlist_40=T.a040(IDXlist);
+tfshotlist_38=T.a038_TF(IDXlist);
+tfshotlist_39=T.a039_TF(IDXlist);
+tfshotlist_40=T.a040_TF(IDXlist);
 EFlist=T.EF_A_(IDXlist);
 TFlist=T.TF_kV_(IDXlist);
-dtacqlist=39.*ones(n_data,1);
-
-% dtacqlist=39;
-% shotlist= 1110;%【input】dtacqの保存番号
-% % tfshotlist=zeros(size(shotlist));
-% tfshotlist = 1106;
-
-date = 230428;%【input】計測日
-n=numel(shotlist);%計測データ数
 
 %RC係数読み込み
 
-for i=1:n
-    dtacq_num=dtacqlist(i);
-    shot=shotlist(i);
-    tfshot=tfshotlist(i);
-    [rawdata]=getMDSdata(dtacq_num,shot,tfshot);%測定した生信号
-    save(strcat(pathname.rawdata,'/rawdata_dtacq',num2str(dtacq_num),'_shot',num2str(shot),'_tfshot',num2str(tfshot),'.mat'),'rawdata');
+for i=1:n_data
+    disp(strcat(num2str(i), '/', num2str(n_data)));
+    % dtacq38
+    shot=shotlist_38(i);
+    tfshot=tfshotlist_38(i);
+    [rawdata]=getMDSdata(38,shot,tfshot);% 測定した生信号
+    save(strcat(pathname.rawdata,'/rawdata_dtacq',num2str(38),'_shot',num2str(shot),'_tfshot',num2str(tfshot),'.mat'),'rawdata');
+    % tfshotが0でない，つまり通常のshotである場合は，TFを差し引かない信号も保存する．
     if tfshot>0
-        [rawdata0]=getMDSdata(dtacq_num,shot,0);
-        save(strcat(pathname.rawdata,'/rawdata_dtacq',num2str(dtacq_num),'_shot',num2str(shot),'_tfshot0.mat'),'rawdata0');
+        [rawdata0]=getMDSdata(38,shot,0);
+        save(strcat(pathname.rawdata,'/rawdata_dtacq',num2str(38),'_shot',num2str(shot),'_tfshot0.mat'),'rawdata0');
     end
+%     % dtacq39
+%     shot=shotlist_39(i);
+%     tfshot=tfshotlist_39(i);
+%     [rawdata]=getMDSdata(39,shot,tfshot);% 測定した生信号
+%     save(strcat(pathname.rawdata,'/rawdata_dtacq',num2str(39),'_shot',num2str(shot),'_tfshot',num2str(tfshot),'.mat'),'rawdata');
+%     % tfshotが0でない，つまり通常のshotである場合は，TFを差し引かない信号も保存する．
+% %     if tfshot>0
+% %         [rawdata0]=getMDSdata(39,shot,0);
+% %         save(strcat(pathname.rawdata,'/rawdata_dtacq',num2str(39),'_shot',num2str(shot),'_tfshot0.mat'),'rawdata0');
+% %     end
+%     % dtacq40
+%     shot=shotlist_40(i);
+%     tfshot=tfshotlist_40(i);
+%     [rawdata]=getMDSdata(40,shot,tfshot);%測定した生信号
+%     save(strcat(pathname.rawdata,'/rawdata_dtacq',num2str(40),'_shot',num2str(shot),'_tfshot',num2str(tfshot),'.mat'),'rawdata');
+%     % tfshotが0でない，つまり通常のshotである場合は，TFを差し引かない信号も保存する．
+%     %     if tfshot>0
+% %         [rawdata0]=getMDSdata(40,shot,0);
+% %         save(strcat(pathname.rawdata,'/rawdata_dtacq',num2str(40),'_shot',num2str(shot),'_tfshot0.mat'),'rawdata0');
+% %     end
 end

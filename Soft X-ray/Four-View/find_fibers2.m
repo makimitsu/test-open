@@ -1,6 +1,7 @@
-function [centerInformation,radius]=find_fibers2(imageFile)
+function [CenterPositions,radius]=find_fibers2(imageFile)
 
 radiusRange = [65, 75];
+NumberOfFrame = 8;
 
 % このブロックでは，ファイバーの較正画像から32個の円を漏れなく検出することを目指します.
 % 実行環境によって調整すべき変数は，較正画像pathであるFiberCalibrationImagePathです．
@@ -8,6 +9,7 @@ radiusRange = [65, 75];
 % 画像を読み込み，前処理を施します．
 % FiberCalibrationImagePath = "/Volumes/experiment/results/X-ray/230704/Calibration/shot006.tif";
 % CalibrationImage = imread(FiberCalibrationImagePath);
+% imageFile = imread(imageFilePath);
 imageFile = wiener2(imageFile,[10,10]);
 imageFile = imadjust(imageFile);
 % 円を検出します．range,sensitivity,method がパラメータです．
@@ -76,9 +78,9 @@ radii = circleInformation(:,3);circleInformation = circleInformation(:,1:2);
 circleInformation = [circleInformation radii];
 [~,I] = sort(circleInformation(:,1),'descend');
 circleInformation = circleInformation(I,:);
-% 次に横軸が近しい4つのデータの中で，縦軸を基準に並び替えます．
+% 次に横軸x座標が近しい4つのデータの中で，縦軸を基準に並び替えます．
 % これで，右上から左下に五十音表と同じ順に整理されます．
-for i = 1:4
+for i = 1:NumberOfFrame
     range = 1+4*(i-1):1:4+4*(i-1);
     [~,I] = sort(circleInformation(range,2),'descend');
     I = I + 4*(i-1);
@@ -86,36 +88,39 @@ for i = 1:4
 end
 % 次にX線フィルタ種類と時系列順に整理します．
 % X線フィルタは，右上を1，右下を2, 左上を3とします
-% CentersTimeRaps(3,:,:)はX線フィルタ3の時系列[8 2]行列です．
+% CentersTimeRaps(3,:,:)はX線フィルタ3の時系列[4 2]行列です．
 % CentersTimeRaps(3,4,:)はX線フィルタ3の時系列4番目のxy座標です．
 % 蛇順のため原始的なコードが入りますが，次のブロックで上手くいっていることが確かめられます．
-centerInformation = zeros(4,4,3);
-centerInformation(1,:,:) = circleInformation([4,2,10,12],:);
-centerInformation(2,:,:) = circleInformation([3,1,9,11],:);
-centerInformation(3,:,:) = circleInformation([8,6,14,16],:);
-centerInformation(4,:,:) = circleInformation([7,5,13,15],:);
-% for i = 1:4
-%     % i = 1
-%     % 4,2,10,12,20,18,26,28
-%     % i = 2
-%     % 3,1,9,11,19,17,25,27
-%     % i = 3
-%     % 8,6,14,16,24,22,30,32
-%     % i = 4
-%     % 7,5,13,15,23,21,29,31
-%     if i==1 || i==2
-%     j = i-1;
-%     centerInformation(i,:,:) = circleInformation([1+j,3+j,11+j, ...
-%         9+j,17+j,19+j,27+j,25+j],:);
-%     else
-%     j=i-3;
-%     centerInformation(i,:,:) = circleInformation([5+j,7+j,15+j, ...
-%         13+j,21+j,23+j,31+j,29+j],:);    
-%     end
-% end
+CenterPositions = zeros(4,NumberOfFrame,3);
+if NumberOfFrame == 4
+    CenterPositions(1,:,:) = circleInformation([4,2,10,12],:);% ここの順番reservation
+    CenterPositions(2,:,:) = circleInformation([3,1,9,11],:);
+    CenterPositions(3,:,:) = circleInformation([8,6,14,16],:);
+    CenterPositions(4,:,:) = circleInformation([7,5,13,15],:);
+else
+    CenterPositions(1,:,:) = circleInformation([4,2,10,12,20,18,26,28],:);
+    CenterPositions(2,:,:) = circleInformation([3,1,9,11,19,17,25,27],:);
+    CenterPositions(3,:,:) = circleInformation([8,6,14,16,24,22,30,32],:);
+    CenterPositions(4,:,:) = circleInformation([7,5,13,15,23,21,29,31],:);
+end
+disp(num2str(CenterPositions(:,:,3)));
+radius = round(mean(CenterPositions(:,:,3),'all'));
+% radius = min(CenterPositions(:,:,3),[],'all');
+CenterPositions(:,:,3) = [];% これはradius分をすてたということです。
 
-% radius = mean(centerInformation(:,:,3),'all');
-radius = min(centerInformation(:,:,3),[],'all');
-centerInformation(:,:,3) = [];
+%::::中心位置の補正を入れます::::
+OFFSET = zeros(size(CenterPositions));
+OFFSET_fiber = zeros([4,2]);
+OFFSET_fiber(1,:)=[-17,51];% [x(横);y(縦)]% ここ調整ポイント MyFindCircleとか，get_sxr_imageでdocheckを入れて手動調整してください ファイバごとで補正値違いそうなのでゆくゆく突き詰めたい
+OFFSET_fiber(2,:)=[-4,53];
+OFFSET_fiber(3,:)=[-30,46];
+OFFSET_fiber(4,:)=[-20,44];
+for i=1:4
+    for j=1:2
+        OFFSET(i,:,j)=OFFSET_fiber(i,j);
+    end
+end
+CenterPositions = CenterPositions+OFFSET;
+%::::::::::::::::::::::::::
 
 end

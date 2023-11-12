@@ -1,7 +1,7 @@
 function plot_save_sxr(range,EE1,EE2,EE3,EE4)
+% この関数は，発光出力EEをrangeで定義される範囲で切り取り，figureで出力します
 
-
-range = range./1000;
+range = range./1000; % 単位をmmからmに変換します
 zmin = range(1);
 zmax = range(2);
 rmin = range(5);

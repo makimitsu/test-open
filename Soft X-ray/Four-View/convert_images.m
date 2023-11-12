@@ -30,8 +30,7 @@ for i = 1:numel(FolderInfo)
     figure(1);
     % figure;
     IM = imread(string(FolderInfo(i)));
-    imagesc(IM,[50,80]);
-    imagesc(IM);
+    imagesc(IM,[50,85]);
     saveas(gcf,strcat(path2,'/',string(MyFolderName(i))));
 end
 end

@@ -20,7 +20,7 @@ pathname.pre_processed_directory = getenv('pre_processed_directory_path');%計�
 prompt = {'Date:','Shot number:'};
 dlgtitle = 'Input';
 dims = [1 35];
-definput = {'',''};
+definput = {'230929',''};
 answer = inputdlg(prompt,dlgtitle,dims,definput);
 date = str2double(cell2mat(answer(1)));
 IDXlist = str2num(cell2mat(answer(2)));
@@ -42,7 +42,7 @@ EFlist=T.EF_A_(IDXlist);
 TFlist=T.TF_kV_(IDXlist);
 dtacqlist=39.*ones(n_data,1);
 
-trange=400:800;%【input】計算時間範囲
+trange=460:560;%【input】計算時間範囲
 n=40; %【input】rz方向のメッシュ数
 
 doCheck = false;
@@ -61,7 +61,7 @@ for i=1:n_data
     if doCheck
         check_signal(date, dtacq_num, shot, tfshot, pathname);
     else
-        plot_psi200ch(date, shot, tfshot, pathname,n,i_EF,trange);
+        plot_psi200ch(date, shot, tfshot, pathname,n,i_EF,trange,IDXlist);
     end
 end
 
@@ -69,7 +69,7 @@ end
 %以下、local関数
 %%%%%%%%%%%%%%%%%%%%%%%%
 
-function plot_psi200ch(date, shot, tfshot, pathname, n,i_EF,trange)
+function plot_psi200ch(date, shot, tfshot, pathname, n,i_EF,trange, IDXlist)
 % filename=strcat(pathname.rawdata,'/rawdata_dtacq',num2str(dtacq_num),'_shot',num2str(shot),'_tfshot',num2str(tfshot),'.mat');
 % if exist(filename,"file")==0
 %     disp('No rawdata file -- Start generating!')
@@ -263,8 +263,8 @@ end
 
 % プロット部分
 % figure('Position', [0 0 1500 1500],'visible','on');
-start=50;
-dt = 4;
+start=0;
+dt = 5;
 %  t_start=470+start;
  for m=1:16 %図示する時間
      i=start+m.*dt; %end
@@ -275,7 +275,7 @@ dt = 4;
     % contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bt(:,:,i),-100e-3:0.5e-3:100e-3,'LineStyle','none')
     % contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Jt(:,:,i),30,'LineStyle','none')
 %     contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Et(:,:,i),20,'LineStyle','none')
-    colormap(jet)
+    colormap("jet")
     axis image
     axis tight manual
 %     caxis([-0.8*1e+6,0.8*1e+6]) %jt%カラーバーの軸の範囲
@@ -291,21 +291,23 @@ dt = 4;
 %     plot(grid2D.zq(1,squeeze(mid(:,:,i))),grid2D.rq(:,1))
 %     contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),20,'black')
 %     contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),20,'black')
-    contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),[-20e-3:0.2e-3:40e-3],'black','LineWidth',1)
+    contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),[-20e-3:0.8e-3:40e-3],'black','LineWidth',0.5)
 %     plot(grid2D.zq(1,squeeze(mid(opoint(:,:,i),:,i))),grid2D.rq(opoint(:,:,i),1),"bo")
 %     plot(grid2D.zq(1,squeeze(mid(xpoint(:,:,i),:,i))),grid2D.rq(xpoint(:,:,i),1),"bx")
      % plot(ok_z,ok_r,"k.",'MarkerSize', 6)%測定位置
     hold off
-    title(string(t)+' us')
+    title(string(t)+' us@shot' + string(IDXlist))
     drawnow
 %     xlabel('z [m]')
 %     ylabel('r [m]')
  end
+ set(gcf,'Name','shot' + string(IDXlist),'NumberTitle','off');
+ sgtitle('shot' + string(IDXlist))
 
 if doCalculation
     clearvars -except data2D grid2D shot pathname;
     filename = strcat(pathname.pre_processed_directory,'/a039_',num2str(shot(1)),'.mat');
-    save(filename)
+    save(filename);
 end
 
 end

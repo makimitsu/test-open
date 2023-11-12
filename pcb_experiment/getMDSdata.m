@@ -17,7 +17,7 @@ import MDSplus.*
 %ツリーのdatafileがあるフォルダのパスをtreename_pathという形で環境変数に設定(a038_path, a039_path, a040_path)
 %mdsipのポートに接続して各デジタイザののツリーを開く。
 mdsconnect('192.168.1.140');
-mdsopen(dtacq, shot); 
+mdsopen(dtacq, shot);
 
 for i=1:ch_num
     %各チャンネルにおいて「.AI:CHXXX」というノードを指定するためのノード名を作る
@@ -26,6 +26,7 @@ for i=1:ch_num
     x(:,i)=mdsvalue(chname);
     %データがとれていないときエラーメッセージが多分237文字で帰ってくるので、1000以下の要素はデータなしとしてリターンする
     if numel(x(:,i)) <1000
+        disp('error occured');
         return
     end
     x(:,i)=x(:,i)-x(1,i);% オフセット調整

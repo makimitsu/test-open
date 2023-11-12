@@ -1,4 +1,5 @@
-function EE = get_distribution(M,K,gm2d,U,s,v,VectorImage,plot_flag,NL)
+function EE = get_distribution(M,K,gm2d,U,s,v,VectorImage,plot_flag,NonLiner_flag)
+% この関数は，一つのベクトルイメージから二次元発光分布を再構成します．
 
 Z=U'*VectorImage.';
 
@@ -40,7 +41,7 @@ E = zeros(1,K);
 % end
 % EE = reshape(E,sqrt(K),sqrt(K)); %ここで縦がr、横がzで左下が最小になる
 
-if NL
+if NonLiner_flag
     gamma = 10^(lg_gamma(gamma_index));
     C = Laplacian(sqrt(K)-1);
     H = gm2d;
