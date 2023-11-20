@@ -18,22 +18,22 @@ NumberOfFrame = 8;
 % そもそも今回は断面全体は使わない予定なので問題なし？
 
 % 画像を切り取る
-doCheck = true;
+doCheck = false;
 
 % 生画像の取得
-TIFImage = imread(TIFImagePath);
-imagesc(TIFImage);
+% TIFImage = imread(TIFImagePath);
+TIFImage = TIFImagePath;
+% imagesc(TIFImage);
 
-% 非線形フィルターをかける（必要があれば）
-if ApplyFilter
-    figure;imagesc(TIFImage);
-    [TIFImage,~] = imnlmfilt(TIFImage,'SearchWindowSize',91,'ComparisonWindowSize',15);
-    figure;imagesc(TIFImage);
-end
+% 非線形フィルターをかける（必要があれば）これより上の階層の関数で，既にフィルタを適用しているのでここは不要
+% if ApplyFilter
+%     figure;imagesc(TIFImage);
+%     [TIFImage,~] = imnlmfilt(TIFImage,'SearchWindowSize',91,'ComparisonWindowSize',15);
+%     figure;imagesc(TIFImage);
+% end
 
 % ファイバーの位置を検索するための校正用画像を取得
-% PositionCheckImagePath = strcat('G:\My Drive\X-ray\Data\TIF\',num2str(Date),'/PositionCheck.tif');
-PositionCheckImagePath = "G:\My Drive\X-ray\tmp\230929.check.tif";
+PositionCheckImagePath = strcat('G:\My Drive\X-ray\Data\TIF\',num2str(Date),'/PositionCheck.tif');
 PositionCheckImage = imread(PositionCheckImagePath);
 
 % % 校正用画像からファイバーの位置（＋半径）を取得
@@ -158,6 +158,7 @@ imageVectors3 = squeeze(imageVectors(3,:,:));
 imageVectors4 = squeeze(imageVectors(4,:,:));
 
 % 目的の時間のみを取り出します
+disp(num2str(TimeFrameNumber));
 imageVector1 = imageVectors1(TimeFrameNumber,:);
 imageVector2 = imageVectors2(TimeFrameNumber,:);
 imageVector3 = imageVectors3(TimeFrameNumber,:);

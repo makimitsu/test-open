@@ -42,6 +42,7 @@ E = zeros(1,K);
 % EE = reshape(E,sqrt(K),sqrt(K)); %ここで縦がr、横がzで左下が最小になる
 
 if NonLiner_flag
+    disp('NL EE calc start');
     gamma = 10^(lg_gamma(gamma_index));
     C = Laplacian(sqrt(K)-1);
     H = gm2d;
@@ -63,9 +64,10 @@ if NonLiner_flag
     W(W==Inf) = -1;
     W(W<0) = max(W, [], 'all');
     EE = (H' * H + (M * gamma) .* (C'* W * C))^(-1) * H' * G'; 
-
+    disp('NL EE calc end');
     EE = reshape(EE, sqrt(K), sqrt(K));
 else
+    disp('L EE calc start');
     for i=1:K
         if M>K
             v_1 = [v(i,:) zeros(1,M-K)];
@@ -76,6 +78,7 @@ else
         E(i)=sum(E1);
     end
     EE = reshape(E,sqrt(K),sqrt(K)); %ここで縦がr、横がzで左下が最小になる
+    disp('L EE calc end');    
 end
 
 % contourfで単調増加する軸から生成されたmeshgridを使ってプロットすると上下が反転する

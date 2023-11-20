@@ -1,7 +1,7 @@
 function MyFindCircleApp
 global OFFSET_fiber
-ShotImagePath = "G:\My Drive\X-ray\tmp\230929.shot009.tif";
-FiberCalibrationImagePath = "G:\My Drive\X-ray\tmp\230929.check.tif";
+ShotImagePath = "G:\My Drive\X-ray\Data\TIF\230920\shot065.tif";
+FiberCalibrationImagePath = "G:\My Drive\X-ray\Data\TIF\230920\PositionCheck.tif";
 
 % このブロックでは，ファイバーの較正画像から32個の円を漏れなく検出することを目指します
 % 個別のTIF画像で調整すべき変数は，画像path, imfindcircles(RadiusRenge, Sensitivity), numberです．
