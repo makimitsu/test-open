@@ -1,4 +1,4 @@
-clearvars -except date IDX times
+clearvars -except date IDXlist times
 addpath '/Users/shinjirotakeda/Documents/GitHub/test-open/pcb_experiment'; %getMDSdata.mとcoeff200ch.xlsxのあるフォルダへのパス
 
 %%%%%%%%%%%%%%%%%%%%%%%%
@@ -22,8 +22,8 @@ definput = {'','',''};
 if exist('date','var')
     definput{1} = num2str(date);
 end
-if exist('IDX','var')
-    definput{2} = num2str(IDX);
+if exist('IDXlist','var')
+    definput{2} = num2str(IDXlist);
 end
 if exist('times','var')
     definput{3} = num2str(times);
@@ -39,54 +39,80 @@ dims = [1 35];
 % definput = {num2str(date),num2str(IDXlist),num2str(doCheck)};
 answer = inputdlg(prompt,dlgtitle,dims,definput);
 date = str2double(cell2mat(answer(1)));
-IDX = str2num(cell2mat(answer(2))); 
+IDXlist = str2num(cell2mat(answer(2))); 
 times = str2num(cell2mat(answer(3))); 
 
 DOCID='1wG5fBaiQ7-jOzOI-2pkPAeV6SDiHc_LrOdcbWlvhHBw';%スプレッドシートのID
 T=getTS6log(DOCID);
 node='date';
 % date=230714;
+n_data = numel(IDXlist);
 T=searchlog(T,node,date);
-shot_a039 =T.a039(IDX);
-shot_a040 = T.a040(IDX);
-shot = [shot_a039, shot_a040];
-tfshot_a039 =T.a039_TF(IDX);
-tfshot_a040 =T.a040_TF(IDX);
-tfshot = [tfshot_a039, tfshot_a040];
-EF=T.EF_A_(IDX);
-TF=T.TF_kV_(IDX);
+shot_a039 =T.a039(IDXlist);
+shot_a040 = T.a040(IDXlist);
+shotlist = [shot_a039, shot_a040];
+tfshot_a039 =T.a039_TF(IDXlist);
+tfshot_a040 =T.a040_TF(IDXlist);
+tfshotlist = [tfshot_a039, tfshot_a040];
+EFlist=T.EF_A_(IDXlist);
+TFlist=T.TF_kV_(IDXlist);
 dtacqlist=39;
 
 trange=400:800;%【input】計算時間範囲
 n=40; %【input】rz方向のメッシュ数
 
-% doCheck = false;
-% doCheck = true;
-% if ~doCheck
-%     figure('Position', [0 0 1500 1500],'visible','on');
-% end
-
-% dtacq_num=dtacqlist;
-if shot == tfshot
-    tfshot = [0,0];
-end
-i_EF=EF;
-
-[grid2D,data2D] = process_PCBdata_280ch(date, shot, tfshot, pathname, n,i_EF,trange);
-
-% ***********************************************
-
-if isstruct(grid2D)==0 %もしdtacqデータがない場合次のloopへ(データがない場合NaNを返しているため)
-    return
-end
-
-merging_ratio = get_merging_ratio(data2D,grid2D,times);
-
-figure;
-plot(times,merging_ratio,'k-','LineWidth',2);
+figure;hold on
 xlabel('time [us]');ylabel('Merging ratio [%]');
-title('Merging ratio');
+legendList = cell(1,n_data);
 ax=gca;ax.FontSize=18;
+for i=1:n_data
+    % dtacq_num=dtacqlist;
+    shot=shotlist(i,:);
+    tfshot=tfshotlist(i,:);
+    if shot == tfshot
+        tfshot = [0,0];
+    end
+    i_EF=EFlist(i);
+    TF=TFlist(i);
+    [grid2D,data2D] = process_PCBdata_280ch(date, shot, tfshot, pathname, n,i_EF,trange);
+    % ***********************************************
+
+    if isstruct(grid2D)==0 %もしdtacqデータがない場合次のloopへ(データがない場合NaNを返しているため)
+        return
+    end
+    
+    merging_ratio = get_merging_ratio(data2D,grid2D,times);
+    legendList(i) = cellstr(strcat('shot',num2str(IDXlist(i))));
+
+    % figure;
+    plot(times,merging_ratio,'LineWidth',2);
+    % xlabel('time [us]');ylabel('Merging ratio [%]');
+    % title('Merging ratio');
+    % ax=gca;ax.FontSize=18;
+
+end
+legend(legendList,'Location','northwest');
+
+% if shot == tfshot
+%     tfshot = [0,0];
+% end
+% i_EF=EF;
+% 
+% [grid2D,data2D] = process_PCBdata_280ch(date, shot, tfshot, pathname, n,i_EF,trange);
+% 
+% % ***********************************************
+% 
+% if isstruct(grid2D)==0 %もしdtacqデータがない場合次のloopへ(データがない場合NaNを返しているため)
+%     return
+% end
+% 
+% merging_ratio = get_merging_ratio(data2D,grid2D,times);
+% 
+% figure;
+% plot(times,merging_ratio,'k-','LineWidth',2);
+% xlabel('time [us]');ylabel('Merging ratio [%]');
+% % title('Merging ratio');
+% ax=gca;ax.FontSize=18;
 
 
 function merging_ratio = get_merging_ratio(data2D,grid2D,times)
@@ -141,8 +167,10 @@ if max(sum(pos_oz<pos_xz),sum(pos_oz>pos_xz))==1 % pos_xzがpos_ozの最大値�
 elseif sum(isnan(pos_oz))==0 && sum(pos_oz>0)==1 && isnan(pos_xz)% O点二つ（値が違う）あるけどX点なし
     pos_xz = mean(pos_oz);
     pos_xr = mean(pos_or);
+    r_space = grid2D.rq(:,1);
+    z_space = grid2D.zq(1,:);
     z_idx = knnsearch(z_space',pos_xz);
-    r_idx = knnsearch(r_space',pos_xr);
+    r_idx = knnsearch(r_space,pos_xr);
     common_flux = psi(r_idx,z_idx);
     private_flux = min(psi_o);
 else

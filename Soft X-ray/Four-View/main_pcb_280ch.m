@@ -7,7 +7,7 @@ addpath '/Users/shinjirotakeda/Documents/GitHub/test-open/pcb_experiment'; %getM
 %280ch用新規pcbプローブのみでの磁気面（Bz）
 %%%%%%%%%%%%%%%%%%%%%%%%
 
-%%%%%ここが各PCのパス
+%%%%%ここが各PCのパスx
 %【※コードを使用する前に】環境変数を設定しておくか、matlab内のコマンドからsetenv('パス名','アドレス')で指定してから動かす
 pathname.ts3u=getenv('ts3u_path');%old-koalaのts-3uまでのパス（mrdなど）
 pathname.fourier=getenv('fourier_path');%fourierのmd0（データックのショットが入ってる）までのpath
@@ -20,6 +20,7 @@ pathname.pre_processed_directory = getenv('pre_processed_directory_path');%計�
 
 %%%%実験オペレーションの取得
 prompt = {'Date:','Shot number:','doCheck:'};
+definput = {'','',''};
 if exist('date','var')
     definput{1} = num2str(date);
 end
