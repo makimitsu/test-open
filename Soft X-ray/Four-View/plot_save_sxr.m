@@ -48,11 +48,10 @@ z_space_SXR2 = z_space_SXR2(z_range2);
 % f.Position = [0.1,0.2,0.8,0.8];
 
 positionList = [2,4,1,3];
-nameList = {'1um Al', '2.5um Al', '2um Mylar', '1um Mylar'};
+nameList = {strcat('1um Al @',num2str(t),'us'), strcat('2.5um Al @',num2str(t),'us'), strcat('2um Mylar @',num2str(t),'us'), strcat('1um Mylar @',num2str(t),'us')};
 % cLimList = {[0 0.15],[0 0.075],[0 0.05],[0 0.075]};
-% cLimList = {[0 0.35],[0 0.45],[0 0.15],[0 1]};% 230929
-cLimList = {[0 0.33],[0 0.16],[0 0.05],[0 0.2]};% 230920
-
+% cLimList = {[0 0.33],[0 0.16],[0 0.05],[0 0.2]};% 230920
+cLimList = {[0 0.35],[0 0.45],[0 0.15],[0 1]};% 230929
 
 % 負の要素を0で置換
 negativeEE = find(EE<0);
@@ -84,7 +83,7 @@ for i = 1:4
         plot(localmax_pos_z,localmax_pos_r,'r*');
     end
     % if show_flux_surface
-        [~,hp]=contourf(psi_mesh_z,psi_mesh_r,psi,contour_layer,'white','Fill','off');
+        [~,hp]=contourf(psi_mesh_z,psi_mesh_r,psi,contour_layer,'white','Fill','off');axis([-0.12 0.12 0.06 0.33]);daspect([1 0.8 1]);
         hp.LineWidth = 1.5;
         if show_xpoint
             [~,~,pos_xz,pos_xr,~,~] = search_xo(psi,z_space,r_space);

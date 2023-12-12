@@ -16,19 +16,6 @@ function [] = plot_sxr_multi(grid2D,data2D,date,shot,show_xpoint,show_localmax,s
 %   boolean: filter, option for applying non-linear mean (NLM) filter
 %   boolean: NL, option for using non-linear reconstruction
 
-% 実行結果（行列）を保存するフォルダの確認
-% なければ作成＆計算、あれば読み込みsave
-% if filter & NL
-%     savefolder = strcat('/Users/shinjirotakeda/OneDrive - The University of Tokyo/Documents/result_matrix/NLF_NLR/',num2str(date),'/shot',num2str(shot));
-% elseif ~filter & NL
-%     savefolder = strcat('/Users/shinjirotakeda/OneDrive - The University of Tokyo/Documents/result_matrix/LF_NLR/',num2str(date),'/shot',num2str(shot));
-% elseif filter & ~NL
-%     savefolder = strcat('/Users/shinjirotakeda/OneDrive - The University of Tokyo/Documents/result_matrix/NLF_LR/',num2str(date),'/shot',num2str(shot));
-% else
-%     savefolder = strcat('/Users/shinjirotakeda/OneDrive - The University of Tokyo/Documents/result_matrix/LF_LR/',num2str(date),'/shot',num2str(shot));
-% end
-% savefolder = strcat('/Users/shinjirotakeda/OneDrive - The University of Tokyo/Documents/result_matrix/',num2str(date),'/shot',num2str(shot));
-
 if doFilter & NL
     options = 'NLF_NLR';
 elseif ~doFilter & NL
@@ -41,7 +28,6 @@ end
 
 dirPath = getenv('SXR_MATRIX_DIR');
 matrixFolder = strcat(dirPath,'/',options,'/',num2str(date),'/shot',num2str(shot));
-% savefolder = strcat('/Users/shinjirotakeda/OneDrive - The University of Tokyo/Documents/result_matrix/',options,'/',num2str(date),'/shot',num2str(shot));
 if exist(matrixFolder,'dir') == 0
     doCalculation = true;
     mkdir(matrixFolder);
@@ -82,8 +68,8 @@ if doCalculation
     % 非線形フィルターをかける（必要があれば）
     if doFilter
         %figure;imagesc(rawImage);
-        [rawImage,~] = imnlmfilt(rawImage,'SearchWindowSize',91,'ComparisonWindowSize',15);
-        %figure;imagesc(rawImage);
+        [rawImage,~] = imnlmfilt(rawImage,'SearchWindowSize',11,'ComparisonWindowSize',5);
+        imagesc(rawImage);
     end
 else
     disp(strcat('Loading matrix from :',matrixFolder))

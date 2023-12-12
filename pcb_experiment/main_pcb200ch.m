@@ -170,8 +170,8 @@ data2D.Et=diff(data2D.psi,1,3).*1e+6;
 %diffは単なる差分なので時間方向のsizeが1小さくなる %ステップサイズは1us
 data2D.Et=data2D.Et./(2.*pi.*grid2D.rq);
 
-ok_z = zpos_bz(ok_bz_plot); %z方向の生きているチャンネル
-ok_r = rpos_bz(ok_bz_plot); %r方向の生きているチャンネル
+% ok_z = zpos_bz(ok_bz_plot); %z方向の生きているチャンネル
+% ok_r = rpos_bz(ok_bz_plot); %r方向の生きているチャンネル
 
 if isstruct(grid2D)==0 %もしdtacqデータがない場合次のloopへ(データがない場合NaNを返しているため)
     return

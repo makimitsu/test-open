@@ -1,9 +1,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%
 % Top-level file for calculating and plotting SXR emission for four-view
 % experimental setup
+% 始める前に，1)find_fibers2.m>>position 2)plot_save_sxr.m>>clim を適合させること
 %%%%%%%%%%%%%%%%%%%%%%%%
-% clear
-% close all
 clearvars -except date IDXlist doSave doFilter doNLR
 addpath '/Users/yuleo/Documents/GitHub/test-open'/pcb_experiment/; %getMDSdata.mとcoeff200ch.xlsxのあるフォルダへのパス
 setenv('SXR_IMAGE_DIR','G:\My Drive\X-ray\Data\TIF');

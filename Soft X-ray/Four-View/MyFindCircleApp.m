@@ -1,7 +1,10 @@
 function MyFindCircleApp
 global OFFSET_fiber
-ShotImagePath = "G:\My Drive\X-ray\Data\TIF\230920\shot065.tif";
+% ShotImagePath = "G:\My Drive\X-ray\Data\TIF\230929\shot027.tif";
+% FiberCalibrationImagePath = "G:\My Drive\X-ray\Data\TIF\230929\PositionCheck.tif";
+ShotImagePath = "G:\My Drive\X-ray\Data\TIF\230920\shot015.tif";
 FiberCalibrationImagePath = "G:\My Drive\X-ray\Data\TIF\230920\PositionCheck.tif";
+up=54;
 
 % このブロックでは，ファイバーの較正画像から32個の円を漏れなく検出することを目指します
 % 個別のTIF画像で調整すべき変数は，画像path, imfindcircles(RadiusRenge, Sensitivity), numberです．
@@ -125,21 +128,21 @@ fib2 = uicontrol('Style','radiobutton','String','Fiber2','Position',[100 40 60 2
 fib3 = uicontrol('Style','radiobutton','String','Fiber3','Position',[40 60 60 20]);
 fib4 = uicontrol('Style','radiobutton','String','Fiber4','Position',[40 40 60 20]);
 % 一旦描画する
-imagesc(ShotImage);axis image;
+imagesc(ShotImage,[50,up]);axis image;
 % 円書く
 viscircles(FixedCentersForViscircles,radii,'LineWidth',0.5,'EnhanceVisibility',0);
 plot(reshape(CenterPositions(:,:,1),[32,1]),reshape(CenterPositions(:,:,2),[32,1]),'x','Color','red');
 % イベントリスナーの作成
-addlistener(handle_slider_x,'Value','PostSet',@(event,obj) UpdateImage(event,obj,OFFSET,CenterPositions,handle_slider_x,handle_slider_y,ShotImage,radii,fib1,fib2,fib3,fib4));
-addlistener(handle_slider_y,'Value','PostSet',@(event,obj) UpdateImage(event,obj,OFFSET,CenterPositions,handle_slider_x,handle_slider_y,ShotImage,radii,fib1,fib2,fib3,fib4));
+addlistener(handle_slider_x,'Value','PostSet',@(event,obj) UpdateImage(event,obj,OFFSET,CenterPositions,handle_slider_x,handle_slider_y,ShotImage,radii,fib1,fib2,fib3,fib4,up));
+addlistener(handle_slider_y,'Value','PostSet',@(event,obj) UpdateImage(event,obj,OFFSET,CenterPositions,handle_slider_x,handle_slider_y,ShotImage,radii,fib1,fib2,fib3,fib4,up));
 
 hold off;
 end
 
-function UpdateImage(event,obj,OFFSET,CenterPositions,handle_slider_x,handle_slider_y,ShotImage,radii,fib1,fib2,fib3,fib4)
+function UpdateImage(event,obj,OFFSET,CenterPositions,handle_slider_x,handle_slider_y,ShotImage,radii,fib1,fib2,fib3,fib4,up)
 global OFFSET_fiber
 % 大事な部分を再描画する
-imagesc(ShotImage);axis image;set(gca,'YDir','normal');
+imagesc(ShotImage,[50,up]);axis image;set(gca,'YDir','normal');
 % 値の取得
 value_x = round(handle_slider_x.Value);
 value_y = round(handle_slider_y.Value);

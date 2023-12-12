@@ -16,7 +16,6 @@ pathname.rawdata38=getenv('rawdata038_path');% dtacq a038のrawdataの保管場�
 pathname.woTFdata=getenv('woTFdata_path');% rawdata（TFoffset引いた）の保管場所
 pathname.rawdata=getenv('rawdata_path');% dtacqのrawdataの保管場所
 
-
 %% 直接入力の場合
 %{
 shotlist=[11946]; %[10650:10692];%【input】dtacqの保存番号: shot_38
@@ -41,12 +40,11 @@ for i = 1:length(shotlist)
 end
 %}
 
-
 %%　実験オペレーションの取得　自動入力の場合
 prompt = {'Date:','Shot number:'};
 dlgtitle = 'Input';
 dims = [1 35];
-definput = {'',''};
+definput = {'230920','49'};
 answer = inputdlg(prompt,dlgtitle,dims,definput);
 date = str2double(cell2mat(answer(1)));
 IDXlist = str2double(cell2mat(answer(2)));
@@ -336,8 +334,7 @@ end
     
     if interp_method == 0 %'scatteredInterpolant'
             Fz_grid.Values = B_z_calibrated_restored(t,:)';
-          
-
+         
             grid_z_lis = reshape(grid2D.zq,[],1);
             grid_r_lis = reshape(grid2D.rq,[],1);
             vq = reshape(Fz_grid(grid_z_lis,grid_r_lis),[n,n]);
@@ -387,10 +384,10 @@ end
 
 function plot_psi125ch(shot,trange)
 
-load(strcat("G:\My Drive\X-ray\Data\A038FILE\shot\",num2str(shot),".mat"));
+load(strcat("G:\My Drive\X-ray\Data\A038FILE\shot",num2str(shot(1)),".mat"));
 
-figure('Position', [0 0 1500 1500],'visible','on');
-start=15;
+figure('Position', [0 0 1000 1000],'visible','on');
+start=60;
 % t_start=470+start;
  for m=1:10 % 図示する時間
      i=start+m.*2; %end
@@ -401,7 +398,7 @@ start=15;
     colormap(jet)
     axis image
     axis tight manual
-    caxis([-2*1e+6,1.0*1e+6]) %カラーバーの軸の範囲
+    caxis([-3*1e+6,3.0*1e+6]) %カラーバーの軸の範囲
 %     caxis([-0.1,0.1])
     colorbar('Location','eastoutside')
     % カラーバーのラベル付け
@@ -409,10 +406,10 @@ start=15;
 %     c.Label.String = 'Jt [A/m^{2}]';
     hold on
 %     plot(grid2D.zq(1,squeeze(mid(:,:,i))),grid2D.rq(:,1))
-    contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),50,'black')
+    contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),10,'black')
 %     plot(grid2D.zq(1,squeeze(mid(opoint(:,:,i),:,i))),grid2D.rq(opoint(:,:,i),1),"bo")
 %     plot(grid2D.zq(1,squeeze(mid(xpoint(:,:,i),:,i))),grid2D.rq(xpoint(:,:,i),1),"bx")
-    plot(ok_z,ok_r,"k.",'MarkerSize', 7)%測定位置
+    % plot(ok_z,ok_r,"k.",'MarkerSize', 7)%測定位置
     hold off
     title(string(t)+' us')
     xlabel('z [m]')
