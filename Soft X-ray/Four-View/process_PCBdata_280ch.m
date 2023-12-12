@@ -1,4 +1,11 @@
-function [grid2D,data2D] = process_PCBdata_280ch(date, shot, tfshot, pathname, n,i_EF,trange)
+% function [grid2D,data2D] = process_PCBdata_280ch(date, shot, tfshot, pathname, n,i_EF,trange)
+function [grid2D,data2D] = process_PCBdata_280ch(PCB,pathname)
+date = PCB.date;
+shot = PCB.shot;
+tfshot = PCB.tfshot;
+n = PCB.n;
+i_EF = PCB.i_EF;
+trange = PCB.trange;
 
 filename = strcat(pathname.pre_processed_directory,'/a039_',num2str(shot(1)),'.mat');
 if exist(filename,'file') == 0

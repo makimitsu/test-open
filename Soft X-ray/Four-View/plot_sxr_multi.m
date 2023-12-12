@@ -1,4 +1,18 @@
-function [] = plot_sxr_multi(grid2D,data2D,date,shot,show_xpoint,show_localmax,start,interval,doSave,SXRfilename,doFilter,NL)
+% function [] = plot_sxr_multi(grid2D,data2D,date,shot,show_xpoint,show_localmax,start,interval,doSave,SXRfilename,doFilter,NL)
+function [] = plot_sxr_multi(PCBdata,SXR)
+grid2D = PCBdata.grid2D;
+data2D = PCBdata.data2D;
+date = SXR.date;
+shot = SXR.shot;
+show_xpoint = SXR.show_xpoint;
+show_localmax = SXR.show_localmax;
+start = SXR.start;
+interval = SXR.interval;
+doSave = SXR.doSave;
+doFilter = SXR.doFilter;
+doNLR = SXR.doNLR;
+SXRfilename = SXR.SXRfilename;
+
 % plot SXR emission on psi in rz plane
 % input:
 %   3d array of double: B_z (r,z,t), offsetted at zero and smoothed
@@ -29,11 +43,11 @@ function [] = plot_sxr_multi(grid2D,data2D,date,shot,show_xpoint,show_localmax,s
 % end
 % savefolder = strcat('/Users/shinjirotakeda/OneDrive - The University of Tokyo/Documents/result_matrix/',num2str(date),'/shot',num2str(shot));
 
-if doFilter & NL
+if doFilter & doNLR
     options = 'NLF_NLR';
-elseif ~doFilter & NL
+elseif ~doFilter & doNLR
     options = 'LF_NLR';
-elseif doFilter & ~NL
+elseif doFilter & ~doNLR
     options = 'NLF_LR';
 else
     options = 'LF_LR';
@@ -114,10 +128,10 @@ for t = times
         [VectorImage1,VectorImage2, VectorImage3, VectorImage4] = get_sxr_image(date,number,newProjectionNumber,rawImage);
 
 %         再構成計算
-        EE1 = get_distribution(M,K,gm2d1,U1,s1,v1,VectorImage1,doPlot,NL);
-        EE2 = get_distribution(M,K,gm2d2,U2,s2,v2,VectorImage2,doPlot,NL);
-        EE3 = get_distribution(M,K,gm2d3,U3,s3,v3,VectorImage3,doPlot,NL);
-        EE4 = get_distribution(M,K,gm2d4,U4,s4,v4,VectorImage4,doPlot,NL);
+        EE1 = get_distribution(M,K,gm2d1,U1,s1,v1,VectorImage1,doPlot,doNLR);
+        EE2 = get_distribution(M,K,gm2d2,U2,s2,v2,VectorImage2,doPlot,doNLR);
+        EE3 = get_distribution(M,K,gm2d3,U3,s3,v3,VectorImage3,doPlot,doNLR);
+        EE4 = get_distribution(M,K,gm2d4,U4,s4,v4,VectorImage4,doPlot,doNLR);
         
 %         再構成結果を保存するファイルを作成、保存
         
@@ -157,7 +171,7 @@ for t = times
         f.Position = [0.1,0.2,0.8,0.8];
     end
 
-    plot_save_sxr(grid2D,data2D,range,date,shot,t,EE,show_localmax,show_xpoint,doSave,doFilter,NL);
+    plot_save_sxr(grid2D,data2D,range,date,shot,t,EE,show_localmax,show_xpoint,doSave,doFilter,doNLR);
 
 end
 

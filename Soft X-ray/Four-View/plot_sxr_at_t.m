@@ -1,13 +1,28 @@
-function plot_sxr_at_t(grid2D,data2D,date,shot,t,show_xpoint,show_localmax,start,interval,save,SXRfilename,filter,NL)
+% function plot_sxr_at_t(grid2D,data2D,date,shot,t,show_xpoint,show_localmax,start,interval,save,SXRfilename,filter,NL)
+function plot_sxr_at_t(PCBdata,SXR)
+
+grid2D = PCBdata.grid2D;
+data2D = PCBdata.data2D;
+date = SXR.date;
+shot = SXR.shot;
+show_xpoint = SXR.show_xpoint;
+show_localmax = SXR.show_localmax;
+start = SXR.start;
+interval = SXR.interval;
+doFilter = SXR.doFilter;
+doNLR = SXR.doNLR;
+SXRfilename = SXR.SXRfilename;
+t = SXR.t;
+doCheck = SXR.doCheck;
 
 newProjectionNumber = 50;
 newGridNumber = 90;
 
-if filter & NL
+if filter & doNLR
     options = 'NLF_NLR';
-elseif ~filter & NL
+elseif ~filter & doNLR
     options = 'LF_NLR';
-elseif filter & ~NL
+elseif filter & ~doNLR
     options = 'NLF_LR';
 else
     options = 'LF_LR';
@@ -15,7 +30,7 @@ end
 matrixFolder = strcat('/Users/shinjirotakeda/OneDrive - The University of Tokyo/Documents/result_matrix/' ...
     ,options,'/',num2str(date),'/shot',num2str(shot));
 
-if exist(matrixFolder,'dir') == 0
+if exist(matrixFolder,'dir') == 0 || doCheck
     doCalculation = true;
 else
     doCalculation = false;
@@ -41,14 +56,16 @@ if doCalculation
             's1', 's2', 's3', 's4', 'v1', 'v2', 'v3', 'v4', 'M', 'K', 'range','N_projection', 'N_grid');   
     end
 
-    % 生画像の取得
-    rawImage = imread(SXRfilename);
-    
-    % 非線形フィルターをかける（必要があれば）
-    if doFilter
-        % figure;imagesc(rawImage);
-        [rawImage,~] = imnlmfilt(rawImage,'SearchWindowSize',91,'ComparisonWindowSize',15);
-        % figure;imagesc(rawImage);
+    if ~doCheck
+        % 生画像の取得
+        rawImage = imread(SXRfilename);
+        
+        % 非線形フィルターをかける（必要があれば）
+        if doFilter
+            % figure;imagesc(rawImage);
+            [rawImage,~] = imnlmfilt(rawImage,'SearchWindowSize',91,'ComparisonWindowSize',15);
+            % figure;imagesc(rawImage);
+        end
     end
 else
     load(parameterFile,'range');
@@ -58,12 +75,16 @@ number = (t-start)/interval+1;
 doPlot = false;
 
 if doCalculation
+    if doCheck
+        matrixPath = strcat(matrixFolder,'/',num2str(number),'.mat');
+        load(matrixPath,'EE1','EE2','EE3','EE4');
+        Iwgn1 = 
     [Iwgn1,Iwgn2,Iwgn3,Iwgn4] = get_sxr_image(date,number,newProjectionNumber,rawImage);
     
-    EE1 = get_distribution(M,K,gm2d1,U1,s1,v1,Iwgn1,doPlot,NL);
-    EE2 = get_distribution(M,K,gm2d2,U2,s2,v2,Iwgn2,doPlot,NL);
-    EE3 = get_distribution(M,K,gm2d3,U3,s3,v3,Iwgn3,doPlot,NL);
-    EE4 = get_distribution(M,K,gm2d4,U4,s4,v4,Iwgn4,doPlot,NL);
+    EE1 = get_distribution(M,K,gm2d1,U1,s1,v1,Iwgn1,doPlot,doNLR);
+    EE2 = get_distribution(M,K,gm2d2,U2,s2,v2,Iwgn2,doPlot,doNLR);
+    EE3 = get_distribution(M,K,gm2d3,U3,s3,v3,Iwgn3,doPlot,doNLR);
+    EE4 = get_distribution(M,K,gm2d4,U4,s4,v4,Iwgn4,doPlot,doNLR);
 else
     matrixPath = strcat(matrixFolder,'/',num2str(number),'.mat');
     load(matrixPath,'EE1','EE2','EE3','EE4');
@@ -74,6 +95,6 @@ f.Units = 'normalized';
 f.Position = [0.1,0.2,0.8,0.8];
 
 EE = cat(3,EE1,EE2,EE3,EE4);
-plot_save_sxr(grid2D,data2D,range,date,shot,t,EE,show_localmax,show_xpoint,save,filter,NL);
+plot_save_sxr(grid2D,data2D,range,date,shot,t,EE,show_localmax,show_xpoint,save,filter,doNLR);
 
 end
