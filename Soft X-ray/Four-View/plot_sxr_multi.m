@@ -67,9 +67,16 @@ if doCalculation
     
     % 非線形フィルターをかける（必要があれば）
     if doFilter
-        %figure;imagesc(rawImage);
-        [rawImage,~] = imnlmfilt(rawImage,'SearchWindowSize',11,'ComparisonWindowSize',5);
-        imagesc(rawImage);
+        if date == 230920 && shot == 15
+            load("230920\230920_shot15_denoisedTIF_w91_c5_d0625.mat","TIFImage");
+            rawImage = TIFImage;
+        else
+            patch = rawImage(1:200,1:200);
+            patchSq = patch.^2;
+            edist = sqrt(sum(patchSq,3));
+            patchSigma = sqrt(var(edist(:)));
+            [rawImage,~] = imnlmfilt(rawImage,'SearchWindowSize',91,'ComparisonWindowSize',5,'DegreeOfSmoothing',patchSigma*0.625);
+        end
     end
 else
     disp(strcat('Loading matrix from :',matrixFolder))

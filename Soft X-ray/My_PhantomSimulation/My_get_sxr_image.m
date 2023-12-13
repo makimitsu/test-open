@@ -1,4 +1,9 @@
-function [imageVector1,imageVector2,imageVector3,imageVector4] = My_get_sxr_image(Date,TimeFrameNumber,N_before,TIFImagePath,ApplyFilter)
+Date = 230920;
+TimeFrameNumber = 6;
+N_before = 50;
+TIFImagePath = "G:\My Drive\X-ray\Data\TIF\230920\shot015.tif";
+ApplyFilter = 1;
+
 % この関数では，一枚のTIF画像からファイバの断面のみを切り出し，再構成直前のベクトル画像を生成します．
 % 上下整理，フィルタ処理，時系列整理などは，ここに含まれます．
 
@@ -15,9 +20,13 @@ TIFImage = imread(TIFImagePath);
 
 % 非線形フィルターをかける
 if ApplyFilter
-    figure;imagesc(TIFImage);set(gcf,'Name','RawTIFImage','NumberTitle','off');
-    [TIFImage,~] = imnlmfilt(TIFImage,'SearchWindowSize',91,'ComparisonWindowSize',31);
-    figure;imagesc(TIFImage);set(gcf,'Name','FilteredTIFImage','NumberTitle','off');
+    figure;imagesc(TIFImage);clim([49,60]);set(gcf,'Name','RawTIFImage','NumberTitle','off');
+    patch = TIFImage(1:200,1:200);
+    patchSq = patch.^2;
+    edist = sqrt(sum(patchSq,3));
+    patchSigma = sqrt(var(edist(:)));
+    [TIFImage,~] = imnlmfilt(RawTIFImage,'SearchWindowSize',91,'ComparisonWindowSize',5,'DegreeOfSmoothing',patchSigma*0.625);
+    figure;imagesc(TIFImage);clim([49,60]);set(gcf,'Name','FilteredTIFImage','NumberTitle','off');
 end
 
 % ファイバーの位置を検索するための校正用画像を取得
@@ -123,12 +132,10 @@ for i=1:NumberOfFrame
         title2 = strcat('2,',i_str);
         title3 = strcat('3,',i_str);
         title4 = strcat('4,',i_str);
-        subplot(4,8,4*(i-1)+1);imagesc(roughImage1);title(title1);
-%         caxis([50,60]);
-        subplot(4,8,4*(i-1)+2);imagesc(roughImage2);title(title2);
-%         caxis([50,60]);
-        subplot(4,8,4*(i-1)+3);imagesc(roughImage3);title(title3);
-        subplot(4,8,4*(i-1)+4);imagesc(roughImage4);title(title4);
+        subplot(4,8,4*(i-1)+1);imagesc(roughImage1);title(title1);clim([50,60]);
+        subplot(4,8,4*(i-1)+2);imagesc(roughImage2);title(title2);clim([50,60]);
+        subplot(4,8,4*(i-1)+3);imagesc(roughImage3);title(title3);clim([50,60]);
+        subplot(4,8,4*(i-1)+4);imagesc(roughImage4);title(title4);clim([50,60]);
         set(gcf,'Name','FiberTrimCheck','NumberTitle','off');
     end
 
@@ -151,7 +158,6 @@ imageVector1 = imageVectors1(TimeFrameNumber,:);
 imageVector2 = imageVectors2(TimeFrameNumber,:);
 imageVector3 = imageVectors3(TimeFrameNumber,:);
 imageVector4 = imageVectors4(TimeFrameNumber,:);
-end
 
 
 function k = find_circle(L)

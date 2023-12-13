@@ -50,8 +50,8 @@ z_space_SXR2 = z_space_SXR2(z_range2);
 positionList = [2,4,1,3];
 nameList = {strcat('1um Al @',num2str(t),'us'), strcat('2.5um Al @',num2str(t),'us'), strcat('2um Mylar @',num2str(t),'us'), strcat('1um Mylar @',num2str(t),'us')};
 % cLimList = {[0 0.15],[0 0.075],[0 0.05],[0 0.075]};
-% cLimList = {[0 0.33],[0 0.16],[0 0.05],[0 0.2]};% 230920
-cLimList = {[0 0.35],[0 0.45],[0 0.15],[0 1]};% 230929
+cLimList = {[0 0.33],[0 0.16],[0 0.05],[0 0.2]};% 230920
+% cLimList = {[0 0.35],[0 0.45],[0 0.15],[0 1]};% 230929
 
 % 負の要素を0で置換
 negativeEE = find(EE<0);
@@ -71,8 +71,7 @@ for i = 1:4
     [~,h] = contourf(SXR_mesh_z,SXR_mesh_r,EE_plot,20);colormap("jet");
     h.LineStyle = 'none';
     c=colorbar;c.Label.String='Intensity [a.u.]';c.FontSize=18;
-    % clim(cell2mat(cLimList(i)));
-    caxis(cell2mat(cLimList(i)));
+    clim(cell2mat(cLimList(i)));
     hold on
     if show_localmax
         localmax_idx = imregionalmax(EE_plot);

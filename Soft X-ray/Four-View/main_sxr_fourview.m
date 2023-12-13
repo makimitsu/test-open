@@ -4,7 +4,7 @@
 % 始める前に，1)find_fibers2.m>>position 2)plot_save_sxr.m>>clim を適合させること
 %%%%%%%%%%%%%%%%%%%%%%%%
 clearvars -except date IDXlist doSave doFilter doNLR
-addpath '/Users/yuleo/Documents/GitHub/test-open'/pcb_experiment/; %getMDSdata.mとcoeff200ch.xlsxのあるフォルダへのパス
+addpath '/Users/yuleo/Documents/GitHub/test-open'; %getMDSdata.mとcoeff200ch.xlsxのあるフォルダへのパス
 setenv('SXR_IMAGE_DIR','G:\My Drive\X-ray\Data\TIF');
 setenv('SXR_RECONSTRUCTED_DIR','G:\My Drive\X-ray\Data\SXROUT');
 setenv('SXR_MATRIX_DIR','G:\My Drive\X-ray\Data\SXROUT');

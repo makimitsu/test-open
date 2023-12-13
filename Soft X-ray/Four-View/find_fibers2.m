@@ -112,10 +112,10 @@ CenterPositions(:,:,3) = [];% これはradius分をすてたということで�
 OFFSET = zeros(size(CenterPositions));
 OFFSET_fiber = zeros([4,2]);
 % 230929
-OFFSET_fiber(1,:)=[-11,51];% [x(横);y(縦)]% ここ調整ポイント MyFindCircleとか，get_sxr_imageでdocheckを入れて手動調整してください ファイバごとで補正値違いそうなのでゆくゆく突き詰めたい
-OFFSET_fiber(2,:)=[-12,51];
-OFFSET_fiber(3,:)=[-36,44];
-OFFSET_fiber(4,:)=[-32,44];
+% OFFSET_fiber(1,:)=[-11,51];% [x(横);y(縦)]% ここ調整ポイント MyFindCircleとか，get_sxr_imageでdocheckを入れて手動調整してください ファイバごとで補正値違いそうなのでゆくゆく突き詰めたい
+% OFFSET_fiber(2,:)=[-12,51];
+% OFFSET_fiber(3,:)=[-36,44];
+% OFFSET_fiber(4,:)=[-32,44];
 
 % 230920/shot27
 % OFFSET_fiber(1,:)=[-7,46];% [x(横);y(縦)]% ここ調整ポイント MyFindCircleとか，get_sxr_imageでdocheckを入れて手動調整してください ファイバごとで補正値違いそうなのでゆくゆく突き詰めたい
@@ -124,10 +124,10 @@ OFFSET_fiber(4,:)=[-32,44];
 % OFFSET_fiber(4,:)=[-12,42];
 
 % 230920/shot15
-% OFFSET_fiber(1,:)=[-7,39];% [x(横);y(縦)]% ここ調整ポイント MyFindCircleとか，get_sxr_imageでdocheckを入れて手動調整してください ファイバごとで補正値違いそうなのでゆくゆく突き詰めたい
-% OFFSET_fiber(2,:)=[9,45];
-% OFFSET_fiber(3,:)=[-17,39];
-% OFFSET_fiber(4,:)=[-17,39];
+OFFSET_fiber(1,:)=[-7,39];% [x(横);y(縦)]% ここ調整ポイント MyFindCircleとか，get_sxr_imageでdocheckを入れて手動調整してください ファイバごとで補正値違いそうなのでゆくゆく突き詰めたい
+OFFSET_fiber(2,:)=[9,45];
+OFFSET_fiber(3,:)=[-17,39];
+OFFSET_fiber(4,:)=[-17,39];
 
 for i=1:4
     for j=1:2
