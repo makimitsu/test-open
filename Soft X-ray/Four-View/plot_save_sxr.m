@@ -71,6 +71,7 @@ for i = 1:4
     p = positionList(i);
     subplot(2,2,p);
     [~,h] = contourf(SXR_mesh_z,SXR_mesh_r,EE_plot,20);
+    colormap('turbo');
     h.LineStyle = 'none';
     c=colorbar;c.Label.String='Intensity [a.u.]';c.FontSize=18;
     clim(cell2mat(cLimList(i)));
@@ -84,7 +85,8 @@ for i = 1:4
         plot(localmax_pos_z,localmax_pos_r,'r*');
     end
     % if show_flux_surface
-        [~,hp]=contourf(psi_mesh_z,psi_mesh_r,psi,contour_layer,'-k','Fill','off');
+        [~,hp]=contourf(psi_mesh_z,psi_mesh_r,psi,contour_layer,'white','Fill','off');axis([-0.12 0.12 0.06 0.33]);
+        % [~,hp]=contourf(psi_mesh_z,psi_mesh_r,psi,contour_layer,'-k','Fill','off');
         hp.LineWidth = 1.5;
         if show_xpoint
             [~,~,pos_xz,pos_xr,~,~] = search_xo(psi,z_space,r_space);

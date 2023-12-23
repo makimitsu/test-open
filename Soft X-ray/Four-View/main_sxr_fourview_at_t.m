@@ -1,10 +1,10 @@
 %%%%%%%%%%%%%%%%%%%%%%%%
 % Top-level file for calculating and plotting SXR emission for four-view
-% experimental setup
+% experimental setup 
 %%%%%%%%%%%%%%%%%%%%%%%%
 % clear
 % close all
-clearvars -except date IDXlist doSave doFilter doNLR time
+clearvars -except date IDXlist doCheck doFilter doNLR time
 addpath '/Users/shinjirotakeda/Documents/GitHub/test-open/pcb_experiment'; %getMDSdata.mとcoeff200ch.xlsxのあるフォルダへのパス
 
 %%%%%ここが各PCのパス
@@ -14,7 +14,7 @@ pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所;
 pathname.pre_processed_directory = getenv('pre_processed_directory_path');%計算結果の保存先（どこでもいい）
 
 %%%%実験オペレーションの取得
-prompt = {'Date:','Shot number:','Time','doSave:','doFilter:','doNLR:'};
+prompt = {'Date:','Shot number:','Time','doCheck:','doFilter:','doNLR:'};
 definput = {'','','','','',''};
 if exist('date','var')
     definput{1} = num2str(date);
@@ -25,8 +25,8 @@ end
 if exist('time','var')
     definput{3} = num2str(time);
 end
-if exist('doSave','var')
-    definput{4} = num2str(doSave);
+if exist('doCheck','var')
+    definput{4} = num2str(doCheck);
 end
 if exist('doFilter','var')
     definput{5} = num2str(doFilter);
@@ -39,13 +39,13 @@ dims = [1 35];
 answer = inputdlg(prompt,dlgtitle,dims,definput);
 date = str2double(cell2mat(answer(1)));
 IDXlist = str2num(cell2mat(answer(2)));
-time = str2num(cell2mat(answer(2)));
-doSave = logical(str2num(cell2mat(answer(4))));
+time = str2num(cell2mat(answer(3)));
+doCheck = logical(str2num(cell2mat(answer(4))));
 doFilter = logical(str2num(cell2mat(answer(5))));
 doNLR = logical(str2num(cell2mat(answer(6))));
 
 SXR.t = time;
-SXR.doSave = doSave;
+SXR.doCheck = doCheck;
 SXR.doFilter = doFilter;
 SXR.doNLR = doNLR;
 
