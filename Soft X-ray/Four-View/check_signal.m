@@ -1,4 +1,10 @@
-function check_signal(date, shot, tfshot, pathname,n)
+% function check_signal(date, shot, tfshot, pathname,n)
+function check_signal(PCB,pathname)
+
+date = PCB.date;
+shot = PCB.shot;
+tfshot = PCB.tfshot;
+n = PCB.n;
 
 sheets = sheetnames('coeff200ch.xlsx');
 sheets = str2double(sheets);

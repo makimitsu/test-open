@@ -61,8 +61,8 @@ EFlist=T.EF_A_(IDXlist);
 TFlist=T.TF_kV_(IDXlist);
 dtacqlist=39.*ones(n_data,1);
 
-trange=400:800;%【input】計算時間範囲
-n=40; %【input】rz方向のメッシュ数
+PCB.trange=400:800;%【input】計算時間範囲
+PCB.n=40; %【input】rz方向のメッシュ数
 
 % doCheck = false;
 % doCheck = true;
@@ -72,16 +72,18 @@ n=40; %【input】rz方向のメッシュ数
 
 for i=1:n_data
     % dtacq_num=dtacqlist;
-    shot=shotlist(i,:);
-    tfshot=tfshotlist(i,:);
-    if shot == tfshot
-        tfshot = [0,0];
+    PCB.shot=shotlist(i,:);
+    PCB.tfshot=tfshotlist(i,:);
+    if PCB.shot == PCB.tfshot
+        PCB.tfshot = [0,0];
     end
-    i_EF=EFlist(i);
-    TF=TFlist(i);
+    PCB.i_EF=EFlist(i);
+    PCB.TF=TFlist(i);
+    PCB.date = date;
     if doCheck
-        check_signal(date, shot, tfshot, pathname, n);
+        check_signal(PCB,pathname);
     else
-        plot_psi280ch(date, shot, tfshot, pathname,n,i_EF,trange);
+        get_B_reconnection(PCB,pathname)
+        % plot_psi280ch(PCB,pathname);
     end
 end

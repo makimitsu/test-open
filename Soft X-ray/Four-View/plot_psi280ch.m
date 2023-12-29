@@ -1,4 +1,7 @@
-function plot_psi280ch(date, shot, tfshot, pathname, n,i_EF,trange)
+% function plot_psi280ch(date, shot, tfshot, pathname, n,i_EF,trange)
+function plot_psi280ch(PCB,pathname)
+shot = PCB.shot;
+trange = PCB.trange;
 % filename=strcat(pathname.rawdata,'/rawdata_dtacq',num2str(dtacq_num),'_shot',num2str(shot),'_tfshot',num2str(tfshot),'.mat');
 % if exist(filename,"file")==0
 %     disp('No rawdata file -- Start generating!')
@@ -186,7 +189,7 @@ function plot_psi280ch(date, shot, tfshot, pathname, n,i_EF,trange)
 %     load(filename,'data2D','grid2D');
 % end
 
-[grid2D,data2D] = process_PCBdata_280ch(date, shot, tfshot, pathname, n,i_EF,trange);
+[grid2D,data2D] = process_PCBdata_280ch(PCB,pathname);
 
 % ***********************************************
 
@@ -230,6 +233,12 @@ dt = 4;
 %     plot(grid2D.zq(1,squeeze(mid(opoint(:,:,i),:,i))),grid2D.rq(opoint(:,:,i),1),"bo")
 %     plot(grid2D.zq(1,squeeze(mid(xpoint(:,:,i),:,i))),grid2D.rq(xpoint(:,:,i),1),"bx")
      % plot(ok_z,ok_r,"k.",'MarkerSize', 6)%測定位置
+
+    timeIndex = find(trange==t);
+    [magaxis,xpoint] = get_axis_x(grid2D,data2D,timeIndex);
+    plot(magaxis.z,magaxis.r,'ro');
+    plot(xpoint.z,xpoint.r,'rx');
+
     hold off
     title(string(t)+' us')
 %     xlabel('z [m]')
