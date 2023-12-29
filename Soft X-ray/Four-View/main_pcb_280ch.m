@@ -1,5 +1,6 @@
 clear
 addpath '/Users/yuleo/Documents/GitHub/test-open/pcb_experiment'; %getMDSdata.mとcoeff200ch.xlsxのあるフォルダへのパス
+addpath 'C:\Users\yuleo\Documents\GitHub\test-open'
 
 %%%%%%%%%%%%%%%%%%%%%%%%
 %280ch用新規pcbプローブのみでの磁気面（Bz）
@@ -20,7 +21,7 @@ pathname.pre_processed_directory = getenv('pre_processed_directory_path');%計�
 prompt = {'Date:','Shot number:','start:','dt'};
 dlgtitle = 'Input';
 dims = [1 35];
-definput = {'231206','','460','1'};
+definput = {'230920','15','470','1'};
 answer = inputdlg(prompt,dlgtitle,dims,definput);
 date = str2double(cell2mat(answer(1)));
 IDXlist = str2num(cell2mat(answer(2)));
@@ -78,7 +79,6 @@ else
     doCalculation = false;
 end
 
-
 if doCalculation
 %較正係数のバージョンを日付で判別
 sheets = sheetnames('coeff200ch.xlsx');
@@ -123,8 +123,8 @@ for i = 1:length(dtaq_ch)
     end
 end
 
-b=raw.*coeff';%較正係数RC/NS
-b=b.*polarity';%極性揃え
+b=raw.*coeff';% 較正係数RC/NS
+b=b.*polarity';% 極性揃え
 
 %デジタイザchからプローブ通し番号順への変換
 bz=zeros(1000,100);
@@ -256,8 +256,10 @@ start=0;
     % contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.psi(:,:,i),40,'LineStyle','none')
     % contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bt(:,:,i),-100e-3:0.5e-3:100e-3,'LineStyle','none')
     contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Jt(:,:,i),30,'LineStyle','none');% clim([0,max(data2D.Jt,[],'all')]);climError出た
+    hold on;contour(grid2D.zq(1,:),grid2D.rq(:,1),-data2D.Jt(:,:,i),[2.3e5:1e5:7.5e5],'white','LineWidth',1);
+
 %     contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Et(:,:,i),20,'LineStyle','none')
-    colormap("jet")
+    colormap("turbo")
     axis image
     axis tight manual
 %     caxis([-0.8*1e+6,0.8*1e+6]) %jt%カラーバーの軸の範囲
@@ -297,59 +299,10 @@ end
 
 function save_dtacq_data(dtacq_num,shot,tfshot,rawdataPath)
 
-% rawdataPath=getenv('rawdata_path'); %保存先
-
-% %%%%実験オペレーションの取得
-% DOCID='1wG5fBaiQ7-jOzOI-2pkPAeV6SDiHc_LrOdcbWlvhHBw';%スプレッドシートのID
-% T=getTS6log(DOCID);
-% node='date';
-% % pat=230707;
-% pat=date;
-% T=searchlog(T,node,pat);
-% IDXlist=6;%[4:6 8:11 13 15:19 21:23 24:30 33:37 39:40 42:51 53:59 61:63 65:69 71:74];
-% IDXlist = shot;
-% n_data=numel(IDXlist);%計測データ数
-% shotlist=T.a039(IDXlist);
-% tfshotlist=T.a039_TF(IDXlist);
-% EFlist=T.EF_A_(IDXlist);
-% TFlist=T.TF_kV_(IDXlist);
-% dtacqlist=39.*ones(n_data,1);
-
-% dtacqlist=39;
-% shotlist= 1819;%【input】dtacqの保存番号
-% tfshotlist = 1817;
-
-% dtacqlist=40;
-% shotlist= 299;%【input】dtacqの保存番号
-% tfshotlist = 297;
-
-% date = 230706;%【input】計測日
-% n=numel(shotlist);%計測データ数
-
-%RC係数読み込み
-
-% for i=1:n
-%     dtacq_num=dtacqlist(i);
-%     shot=shotlist(i);
-%     tfshot=tfshotlist(i);
-%     [rawdata]=getMDSdata(dtacq_num,shot,tfshot);%測定した生信号
-%     save(strcat(rawdataPath,'/rawdata_dtacq',num2str(dtacq_num),'_shot',num2str(shot),'_tfshot',num2str(tfshot),'.mat'),'rawdata');
-%     if tfshot>0
-%         [rawdata]=getMDSdata(dtacq_num,shot,0);
-%         % save(strcat(pathname.rawdata,'/rawdata_dtacq',num2str(dtacq_num),'_shot',num2str(shot),'_tfshot0.mat'),'rawdata0');
-%         save(strcat(rawdataPath,'/rawdata_dtacq',num2str(dtacq_num),'_shot',num2str(shot),'_tfshot0.mat'),'rawdata');
-%     end
-% end
-
-% dtacq_num=dtacqlist(i);
-% shot=shotlist(i);
-% tfshot=tfshotlist(i);
-
 [rawdata]=getMDSdata(dtacq_num,shot,tfshot);%測定した生信号
 save(strcat(rawdataPath,'/rawdata_dtacq',num2str(dtacq_num),'_shot',num2str(shot),'_tfshot',num2str(tfshot),'.mat'),'rawdata');
 if tfshot==0
     [rawdata]=getMDSdata(dtacq_num,shot,0);
-    % save(strcat(pathname.rawdata,'/rawdata_dtacq',num2str(dtacq_num),'_shot',num2str(shot),'_tfshot0.mat'),'rawdata0');
     save(strcat(rawdataPath,'/rawdata_dtacq',num2str(dtacq_num),'_shot',num2str(shot),'_tfshot0.mat'),'rawdata');
 end
 

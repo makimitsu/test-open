@@ -15,5 +15,5 @@ function plot_sxr_multi(doSave,doFilter,NL,M,K,gm2d,U,s,v,EEorigin,range)
     % 再構成計算
     EE = get_distribution(M,K,gm2d,U,s,v,VectorImage,NL);
 
-    plot_save_sxr(range,EE);
+    plot_save_sxr(range,EE,EEorigin);
 end

@@ -1,6 +1,6 @@
 Date = 230920;
 TimeFrameNumber = 6;
-N_before = 50;
+N_befor = 50;
 TIFImagePath = "G:\My Drive\X-ray\Data\TIF\230920\shot015.tif";
 ApplyFilter = 1;
 

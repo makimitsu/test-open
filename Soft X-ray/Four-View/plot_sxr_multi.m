@@ -66,11 +66,17 @@ if doCalculation
     rawImage = imread(SXRfilename);
     
     % 非線形フィルターをかける（必要があれば）
+    filteredTIFPath = strcat(getenv('SXR_IMAGE_DIR'),'/',num2str(date),'/filtered/shot',num2str(shot,'%03i'),'.mat');
     if doFilter
         if date == 230920 && shot == 15
             load("230920\230920_shot15_denoisedTIF_w91_c5_d0625.mat","TIFImage");
             rawImage = TIFImage;
+        elseif exist(filteredTIFPath,'file') == 2
+            load(filteredTIFPath,"filteredTIF");
+            rawImage = filteredTIF;
+            disp('MATfile loaded.');
         else
+            disp('Filter Process Initiated.')
             patch = rawImage(1:200,1:200);
             patchSq = patch.^2;
             edist = sqrt(sum(patchSq,3));
@@ -147,11 +153,11 @@ for t = times
     if ~doSave
         f = figure;
         f.Units = 'normalized';
-        f.Position = [0.1,0.2,0.8,0.8];
+        f.Position = [0.1,0.1,0.64,0.64];
     end
-
-    plot_save_sxr(grid2D,data2D,range,date,shot,t,EE,show_localmax,show_xpoint,doSave,doFilter,NL);
-
+    % if number <= 4
+        plot_save_sxr(grid2D,data2D,range,date,shot,t,EE,show_localmax,show_xpoint,doSave,doFilter,NL);
+    % end
 end
 
 if doSave

@@ -93,9 +93,10 @@ for i=1:n_data
     TF=TFlist(i);
     start = startlist(i);
     interval = intervallist(i);
+    % those who use DOI probe as MAGprobe
     [grid2D,data2D] = process_PCBdata_280ch(date, shot, tfshot, pathname, n,i_EF,trange);
-    % grid2D = NaN;
-    % data2D = NaN;
+    % those who use Akimitsu-DOI probe as MAGprobe
+    % load(strcat('G:\My Drive\X-ray\Local Code Files\a03839_',num2str(shotlist_a039(i)),'.mat'),'data2D','grid2D');
     shot_SXR = IDXlist(i);
     SXRfilename = strcat(getenv('SXR_IMAGE_DIR'),'/',num2str(date),'/shot',num2str(shot_SXR,'%03i'),'.tif');
     plot_sxr_multi(grid2D,data2D,date,shot_SXR,show_xpoint,show_localmax,start,interval,doSave,SXRfilename,doFilter,doNLR);

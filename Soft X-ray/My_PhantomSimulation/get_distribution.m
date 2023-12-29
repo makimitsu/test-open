@@ -33,26 +33,45 @@ E = zeros(1,K);
 if NonLiner_flag
     disp('NL EE calc start');
     gamma = 10^(lg_gamma(gamma_index));
+    gamma = gamma/5;
     C = Laplacian(sqrt(K)-1);
     H = gm2d;
     G = VectorImage;
     W = eye(size(C, 1));
     diag_idx = find(W);
-    for i=1:K
-        % v_1 = v(i,:);
-        if M>K
-            v_1 = [v(i,:) zeros(1,M-K)];
-        else
-            v_1 = v(i,:);
+    % for j=1:1
+        for i=1:K
+            % v_1 = v(i,:);
+            if M>K
+                v_1 = [v(i,:) zeros(1,M-K)];
+            else
+                v_1 = v(i,:);
+            end
+            E1 = (s./(s.^2+M*10^(lg_gamma(gamma_index)))).*v_1.*(Z.');
+            E(i)=sum(E1);
         end
-        E1 = (s./(s.^2+M*10^(lg_gamma(gamma_index)))).*v_1.*(Z.');
-        E(i)=sum(E1);
-    end
-    EE = E;
-    W(diag_idx) = 1./EE;
-    W(W==Inf) = -1;
-    W(W<0) = max(W, [], 'all');
-    EE = (H' * H + (M * gamma) .* (C'* W * C))^(-1) * H' * G'; 
+        EE = E;
+        W(diag_idx) = 1./EE;
+        W(W==Inf) = -1;
+        W(W<0) = max(W, [], 'all');
+        EE = (H' * H + (M * gamma) .* (C'* W * C))^(-1) * H' * G'; 
+    %     EE = (H' * H + (M * gamma).* (C'* W * C))^(-1) * H' * G';        
+    %     diag_W = diag(W);
+    %     index = 1:size(diag(W));
+    %     plot(index, diag_W);hold on;
+    %     for i = 1:size(C, 1)
+    %         if EE(i) > 0
+    %             W(i, i) = 1/EE(i);
+    %         else
+    %             W(i, i) = -100;
+    %         end
+    %     end
+    %     for i = 1:size(C, 1)
+    %         if W(i, i) == -100
+    %             W(i, i) = max(W, [], 'all');
+    %         end
+    %     end
+    % end
     disp('NL EE calc end');
     EE = reshape(EE, sqrt(K), sqrt(K));
 else

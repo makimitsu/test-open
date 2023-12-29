@@ -3,14 +3,20 @@ function [FiberImage,Image] = generateFiberImage(gm2d,EE)
 PhantomEE = reshape(EE,1,[]);
 
 FiberImageArray = gm2d*(PhantomEE)';
-FiberImage=awgn(FiberImageArray,1000,'measured'); % 5 related to 20%; 10 related to 10%;
-FiberImage(FiberImage<0)=0;
-
+FiberImage=awgn(FiberImageArray,5,'measured'); % 5 related to 20%; 10 related to 10%;
+% FiberImage = MyAddWhiteGaussianNoise(FiberImageArray,3);
+% FiberImage = FiberImageArray;
+% FiberImage(FiberImage<0)=0;
+FiberImage = FiberImage.*1.2;
 k = find_circle(50/2);
 Image = zeros(50);
 Image(k) = FiberImage;
 
-figure(2);imagesc(Image);set(gcf,'Name','巻き戻しファイバー画像','NumberTitle','off');
+figure(3);imagesc(Image);set(gcf,'Name','巻き戻しファイバー画像','NumberTitle','off');
+
+Image = imnlmfilt(Image,"ComparisonWindowSize",21,"SearchWindowSize",41);
+FiberImage = Image(k);
+% figure(4);imagesc(Image);set(gcf,'Name','フィルタ後巻き戻しファイバー画像','NumberTitle','off');
 
 end
 

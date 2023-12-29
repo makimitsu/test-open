@@ -1,4 +1,4 @@
-function plot_save_sxr(range,EE)
+function plot_save_sxr(range,EE,EEorigin)
 
 range = range./1000;
 zmin1 = range(1);
@@ -38,17 +38,23 @@ negativeEE = find(EE<0);
 EE(negativeEE) = zeros(size(negativeEE));
 
 % if i <= 2
-    z_range = z_range2;
-    SXR_mesh_z = SXR_mesh_z2;
+    % z_range = z_range2;
+    % SXR_mesh_z = SXR_mesh_z2;
 % else
-%     z_range = z_range1;
-%     SXR_mesh_z = SXR_mesh_z1;
+    z_range = z_range1;
+    SXR_mesh_z = SXR_mesh_z1;
 % end
 EE_plot = EE(r_range,z_range);
 figure(1);
-[~,h] = contourf(SXR_mesh_z,SXR_mesh_r,EE_plot,20);colormap("jet");axis([-0.12 0.12 0.06 0.33]);daspect([1 0.8 1]);
+[~,h] = contourf(SXR_mesh_z,SXR_mesh_r,EE_plot,20);colormap("parula");axis([-0.12 0.12 0.06 0.33]);daspect([1 0.8 1]);
 h.LineStyle = 'none';
-c=colorbar;c.Label.String='Intensity [a.u.]';c.FontSize=12;caxis([0 0.12]);
+c=colorbar;c.Label.String='Intensity [a.u.]';c.FontSize=12;clim([0 0.04]);
 set(gcf,'Name','再構成結果','NumberTitle','off');
 
+EEorigin_plot = EEorigin(r_range,z_range);
+figure(2);
+[~,h] = contourf(SXR_mesh_z,SXR_mesh_r,EEorigin_plot,20);colormap("parula");axis([-0.12 0.12 0.06 0.33]);daspect([1 0.8 1]);
+h.LineStyle = 'none';
+c=colorbar;c.Label.String='Intensity [a.u.]';c.FontSize=12;clim([0 0.05]);
+set(gcf,'Name','元画像','NumberTitle','off');
 end
