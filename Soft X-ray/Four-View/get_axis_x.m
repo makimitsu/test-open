@@ -1,7 +1,11 @@
-function [magaxis,xpoint] = get_axis_x(grid2D,data2D,timeIndex)
+function [magaxis,xpoint] = get_axis_x(grid2D,data2D,time)
 
+trange = data2D.trange;
+timeIndex = trange==time;
 psi = data2D.psi;
 psi = psi(:,:,timeIndex);
+Bt = data2D.Bt;
+Bt = Bt(:,:,timeIndex);
 rq = grid2D.rq;
 zq = grid2D.zq;
 
@@ -26,10 +30,12 @@ if numel(I(TF)) == 2
         xpoint.r = rq(I_x(TF_x));
         xpoint.z = zq(I_x(TF_x));
         xpoint.psi = psi(I_x(TF_x));
+        xpoint.Bt = Bt(I_x(TF_x));
     else
         xpoint.r = NaN;
         xpoint.z = NaN;
         xpoint.psi = NaN;
+        xpoint.Bt = NaN;
     end
 elseif numel(I(TF)) == 1
     % 軸位置のrz座標を取得
@@ -39,6 +45,7 @@ elseif numel(I(TF)) == 1
     xpoint.r = NaN;
     xpoint.z = NaN;
     xpoint.psi = NaN;
+    xpoint.Bt = NaN;
 else
     magaxis.r = NaN;
     magaxis.z = NaN;
@@ -46,6 +53,7 @@ else
     xpoint.r = NaN;
     xpoint.z = NaN;
     xpoint.psi = NaN;
+    xpoint.Bt = NaN;
 end
 
 

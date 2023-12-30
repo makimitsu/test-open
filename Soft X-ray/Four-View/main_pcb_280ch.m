@@ -83,7 +83,7 @@ for i=1:n_data
     if doCheck
         check_signal(PCB,pathname);
     else
-        get_B_reconnection(PCB,pathname)
-        % plot_psi280ch(PCB,pathname);
+        % get_B_reconnection(PCB,pathname)
+        plot_psi280ch(PCB,pathname);
     end
 end

@@ -1,16 +1,21 @@
-function get_B_reconnection(PCB,pathname)
+function B_r = get_B_reconnection(PCB,pathname)
 
 trange = PCB.trange;
+newTimeRange = find(trange>=440&trange<=500);
 [grid2D,data2D] = process_PCBdata_280ch(PCB,pathname);
 Br = data2D.Br;
 rq = grid2D.rq;
 zq = grid2D.zq;
 
+trange = trange(newTimeRange);
+Br = Br(:,:,newTimeRange);
+
 B_reconnection = zeros(1,numel(trange));
 mergingRatio = zeros(1,numel(trange));
 
 for i = 1:numel(trange)
-    [magaxis,xpoint] = get_axis_x(grid2D,data2D,i);
+    time = trange(i);
+    [magaxis,xpoint] = get_axis_x(grid2D,data2D,time);
     if numel(magaxis.r) == 2
         range = rq>=min(magaxis.r)&rq<=max(magaxis.r)&zq>=min(magaxis.z)&zq<=max(magaxis.z);
         Br_t = Br(:,:,i);
@@ -22,7 +27,11 @@ for i = 1:numel(trange)
     end
 end
 
-figure;plot(trange,B_reconnection);
-figure;plot(trange,mergingRatio);
+% t_Br = trange(knnsearch(mergingRatio.',0.2));
+% disp(t_Br);
+B_r = B_reconnection(1,knnsearch(mergingRatio.',0.2));
+
+% figure;plot(trange,B_reconnection);
+% figure;plot(trange,mergingRatio);
 
 end

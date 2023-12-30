@@ -34,26 +34,34 @@ if doCalculation
     ch=C(:,7);
     
     if ismember(39,dtacq_num_list)
-        filename1 = strcat(pathname.rawdata,'/rawdata_dtacq',num2str(39),'_shot',num2str(shot(1)),'_tfshot',num2str(tfshot(1)),'.mat');
+        % filename1 = strcat(pathname.rawdata,'/rawdata_dtacq',num2str(39),'_shot',num2str(shot(1)),'_tfshot',num2str(tfshot(1)),'.mat');
+        filename1 = strcat(pathname.rawdata,'/mag_probe/dtacq',num2str(39),'/shot',num2str(shot(1)),'_tfshot',num2str(tfshot(1)),'.mat');
         if exist(filename1,"file")==0
             disp('No rawdata file of a039 -- Start generating!')
-            rawdataPath = pathname.rawdata;
-            save_dtacq_data(39, shot(1), tfshot(1),rawdataPath)
+            % rawdataPath = pathname.rawdata;
+            % save_dtacq_data(39, shot(1), tfshot(1),rawdataPath)
+            save_dtacq_data(39, shot(1), tfshot(1),filename1)
             % disp(['File:',filename1,' does not exit']);
             % return
         end
-        a039_raw = importdata(filename1);
+        load(filename1,"rawdata_woTF");
+        a039_raw = rawdata_woTF;
+        % a039_raw = importdata(filename1);
     end
     if ismember(40,dtacq_num_list)
-        filename2 = strcat(pathname.rawdata,'/rawdata_dtacq',num2str(40),'_shot',num2str(shot(2)),'_tfshot',num2str(tfshot(2)),'.mat');
+        % filename2 = strcat(pathname.rawdata,'/rawdata_dtacq',num2str(40),'_shot',num2str(shot(2)),'_tfshot',num2str(tfshot(2)),'.mat');
+        filename2 = strcat(pathname.rawdata,'/mag_probe/dtacq',num2str(40),'/shot',num2str(shot(2)),'_tfshot',num2str(tfshot(2)),'.mat');
         if exist(filename2,"file")==0
             disp('No rawdata file of a040 -- Start generating!')
-            rawdataPath = pathname.rawdata;
-            save_dtacq_data(40, shot(2), tfshot(2),rawdataPath)
+            % rawdataPath = pathname.rawdata;
+            % save_dtacq_data(40, shot(2), tfshot(2),rawdataPath)
+            save_dtacq_data(40, shot(2), tfshot(2),filename2)
             % disp(['File:',filename2,' does not exit']);
             % return
         end
-        a040_raw = importdata(filename2);
+        % a040_raw = importdata(filename2);
+        load(filename2,"rawdata_woTF");
+        a040_raw = rawdata_woTF;
     end
     
     raw = zeros(1000,length(dtaq_ch));
@@ -177,7 +185,7 @@ if doCalculation
         data2D.Jt(:,:,i)= curl(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bz(:,:,i),data2D.Br(:,:,i))./(4*pi*1e-7);
 
         if i>1
-            data2D.Et = -1*(data2D.psi(:,:,i)-data2D.psi(:,:,i-1))/(2*pi()*grid2D.rq);
+            data2D.Et(:,:,i) = -1*(data2D.psi(:,:,i)-data2D.psi(:,:,i-1))./(2*pi()*grid2D.rq);
         end
     end
 else

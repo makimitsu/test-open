@@ -1,4 +1,4 @@
-function save_dtacq_data(dtacq_num,shot,tfshot,rawdataPath)
+function save_dtacq_data(dtacq_num,shot,tfshot,fileName)
 
 % rawdataPath=getenv('rawdata_path'); %保存先
 
@@ -48,7 +48,7 @@ function save_dtacq_data(dtacq_num,shot,tfshot,rawdataPath)
 % shot=shotlist(i);
 % tfshot=tfshotlist(i);
 
-% 231128　下のブロックをコメントアウト
+% % 231128　下のブロックをコメントアウト
 % [rawdata]=getMDSdata(dtacq_num,shot,tfshot);%測定した生信号
 % save(strcat(rawdataPath,'/rawdata_dtacq',num2str(dtacq_num),'_shot',num2str(shot),'_tfshot',num2str(tfshot),'.mat'),'rawdata');
 % if tfshot==0
@@ -59,8 +59,9 @@ function save_dtacq_data(dtacq_num,shot,tfshot,rawdataPath)
 
 % 231128　下のブロックとローカル関数を追加、未テスト
 [rawdata_wTF, rawdata_woTF] = get_mds_data(dtacq_num,shot,tfshot);
-save(strcat(rawdataPath,'/mag_probe/dtacq',num2str(dtacq_num),'/shot',num2str(shot),'_tfshot',num2str(tfshot),'_wTF.mat'),'rawdata_wTF');
-save(strcat(rawdataPath,'/mag_probe/dtacq',num2str(dtacq_num),'/shot',num2str(shot),'_tfshot',num2str(tfshot),'_woTF.mat'),'rawdata_woTF');
+save(fileName,"rawdata_wTF","rawdata_woTF");
+% save(strcat(rawdataPath,'/mag_probe/dtacq',num2str(dtacq_num),'/shot',num2str(shot),'_tfshot',num2str(tfshot),'_wTF.mat'),'rawdata_wTF');
+% save(strcat(rawdataPath,'/mag_probe/dtacq',num2str(dtacq_num),'/shot',num2str(shot),'_tfshot',num2str(tfshot),'_woTF.mat'),'rawdata_woTF');
 
 end
 
