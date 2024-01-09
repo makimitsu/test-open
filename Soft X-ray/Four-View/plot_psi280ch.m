@@ -2,6 +2,7 @@
 function plot_psi280ch(PCB,pathname)
 shot = PCB.shot;
 trange = PCB.trange;
+start = PCB.start;
 % filename=strcat(pathname.rawdata,'/rawdata_dtacq',num2str(dtacq_num),'_shot',num2str(shot),'_tfshot',num2str(tfshot),'.mat');
 % if exist(filename,"file")==0
 %     disp('No rawdata file -- Start generating!')
@@ -197,11 +198,13 @@ if isstruct(grid2D)==0 %もしdtacqデータがない場合次のloopへ(デー�
     return
 end
 
+[magAxisList,xPointList] = get_axis_x_multi(grid2D,data2D); %時間ごとの磁気軸、X点を検索
+
 % プロット部分
 figure('Position', [0 0 1500 1500],'visible','on');
 
 % figure('Position', [0 0 1500 1500],'visible','on');
-start=30;
+% start=30;
 dt = 4;
 %  t_start=470+start;
  for m=1:16 %図示する時間
@@ -235,10 +238,12 @@ dt = 4;
 %     plot(grid2D.zq(1,squeeze(mid(xpoint(:,:,i),:,i))),grid2D.rq(xpoint(:,:,i),1),"bx")
      % plot(ok_z,ok_r,"k.",'MarkerSize', 6)%測定位置
 
-    timeIndex = find(trange==t);
-    [magaxis,xpoint] = get_axis_x(grid2D,data2D,timeIndex);
-    plot(magaxis.z,magaxis.r,'ro');
-    plot(xpoint.z,xpoint.r,'rx');
+    % timeIndex = find(trange==t);
+    % [magaxis,xpoint] = get_axis_x(grid2D,data2D,t);
+    % plot(magaxis.z,magaxis.r,'ro');
+    % plot(xpoint.z,xpoint.r,'rx');
+    plot(magAxisList.z(:,i),magAxisList.r(:,i),'ko');
+    plot(xPointList.z(i),xPointList.r(i),'kx');
 
     hold off
     title(string(t)+' us')

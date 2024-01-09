@@ -20,27 +20,46 @@ zpos=C(:,9);
 rpos=C(:,10)+r_shift;
 ch=C(:,7);
 
+% if ismember(39,dtacq_num_list)
+%     filename1 = strcat(pathname.rawdata,'/rawdata_dtacq',num2str(39),'_shot',num2str(shot(1)),'_tfshot',num2str(tfshot(1)),'.mat');
+%     if exist(filename1,"file")==0
+%         disp('No rawdata file of a039 -- Start generating!')
+%         rawdataPath = pathname.rawdata;
+%         save_dtacq_data(39, shot(1), tfshot(1),rawdataPath)
+%         % disp(['File:',filename1,' does not exit']);
+%         % return
+%     end
+%     a039_raw = importdata(filename1);
+% end
+% if ismember(40,dtacq_num_list)
+%     filename2 = strcat(pathname.rawdata,'/rawdata_dtacq',num2str(40),'_shot',num2str(shot(2)),'_tfshot',num2str(tfshot(2)),'.mat');
+%     if exist(filename2,"file")==0
+%         disp('No rawdata file of a040 -- Start generating!')
+%         rawdataPath = pathname.rawdata;
+%         save_dtacq_data(40, shot(2), tfshot(2),rawdataPath)
+%         % disp(['File:',filename2,' does not exit']);
+%         % return
+%     end
+%     a040_raw = importdata(filename2);
+% end
+
 if ismember(39,dtacq_num_list)
-    filename1 = strcat(pathname.rawdata,'/rawdata_dtacq',num2str(39),'_shot',num2str(shot(1)),'_tfshot',num2str(tfshot(1)),'.mat');
+    filename1 = strcat(pathname.rawdata,'/mag_probe/dtacq',num2str(39),'/shot',num2str(shot(1)),'_tfshot',num2str(tfshot(1)),'.mat');
     if exist(filename1,"file")==0
         disp('No rawdata file of a039 -- Start generating!')
-        rawdataPath = pathname.rawdata;
-        save_dtacq_data(39, shot(1), tfshot(1),rawdataPath)
-        % disp(['File:',filename1,' does not exit']);
-        % return
+        save_dtacq_data(39, shot(1), tfshot(1),filename1)
     end
-    a039_raw = importdata(filename1);
+    load(filename1,"rawdata_woTF");
+    a039_raw = rawdata_woTF;
 end
 if ismember(40,dtacq_num_list)
-    filename2 = strcat(pathname.rawdata,'/rawdata_dtacq',num2str(40),'_shot',num2str(shot(2)),'_tfshot',num2str(tfshot(2)),'.mat');
+    filename2 = strcat(pathname.rawdata,'/mag_probe/dtacq',num2str(40),'/shot',num2str(shot(2)),'_tfshot',num2str(tfshot(2)),'.mat');
     if exist(filename2,"file")==0
         disp('No rawdata file of a040 -- Start generating!')
-        rawdataPath = pathname.rawdata;
-        save_dtacq_data(40, shot(2), tfshot(2),rawdataPath)
-        % disp(['File:',filename2,' does not exit']);
-        % return
+        save_dtacq_data(40, shot(2), tfshot(2),filename2)
     end
-    a040_raw = importdata(filename2);
+    load(filename2,"rawdata_woTF");
+    a040_raw = rawdata_woTF;
 end
 
 raw = zeros(1000,length(dtaq_ch));

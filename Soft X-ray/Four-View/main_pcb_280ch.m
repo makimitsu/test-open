@@ -63,6 +63,7 @@ dtacqlist=39.*ones(n_data,1);
 
 PCB.trange=400:800;%【input】計算時間範囲
 PCB.n=40; %【input】rz方向のメッシュ数
+PCB.start = 20; %plot開始時間-400
 
 % doCheck = false;
 % doCheck = true;
@@ -83,7 +84,8 @@ for i=1:n_data
     if doCheck
         check_signal(PCB,pathname);
     else
-        % get_B_reconnection(PCB,pathname)
         plot_psi280ch(PCB,pathname);
+        [B_r,B_t,b] = get_guide_field_ratio(PCB,pathname)
+        % get_B_reconnection(PCB,pathname);
     end
 end

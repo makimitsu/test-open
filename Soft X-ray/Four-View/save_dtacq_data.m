@@ -80,7 +80,6 @@ post=1000;%t=0からの計測時間[us]
 dtacq=strcat('a',num2str(dtacq_num,'%03i'));%a038などの形式の文字列へ変換
 rawdata_wTF=zeros(post,ch_num); %TF成分を含んだデータ
 rawdata_TF=rawdata_wTF; %TF成分
-rawdata_woTF=rawdata_wTF; %TF成分を差し引いたデータ
 
 import MDSplus.*
 %ツリーのdatafileがあるフォルダのパスをtreename_pathという形で環境変数に設定(a038_path, a039_path, a040_path)
@@ -99,6 +98,7 @@ for i=1:ch_num
     end
     rawdata_wTF(:,i)=rawdata_wTF(:,i)-rawdata_wTF(1,i);% オフセット調整
 end
+rawdata_woTF=rawdata_wTF; %TF成分を差し引いたデータ
 if tfshot>0 
     mdsopen(dtacq, tfshot);
     for i=1:ch_num

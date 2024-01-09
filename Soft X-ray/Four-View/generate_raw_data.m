@@ -1,5 +1,7 @@
 function generate_raw_data(date)
 
+addpath('/Users/shinjirotakeda/Documents/GitHub/test-open/pcb_experiment');
+
 %%%%%ここが各PCのパス
 %【※コードを使用する前に】環境変数を設定しておくか、matlab内のコマンドからsetenv('パス名','アドレス')で指定してから動かす
 pathname.ts3u=getenv('ts3u_path');%old-koalaのts-3uまでのパス（mrdなど）
