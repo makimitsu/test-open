@@ -3,7 +3,7 @@ setenv('SXR_RECONSTRUCTED_DIR','G:\My Drive\X-ray\Data\SXROUT');
 setenv('SXR_MATRIX_DIR','G:\My Drive\X-ray\Data\SXROUT');
 % --
 % load('parameters.mat');
-load('G:\My Drive\X-ray\Data\SXROUT\NLF_NLR\231216\shot21\2.mat');
+% load('G:\My Drive\X-ray\Data\SXROUT\NLF_NLR\231216\shot21\2.mat');
 filter = 3;% どの視点を試験するか
 % --
 
@@ -36,5 +36,5 @@ switch filter
         plot_sxr_multi(doSave,doFilter,doNLR,M,K,gm2d1,U3,s3,v3,EE,range);        
     case 4
         EE = EE4;
-        plot_sxr_multi(doSave,doFilter,doNLR,M,K,gm2d1,U4,s4,v4,EE,range);        
+        plot_sxr_multi(doSave,doFilter,doNLR,M,K,gm2d1,U4,s4,v4,EE,range);
 end

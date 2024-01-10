@@ -89,9 +89,7 @@ for i = 1:4
         [~,hp]=contourf(psi_mesh_z,psi_mesh_r,psi,-20e-3:0.6e-3:40e-3,'black','Fill','off');
         axis([-0.0525 0.0525 0.06 0.33]);xticklabels({});yticklabels({});
         colorbar('Fontsize',9);colorbar('off');daspect([0.8 1 1]);
-        % axis([-0.12 0.12 0.06 0.33]);daspect([1 0.8 1]);
         hp.LineWidth = 1;
-        % contour(psi_mesh_z,psi_mesh_r,jt,2e5:2e5:10e5,'red','LineWidth',1);
         contour(psi_mesh_z,psi_mesh_r,jt,2.5e5:1e5:7.5e5,'red','LineWidth',1);
         if show_xpoint
             [~,~,pos_xz,pos_xr,~,~] = search_xo(psi,z_space,r_space);
