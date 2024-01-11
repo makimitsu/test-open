@@ -7,7 +7,7 @@ DOCID='1wG5fBaiQ7-jOzOI-2pkPAeV6SDiHc_LrOdcbWlvhHBw';%スプレッドシート�
 T=getTS6log(DOCID);
 node='date';
 % --ここいじる
-pat=231215;
+pat=240111;
 % --
 T=searchlog(T,node,pat);
 IDXlist = T.shot;% すべてのshotについて保存している，選択したければ配列で渡せばOK．
