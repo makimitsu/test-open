@@ -1,5 +1,11 @@
 function [B_r,B_t,b] = get_guide_field_ratio(PCB,pathname)
 
+% magDataDir = pathname.MAGDATA;
+% magDataFile = strcat(magDataDir,'/',num2str(PCB.data),'.mat');
+% if exist(magDataFile,'file')
+%     load(magDataFile,'idxList','BrList','BtList','bList');
+% end
+
 trange = PCB.trange;
 % newTimeRange = find(trange>=440&trange<=500);
 newTimeRange = 1:numel(trange);
@@ -55,10 +61,16 @@ for i = 1:numel(trange)
     end
 end
 
-figure;
-subplot(1,3,1);plot(trange,mergingRatio);xlabel('time');ylabel('merging ratio');
-subplot(1,3,2);plot(trange,B_reconnection);xlabel('time');ylabel('B_r');
-subplot(1,3,3);plot(trange,B_guide);xlabel('time');ylabel('B_g');
+nanMask = isnan(B_reconnection);
+nanMask(2:end-1) = nanMask(1:end-2)&nanMask(3:end);
+B_reconnection(nanMask) = NaN;
+B_guide(nanMask) = NaN;
+mergingRatio(nanMask) = NaN;
+
+% figure;
+% subplot(1,3,1);plot(trange,mergingRatio);xlabel('time');ylabel('merging ratio');
+% subplot(1,3,2);plot(trange,B_reconnection);xlabel('time');ylabel('B_r');
+% subplot(1,3,3);plot(trange,B_guide);xlabel('time');ylabel('B_g');
 
 
 timing = knnsearch(mergingRatio.',0.1);
@@ -66,5 +78,19 @@ timing = knnsearch(mergingRatio.',0.1);
 B_r = B_reconnection(1,timing);
 B_t = B_guide(1,timing);
 b = B_t/B_r;
+
+% if exist(magDataFile,'file')
+%     idxList(end+1) = PCB.idx;
+%     BrList(end+1) = B_r;
+%     BtList(end+1) = B_t;
+%     bList(end+1) = b;
+% else
+%     idxList = PCB.idx;
+%     BrList = B_r;
+%     BtList = B_t;
+%     bList = b;
+% end
+% 
+% save(magDataFile,'idxList','BrList','BtList','bList');
 
 end

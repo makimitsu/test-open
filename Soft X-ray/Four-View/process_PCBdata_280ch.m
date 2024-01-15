@@ -6,8 +6,12 @@ tfshot = PCB.tfshot;
 n = PCB.n;
 i_EF = PCB.i_EF;
 trange = PCB.trange;
+idx = PCB.idx;
 
-filename = strcat(pathname.pre_processed_directory,'/a039_',num2str(shot(1)),'.mat');
+% idx = convert_shot_number(PCB);
+
+% filename = strcat(pathname.pre_processed_directory,'/a039_',num2str(shot(1)),'.mat');
+filename = strcat(pathname.pre_processed_directory,'/',num2str(PCB.date),sprintf('%03d',idx),'.mat');
 if exist(filename,'file') == 0
     doCalculation = true;
     disp('no processed data -- start calculation');
@@ -193,8 +197,8 @@ else
 end
 
 if doCalculation
-    clearvars -except data2D grid2D shot pathname;
-    filename = strcat(pathname.pre_processed_directory,'/a039_',num2str(shot(1)),'.mat');
+    clearvars -except data2D grid2D shot pathname filename;
+    % filename = strcat(pathname.pre_processed_directory,'/a039_',num2str(shot(1)),'.mat');
     save(filename)
 end
 

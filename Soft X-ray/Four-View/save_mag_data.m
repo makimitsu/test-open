@@ -1,6 +1,6 @@
 % clear
 % close all
-clearvars -except date IDXlist doCheck
+clearvars -except date
 addpath '/Users/shinjirotakeda/Documents/GitHub/test-open/pcb_experiment'; %getMDSdata.mとcoeff200ch.xlsxのあるフォルダへのパス
 addpath '/Users/shinjirotakeda/Documents/GitHub/test-open/Soft X-ray/Four-View_Simulation';
 
@@ -21,17 +21,12 @@ pathname.pre_processed_directory = getenv('pre_processed_directory_path');%計�
 pathname.MAGDATA = getenv('MAGDATA_DIR');
 
 %%%%実験オペレーションの取得
-prompt = {'Date:','Shot number:','doCheck:'};
-definput = {'','',''};
+prompt = {'Date:'};
+definput = {''};
 if exist('date','var')
     definput{1} = num2str(date);
 end
-if exist('IDXlist','var')
-    definput{2} = num2str(IDXlist);
-end
-if exist('doCheck','var')
-    definput{3} = num2str(doCheck);
-end
+
 dlgtitle = 'Input';
 dims = [1 35];
 % if exist('date','var') && exist('IDXlist','var') && exist('doCheck','var')
@@ -43,8 +38,6 @@ dims = [1 35];
 % definput = {num2str(date),num2str(IDXlist),num2str(doCheck)};
 answer = inputdlg(prompt,dlgtitle,dims,definput);
 date = str2double(cell2mat(answer(1)));
-IDXlist = str2num(cell2mat(answer(2)));
-doCheck = logical(str2num(cell2mat(answer(3))));
 
 DOCID='1wG5fBaiQ7-jOzOI-2pkPAeV6SDiHc_LrOdcbWlvhHBw';%スプレッドシートのID
 T=getTS6log(DOCID);
@@ -52,6 +45,7 @@ node='date';
 % date=230714;
 T=searchlog(T,node,date);
 % IDXlist= 1; %[5:50 52:55 58:59];%[4:6 8:11 13 15:19 21:23 24:30 33:37 39:40 42:51 53:59 61:63 65:69 71:74];
+IDXlist = T.shot;
 n_data=numel(IDXlist);%計測データ数
 shotlist_a039 =T.a039(IDXlist);
 shotlist_a040 = T.a040(IDXlist);
@@ -65,7 +59,7 @@ dtacqlist=39.*ones(n_data,1);
 
 PCB.trange=400:800;%【input】計算時間範囲
 PCB.n=40; %【input】rz方向のメッシュ数
-PCB.start = 40; %plot開始時間-400
+PCB.start = 20; %plot開始時間-400
 
 % doCheck = false;
 % doCheck = true;
@@ -73,9 +67,23 @@ PCB.start = 40; %plot開始時間-400
 %     figure('Position', [0 0 1500 1500],'visible','on');
 % end
 
+magDataDir = pathname.MAGDATA;
+magDataFile = strcat(magDataDir,'/',num2str(date),'.mat');
+if exist(magDataFile,'file')
+    load(magDataFile,'idxList','BrList','BtList','bList');
+else
+    idxList = zeros(numel(IDXlist),1);
+    BrList = zeros(numel(IDXlist),1);
+    BtList = zeros(numel(IDXlist),1);
+    bList = zeros(numel(IDXlist),1);
+end
+
+directory_rogo = strcat(pathname.fourier,'rogowski/');
+
 for i=1:n_data
     % dtacq_num=dtacqlist;
     PCB.idx = IDXlist(i);
+    disp(PCB.idx);
     PCB.shot=shotlist(i,:);
     PCB.tfshot=tfshotlist(i,:);
     if PCB.shot == PCB.tfshot
@@ -84,11 +92,18 @@ for i=1:n_data
     PCB.i_EF=EFlist(i);
     PCB.TF=TFlist(i);
     PCB.date = date;
-    if doCheck
-        check_signal(PCB,pathname);
-    else
-        plot_psi280ch(PCB,pathname);
-        [B_r,B_t,b] = get_guide_field_ratio(PCB,pathname)
-        % get_B_reconnection(PCB,pathname);
+
+    current_folder = strcat(directory_rogo,num2str(date),'/');
+    filename = strcat(current_folder,num2str(date),sprintf('%03d',PCB.idx),'.rgw');
+    
+    if isfile(filename)
+        [B_r,B_t,b] = get_guide_field_ratio(PCB,pathname);
+        idxList(i) = PCB.idx;
+        BrList(i) = B_r;
+        BtList(i) = B_t;
+        bList(i) = b;
     end
+
 end
+
+save(magDataFile,'idxList','BrList','BtList','bList');

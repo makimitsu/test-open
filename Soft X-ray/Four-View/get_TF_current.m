@@ -2,7 +2,8 @@ function [I_TF,x,aquisition_rate] = get_TF_current(PCB,pathname)
 
 directory_rogo = strcat(pathname.fourier,'rogowski/');
 
-shot = convert_shot_number(PCB);
+% shot = convert_shot_number(PCB);
+shot = PCB.idx;
 date = PCB.date;
 aquisition_rate = 10;
 offset = 0;
