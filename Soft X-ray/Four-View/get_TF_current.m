@@ -9,6 +9,11 @@ aquisition_rate = 10;
 offset = 0;
 % rogowski(date,aquisition_rate,offset,shot,directory_rogo);
 
+if date == 230920
+    date = 230929;
+    shot = 8;
+end
+
 t_start = 1; % us
 t_end = 1000; % us
 

@@ -11,11 +11,22 @@ zq = grid2D.zq;
 rqList = repmat(rq,1,1,numel(trange));
 zqList = repmat(zq,1,1,numel(trange));
 
+% ltdRangeZ = find(abs(zq(1,:))<=0.17);
+% rq_ltd = rq(:,ltdRangeZ);
+% zq_ltd = zq(:,ltdRangeZ);
+% rqList_ltd = repmat(rq_ltd,1,1,numel(trange));
+% zqList_ltd = repmat(zq_ltd,1,1,numel(trange));
+% psi_ltd = psi(:,ltdRangeZ,:);
+% 
+% rqList = rqList_ltd;
+% zqList = zqList_ltd;
+% psi = psi_ltd;
+
 % 各z座標について、r方向の最大値とそのインデックスを取得
 % [M,I] = max(psi,[],1);
-[M,I] = max(psi,[],1,'linear'); %1*40*401 double
+[psiRidge,psiRidgeIdx] = max(psi,[],1,'linear'); %1*40*401 double
 % 取得されたr方向最大値ベクトルからの極大値（軸位置候補）を2つ取得
-TF = islocalmax(M,'MaxNumExtrema',2); %1*40*401 logical
+axisCandidate = islocalmax(psiRidge,'MaxNumExtrema',2); %1*40*401 logical
 
 magAxisList.r = NaN(2,numel(trange));
 magAxisList.z = NaN(2,numel(trange));
@@ -29,7 +40,7 @@ xPointList.psi = NaN(1,numel(trange));
 % magAxisList.psi = psi(I(TF));
 
 rLim = [min(rq,[],'all'),max(rq,[],"all")];
-zLim = [min(zq,[],'all'),max(zq,[],"all")];
+% zLim = [min(zq,[],'all'),max(zq,[],"all")];
 
 % ここから
 % X点を探す
@@ -38,31 +49,47 @@ zLim = [min(zq,[],'all'),max(zq,[],"all")];
 % 極大値の外側は0か最大値（極大値の大きい方）で埋める？
 % 外側の識別
 for i=1:numel(trange)
-    M_t = M(:,:,i);
-    I_t = I(:,:,i);
-    TF_t = TF(:,:,i);
-    if ~isempty(I_t(TF_t))
-        magAxisList.r(:,i) = rqList(I_t(TF_t));
-        magAxisList.z(:,i) = zqList(I_t(TF_t));
-        magAxisList.psi(:,i) = psi(I_t(TF_t));
-        M_x = M_t(find(TF_t,1):find(TF_t,1,'last'));
-        I_x = I_t(find(TF_t,1):find(TF_t,1,'last'));
-        TF_x = islocalmin(M_x,'MaxNumExtrema',1);
-        if ~isempty(I_x(TF_x))
-            xPointList.r(i) = rqList(I_x(TF_x));
-            xPointList.z(i) = zqList(I_x(TF_x));
-            xPointList.psi(i) = psi(I_x(TF_x));
+    psiRidge_t = psiRidge(:,:,i);
+    psiRidgeIdx_t = psiRidgeIdx(:,:,i);
+    axisCandidate_t = axisCandidate(:,:,i);
+    if ~isempty(psiRidgeIdx_t(axisCandidate_t))
+        magAxisList.r(:,i) = rqList(psiRidgeIdx_t(axisCandidate_t));
+        magAxisList.z(:,i) = zqList(psiRidgeIdx_t(axisCandidate_t));
+        magAxisList.psi(:,i) = psi(psiRidgeIdx_t(axisCandidate_t));
+        xpointIdx = islocalmin(smooth(psiRidge_t),'MaxNumExtrema', 1);
+        if ~isempty(find(xpointIdx, 1))
+            xPointList.r(i) = rqList(psiRidgeIdx_t(xpointIdx));
+            xPointList.z(i) = zqList(psiRidgeIdx_t(xpointIdx));
+            xPointList.psi(i) = psi(psiRidgeIdx_t(xpointIdx));
         end
+        % M_x = psiRidge_t(find(axisCandidate_t,1):find(axisCandidate_t,1,'last'));
+        % I_x = psiRidgeIdx_t(find(axisCandidate_t,1):find(axisCandidate_t,1,'last'));
+        % TF_x = islocalmin(M_x,'MaxNumExtrema',1);
+        % if ~isempty(I_x(TF_x))
+        %     xPointList.r(i) = rqList(I_x(TF_x));
+        %     xPointList.z(i) = zqList(I_x(TF_x));
+        %     xPointList.psi(i) = psi(I_x(TF_x));
+        % end
     end
-    if any(ismember(magAxisList.r(:,i),rLim)) || any(ismember(magAxisList.z(:,i),zLim))
+    if any(ismember(magAxisList.r(:,i),rLim))
         magAxisList.r(:,i) = NaN;
         magAxisList.z(:,i) = NaN;
         magAxisList.psi(:,i) = NaN;
     end
-    if any(ismember(xPointList.r(i),rLim)) || any(ismember(xPointList.z(i),zLim))
+    if any(ismember(xPointList.r(i),rLim))
         xPointList.r(i) = NaN;
         xPointList.z(i) = NaN;
         xPointList.psi(i) = NaN;
+    end
+    % if trange(i) == 467
+    %     flag = true;
+    % end
+    if all(~isnan([magAxisList.r(:,i);xPointList.r(i)]))&&sum(magAxisList.z(:,i)>xPointList.z(i))~=1
+        [~,smallAxis] = min(magAxisList.psi(i));
+        maxAxis = 3-smallAxis;
+        magAxisList.r(smallAxis,i) = magAxisList.r(maxAxis,i);
+        magAxisList.z(smallAxis,i) = magAxisList.z(maxAxis,i);
+        magAxisList.psi(smallAxis,i) = magAxisList.psi(maxAxis,i);
     end
 end
 

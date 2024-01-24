@@ -1,4 +1,3 @@
-% function plot_psi280ch(date, shot, tfshot, pathname, n,i_EF,trange)
 function plot_psi280ch(PCB,pathname)
 shot = PCB.shot;
 trange = PCB.trange;
@@ -190,7 +189,8 @@ start = PCB.start;
 %     load(filename,'data2D','grid2D');
 % end
 
-[grid2D,data2D] = process_PCBdata_280ch(PCB,pathname);
+% [grid2D,data2D] = process_PCBdata_280ch(PCB,pathname);
+[grid2D,data2D] = process_PCBdata_200ch(PCB,pathname);
 
 % ***********************************************
 
@@ -211,8 +211,8 @@ dt = 4;
      i=start+m.*dt; %end
      t=trange(i);
      subplot(4,4,m)
-    % contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bz(:,:,i),30,'LineStyle','none')
-    contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.psi(:,:,i),40,'LineStyle','none')
+    contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bz(:,:,i),30,'LineStyle','none')
+    % contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.psi(:,:,i),40,'LineStyle','none')
     % contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bt(:,:,i),40,'LineStyle','none')
     % contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bt(:,:,i),-100e-3:0.5e-3:100e-3,'LineStyle','none')
     % contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Jt(:,:,i),30,'LineStyle','none')

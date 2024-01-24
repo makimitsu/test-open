@@ -72,7 +72,6 @@ PCB.start = 40; %plot開始時間-400
 % if ~doCheck
 %     figure('Position', [0 0 1500 1500],'visible','on');
 % end
-
 for i=1:n_data
     % dtacq_num=dtacqlist;
     PCB.idx = IDXlist(i);
@@ -88,7 +87,7 @@ for i=1:n_data
         check_signal(PCB,pathname);
     else
         plot_psi280ch(PCB,pathname);
-        [B_r,B_t,b] = get_guide_field_ratio(PCB,pathname)
+        % [B_r,B_t,b] = get_guide_field_ratio(PCB,pathname)
         % get_B_reconnection(PCB,pathname);
     end
 end

@@ -9,7 +9,8 @@ function [B_r,B_t,b] = get_guide_field_ratio(PCB,pathname)
 trange = PCB.trange;
 % newTimeRange = find(trange>=440&trange<=500);
 newTimeRange = 1:numel(trange);
-[grid2D,data2D] = process_PCBdata_280ch(PCB,pathname);
+% [grid2D,data2D] = process_PCBdata_280ch(PCB,pathname);
+[grid2D,data2D] = process_PCBdata_200ch(PCB,pathname);
 Br = data2D.Br;
 rq = grid2D.rq;
 zq = grid2D.zq;
@@ -34,23 +35,34 @@ m0 = 4*pi*10^(-7);
 % r = xpoint.r;
 % Bt = m0*I_TF(timing)*1e3*12/(2*pi()*r);
 
-% 20240108 できるだけループを使わずに一括で処理したい
-% 特にget_axis_xを呼び出しすぎてる
+
+% 240117
+% SPコイルの内側のプローブ（からのデータ）のみを使用するように修正が必要
 for i = 1:numel(trange)
     time = trange(i);
     % [magaxis,xpoint] = get_axis_x(grid2D,data2D,time);
     magaxis.r = magAxisList.r(:,i);
     magaxis.z = magAxisList.z(:,i);
+    xpoint.r = xPointList.r(:,i);
+    xpoint.z = xPointList.z(:,i);
     % if numel(magaxis.r) == 2
     if magaxis.z(1)~=magaxis.z(2) && ~isnan(magaxis.r(1))
         range = rq>=min(magaxis.r)&rq<=max(magaxis.r)&zq>=min(magaxis.z)&zq<=max(magaxis.z);
         % 値の取り方は考えた方がいい、Btは理論値でもよさそう
         Br_t = Br(:,:,i);
-        B_reconnection(1,i) = max(abs(Br_t(range)),[],'all');
+        % B_reconnection(1,i) = max(abs(Br_t(range)),[],'all');
+        B_reconnection(1,i) = mean([max(Br_t(range),[],'all'),abs(min(Br_t(range),[],"all"))]);
         % diffusionRegion = (abs(rq-xpoint.r)+abs(zq-xpoint.z))<=0.02;
         % Bt_t = Bt_ref(:,:,i);
         % B_guide(1,i) = mean(Bt_t(diffusionRegion));
         % B_guide(1,i) = get_B_troidal(PCB,grid2D,data2D,pathname,time);
+        timing = x/aquisition_rate==time;
+        B_guide(1,i) = m0*I_TF(timing)*1e3*12/(2*pi()*xPointList.r(1,i));
+        mergingRatio(1,i) = xPointList.psi(i)/mean(magAxisList.psi(:,i));
+    elseif ~isnan(magaxis.r(1))
+        range = rq>=min(magaxis.r(1),xpoint.r)&rq<=max(magaxis.r(1),xpoint.r)&zq>=min(magaxis.z(1),xpoint.z)&zq<=max(magaxis.z(1),xpoint.z);
+        Br_t = Br(:,:,i);
+        B_reconnection(1,i) = mean([max(Br_t(range),[],'all'),abs(min(Br_t(range),[],"all"))]);
         timing = x/aquisition_rate==time;
         B_guide(1,i) = m0*I_TF(timing)*1e3*12/(2*pi()*xPointList.r(1,i));
         mergingRatio(1,i) = xPointList.psi(i)/mean(magAxisList.psi(:,i));
@@ -67,17 +79,26 @@ B_reconnection(nanMask) = NaN;
 B_guide(nanMask) = NaN;
 mergingRatio(nanMask) = NaN;
 
-% figure;
-% subplot(1,3,1);plot(trange,mergingRatio);xlabel('time');ylabel('merging ratio');
-% subplot(1,3,2);plot(trange,B_reconnection);xlabel('time');ylabel('B_r');
-% subplot(1,3,3);plot(trange,B_guide);xlabel('time');ylabel('B_g');
+% 合体率・Br・Btの時間発展を表示
+plotRange = find(trange>=430&trange<=510);
+figure('Position', [0 0 1500 1500],'visible','on');
+subplot(1,3,1);plot(trange(plotRange),mergingRatio(plotRange));xlabel('time');ylabel('merging ratio');
+subplot(1,3,2);plot(trange(plotRange),B_reconnection(plotRange));xlabel('time');ylabel('B_r');
+subplot(1,3,3);plot(trange(plotRange),B_guide(plotRange));xlabel('time');ylabel('B_g');
 
+figure;plot(trange,mergingRatio);
 
-timing = knnsearch(mergingRatio.',0.1);
+% timing = knnsearch(mergingRatio(plotRange).',0.5);
 % timing = find(mergingRatio==0,1,'last');
+timing = find(trange>=460&trange<=500&mergingRatio>=0.5,1);
 B_r = B_reconnection(1,timing);
 B_t = B_guide(1,timing);
 b = B_t/B_r;
+
+% ガイド磁場比の計算に使用した磁気面を表示
+time = trange(timing);
+PCB.time = time;
+plot_psi280ch_at_t(PCB,pathname);
 
 % if exist(magDataFile,'file')
 %     idxList(end+1) = PCB.idx;
