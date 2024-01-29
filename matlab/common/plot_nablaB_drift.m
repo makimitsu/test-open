@@ -21,16 +21,16 @@ for i_t = 1:FIG.tate*FIG.yoko
     switch plot_type
         case 'F_r'
             contourf(NablaBdata2D.zq,NablaBdata2D.rq,squeeze(NablaBdata2D.FnablaB_r(:,:,i_t)),100,'edgecolor','none')
-            c = colorbar;
+            % c = colorbar;
             colormap(jet)
-            clim([min(NablaBdata2D.FnablaB_r,[],"all") max(NablaBdata2D.FnablaB_r,[],"all")])
-            c.Label.String = 'R component of Grad B Force [N]';
+            % clim([min(NablaBdata2D.FnablaB_r,[],"all") max(NablaBdata2D.FnablaB_r,[],"all")])
+            % c.Label.String = 'R component of Grad B Force [N]';
         case 'F_z'
             contourf(NablaBdata2D.zq,NablaBdata2D.rq,squeeze(NablaBdata2D.FnablaB_z(:,:,i_t)),100,'edgecolor','none')
             c = colorbar;
             colormap(jet)
             clim([min(NablaBdata2D.FnablaB_z,[],"all") max(NablaBdata2D.FnablaB_z,[],"all")])
-            c.Label.String = 'Z component of Grad B Force [N]';
+            % c.Label.String = 'Z component of Grad B Force [N]';
         case 'F'
             contourf(NablaBdata2D.zq,NablaBdata2D.rq,squeeze(NablaBdata2D.FnablaB(:,:,i_t)),100,'edgecolor','none')
             c = colorbar;
@@ -83,15 +83,21 @@ for i_t = 1:FIG.tate*FIG.yoko
     xlabel('Z [m]')
     ylabel('R [m]')
     ax = gca;
-    ax.FontSize = 12;
+    ax.FontSize = 20;
 end
 
-switch plot_type
-    case {'F_r','F_z','F','V_r','V_z','V'}
-        sgtitle(c.Label.String)
-    case 'F_zr'
-        sgtitle('Grad B Force Vector')
-    case 'V_zr'
-        sgtitle('Grad B Drift Vector')
-end
+% switch plot_type
+%     case {'F_r','F_z','F','V_r','V_z','V'}
+%         sgtitle(c.Label.String)
+%     case 'F_zr'
+%         sgtitle('Grad B Force Vector')
+%     case 'V_zr'
+%         sgtitle('Grad B Drift Vector')
+% end
 
+% view([90 -90])%RZ反転
+% % clim([0 1.2E-17])
+% % clim([-1.5E-18 1.5E-18])
+xlim([-0.01 0.05])
+ylim([0.1 0.27])
+% c.Location = "north";

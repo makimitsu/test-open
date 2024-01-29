@@ -24,6 +24,7 @@ switch IDSP.date
         savename.nablaB = [pathname.mat,'/nablaB/','230828_a039_2301_', num2str(plot_time - 2), '_1_5.mat'];
     case 230830
         savename.ExB = [pathname.mat,'/ExB/','230830_shot11-60-a039_2437_' , num2str(plot_time - 2), '_1_5.mat'];
+        savename.magline = [pathname.mat,'/magline/','230830_a039_2437_', num2str(plot_time - 2), '_1_5.mat'];
         savename.curve = [pathname.mat,'/curve/','230830_a039_2437_', num2str(plot_time - 2), '_1_5.mat'];
         savename.nablaB = [pathname.mat,'/nablaB/','230830_a039_2437_', num2str(plot_time - 2), '_1_5.mat'];
 end
@@ -35,17 +36,19 @@ IDSP.int_r = 2.5;%【input】IDSPr方向計測点間隔[cm](2.5)
 profileplot = 'Vr';%【input】プロット種類('Vr','Vz','T','offset')
 cal_type = 'ionflow';%【input】IDSP計算法('ionflow','ionvdist')
 ExB_mean = true;
-curve_mean = true;
 nablaB_mean = true;
+curve_mean = true;
+magline_mean = true;
 magpresplot = 'Pz';%【input】プロット種類('Pr','Pz','Pt',Pall)
 magpres_mean = true;
 single_range = [1:4 6 7];%【input】プロットCH([1:4 7])
 wav_range = [1:12 16:21];%【input】プロットr([1:21],[1:12 19:21])
 plot_single = false;%【input】IDSPシングルショットをプロット
-plot_VExB = false;%【input】ExBをプロット
-plot_Vcurve = true;%【input】curve driftをプロット
-plot_VnablaB = true;%【input】∇B driftをプロット
 plot_WAV = false;%【input】IDSP重み付き平均をプロット
+plot_VExB = false;%【input】ExBをプロット
+plot_VnablaB = true;%【input】∇B driftをプロット
+plot_Vcurve = true;%【input】curve driftをプロット
+plot_Vmagline = false;%【input】磁力線ドリフトをプロット
 plot_magpres = false;%【input】磁気圧をプロット
 
 %------IDSP詳細設定【input】------
@@ -233,156 +236,6 @@ switch cal_type
     case 'ionvdist'
 end
 
-if plot_VExB
-    if exist(savename.ExB,"file")
-        load(savename.ExB,'ExBdata2D')
-        idx_IDSP_z = knnsearch(ExBdata2D.zq(1,:)',IDSP.z(1));
-        idx_IDSP_z_min = knnsearch(ExBdata2D.zq(1,:)',IDSP.z(1)-0.016);
-        idx_IDSP_z_max = knnsearch(ExBdata2D.zq(1,:)',IDSP.z(1)+0.016);
-        idx_ExB_time = knnsearch(ExBdata2D.time,plot_time);
-        VExB_z_mean = mean(ExBdata2D.VExB_z(:,idx_IDSP_z_min:idx_IDSP_z_max,:),3);
-        VExB_z_mean = mean(VExB_z_mean,2);
-        VExB_r_mean = mean(ExBdata2D.VExB_r(:,idx_IDSP_z_min:idx_IDSP_z_max,:),3);
-        VExB_r_mean = mean(VExB_r_mean,2);
-        err_ExB_z_y = 3;
-        err_ExB_r_y = 3;
-        err_ExB_x = 0.01;
-        switch plot_time
-            case {470,482}
-                if ExB_mean
-                    switch profileplot
-                        case 'Vz'
-                            errorbar(ExBdata2D.rq(:,idx_IDSP_z),VExB_z_mean,err_ExB_z_y,err_ExB_z_y,err_ExB_x,err_ExB_x,'bo','LineWidth',3)
-                        case 'Vr'
-                            errorbar(ExBdata2D.rq(:,idx_IDSP_z),VExB_r_mean,err_ExB_r_y,err_ExB_r_y,err_ExB_x,err_ExB_x,'bo','LineWidth',3)
-                    end
-                else
-                    switch profileplot
-                        case 'Vz'
-                            errorbar(ExBdata2D.rq(:,idx_IDSP_z),ExBdata2D.VExB_z(:,idx_IDSP_z,idx_ExB_time),err_ExB_z_y,err_ExB_z_y,err_ExB_x,err_ExB_x,'bo','LineWidth',3)
-                        case 'Vr'
-                            errorbar(ExBdata2D.rq(:,idx_IDSP_z),ExBdata2D.VExB_r(:,idx_IDSP_z,idx_ExB_time),err_ExB_r_y,err_ExB_r_y,err_ExB_x,err_ExB_x,'bo','LineWidth',3)
-                    end
-                end
-        end
-        hold on
-        h = plot(nan,nan,'bo-','LineWidth',3);
-        hold on
-        if isempty(hs)
-            hs = h;
-        else
-            hs = [hs h];
-        end
-        if legendStrings == ""
-            legendStrings = "ExB";
-        else
-            legendStrings = [legendStrings "ExB"];
-        end
-    else
-        warning([savename.ExB, 'does not exist.'])
-    end
-end
-
-if plot_Vcurve
-    if exist(savename.curve,"file")
-        load(savename.curve,'Curvedata2D')
-        idx_IDSP_z = knnsearch(Curvedata2D.zq(1,:)',IDSP.z(1));
-        idx_IDSP_z_min = knnsearch(Curvedata2D.zq(1,:)',IDSP.z(1)-0.016);
-        idx_IDSP_z_max = knnsearch(Curvedata2D.zq(1,:)',IDSP.z(1)+0.016);
-        idx_curve_time = knnsearch(Curvedata2D.trange,plot_time);
-        Vcurve_z_mean = mean(Curvedata2D.Vcurve_z(:,idx_IDSP_z_min:idx_IDSP_z_max,:),3);
-        Vcurve_z_mean = mean(Vcurve_z_mean,2);
-        Vcurve_r_mean = mean(Curvedata2D.Vcurve_r(:,idx_IDSP_z_min:idx_IDSP_z_max,:),3);
-        Vcurve_r_mean = mean(Vcurve_r_mean,2);
-        err_curve_z_y = 1E-2;
-        err_curve_r_y = 1E-2;
-        err_curve_x = 0.01;
-        switch plot_time
-            case {470,482}
-                if curve_mean
-                    switch profileplot
-                        case 'Vz'
-                            errorbar(Curvedata2D.rq(:,idx_IDSP_z),Vcurve_z_mean,err_curve_z_y,err_curve_z_y,err_curve_x,err_curve_x,'mo','LineWidth',3)
-                        case 'Vr'
-                            errorbar(Curvedata2D.rq(:,idx_IDSP_z),Vcurve_r_mean,err_curve_r_y,err_curve_r_y,err_curve_x,err_curve_x,'mo','LineWidth',3)
-                    end
-                else
-                    switch profileplot
-                        case 'Vz'
-                            errorbar(Curvedata2D.rq(:,idx_IDSP_z),Curvedata2D.Vcurve_z(:,idx_IDSP_z,idx_curve_time),err_curve_z_y,err_curve_z_y,err_curve_x,err_curve_x,'mo','LineWidth',3)
-                        case 'Vr'
-                            errorbar(Curvedata2D.rq(:,idx_IDSP_z),Curvedata2D.Vcurve_r(:,idx_IDSP_z,idx_curve_time),err_curve_r_y,err_curve_r_y,err_curve_x,err_curve_x,'mo','LineWidth',3)
-                    end
-                end
-        end
-        hold on
-        h = plot(nan,nan,'mo-','LineWidth',3);
-        hold on
-        if isempty(hs)
-            hs = h;
-        else
-            hs = [hs h];
-        end
-        if legendStrings == ""
-            legendStrings = "Curvature";
-        else
-            legendStrings = [legendStrings "Curvature"];
-        end
-    else
-        warning([savename.curve, 'does not exist.'])
-    end
-end
-
-if plot_VnablaB
-    if exist(savename.nablaB,"file")
-        load(savename.nablaB,'NablaBdata2D')
-        idx_IDSP_z = knnsearch(NablaBdata2D.zq(1,:)',IDSP.z(1));
-        idx_IDSP_z_min = knnsearch(NablaBdata2D.zq(1,:)',IDSP.z(1)-0.016);
-        idx_IDSP_z_max = knnsearch(NablaBdata2D.zq(1,:)',IDSP.z(1)+0.016);
-        idx_nablaB_time = knnsearch(NablaBdata2D.trange,plot_time);
-        VnablaB_z_mean = mean(NablaBdata2D.VnablaB_z(:,idx_IDSP_z_min:idx_IDSP_z_max,:),3);
-        VnablaB_z_mean = mean(VnablaB_z_mean,2);
-        VnablaB_r_mean = mean(NablaBdata2D.VnablaB_r(:,idx_IDSP_z_min:idx_IDSP_z_max,:),3);
-        VnablaB_r_mean = mean(VnablaB_r_mean,2);
-        err_nablaB_z_y = 5E-2;
-        err_nablaB_r_y = 5E-2;
-        err_nablaB_x = 0.01;
-        switch plot_time
-            case {470,482}
-                if nablaB_mean
-                    switch profileplot
-                        case 'Vz'
-                            errorbar(NablaBdata2D.rq(:,idx_IDSP_z),VnablaB_z_mean,err_nablaB_z_y,err_nablaB_z_y,err_nablaB_x,err_nablaB_x,'co','LineWidth',3)
-                        case 'Vr'
-                            errorbar(NablaBdata2D.rq(:,idx_IDSP_z),VnablaB_r_mean,err_nablaB_r_y,err_nablaB_r_y,err_nablaB_x,err_nablaB_x,'co','LineWidth',3)
-                    end
-                else
-                    switch profileplot
-                        case 'Vz'
-                            errorbar(NablaBdata2D.rq(:,idx_IDSP_z),NablaBdata2D.VnablaB_z(:,idx_IDSP_z,idx_nablaB_time),err_nablaB_z_y,err_nablaB_z_y,err_nablaB_x,err_nablaB_x,'co','LineWidth',3)
-                        case 'Vr'
-                            errorbar(NablaBdata2D.rq(:,idx_IDSP_z),NablaBdata2D.VnablaB_r(:,idx_IDSP_z,idx_nablaB_time),err_nablaB_r_y,err_nablaB_r_y,err_nablaB_x,err_nablaB_x,'co','LineWidth',3)
-                    end
-                end
-        end
-        hold on
-        h = plot(nan,nan,'co-','LineWidth',3);
-        hold on
-        if isempty(hs)
-            hs = h;
-        else
-            hs = [hs h];
-        end
-        if legendStrings == ""
-            legendStrings = "GradB";
-        else
-            legendStrings = [legendStrings "GradB"];
-        end
-    else
-        warning([savename.nablaB, 'does not exist.'])
-    end
-end
-
 if plot_WAV
     idx_WAV_time = knnsearch(WAV_IDSPdata.time,plot_time);
     switch profileplot
@@ -428,6 +281,205 @@ if plot_WAV
         legendStrings = [legendStrings "Ion Flow"];
     end
 end
+
+if plot_VExB
+    if exist(savename.ExB,"file")
+        load(savename.ExB,'ExBdata2D')
+        idx_IDSP_z = knnsearch(ExBdata2D.zq(1,:)',IDSP.z(1));
+        idx_IDSP_z_min = knnsearch(ExBdata2D.zq(1,:)',IDSP.z(1)-0.016);
+        idx_IDSP_z_max = knnsearch(ExBdata2D.zq(1,:)',IDSP.z(1)+0.016);
+        idx_ExB_time = knnsearch(ExBdata2D.time,plot_time);
+        VExB_z_mean = mean(ExBdata2D.VExB_z(:,idx_IDSP_z_min:idx_IDSP_z_max,:),3);
+        VExB_z_mean = mean(VExB_z_mean,2);
+        VExB_r_mean = mean(ExBdata2D.VExB_r(:,idx_IDSP_z_min:idx_IDSP_z_max,:),3);
+        VExB_r_mean = mean(VExB_r_mean,2);
+        err_ExB_z_y = 3;
+        err_ExB_r_y = 3;
+        err_ExB_x = 0.01;
+        switch plot_time
+            case {470,482}
+                if ExB_mean
+                    switch profileplot
+                        case 'Vz'
+                            errorbar(ExBdata2D.rq(:,idx_IDSP_z),VExB_z_mean,err_ExB_z_y,err_ExB_z_y,err_ExB_x,err_ExB_x,'bo','LineWidth',3)
+                            % %平均値表示
+                            % plot(ExBdata2D.rq(:,idx_IDSP_z),VExB_z_mean,'b','LineWidth',3)
+                            % hold on
+                            % %標準偏差表示
+                            % errarea_ExB_z_y = err_ExB_z_y*ones(size(VExB_z_mean,1),1);
+                            % ar_ExB=area(ExBdata2D.rq(:,idx_IDSP_z),[VExB_z_mean-errarea_ExB_z_y errarea_ExB_z_y+errarea_ExB_z_y]);
+                            % set(ar_ExB(1),'FaceColor','None','LineStyle',':','EdgeColor','b')
+                            % set(ar_ExB(2),'FaceColor','b','FaceAlpha',0.2,'LineStyle',':','EdgeColor','b')
+                        case 'Vr'
+                            errorbar(ExBdata2D.rq(:,idx_IDSP_z),VExB_r_mean,err_ExB_r_y,err_ExB_r_y,err_ExB_x,err_ExB_x,'bo','LineWidth',3)
+                            % %平均値表示
+                            % plot(ExBdata2D.rq(:,idx_IDSP_z),VExB_r_mean,'b','LineWidth',3)
+                            % hold on
+                            % %標準偏差表示
+                            % errarea_ExB_r_y = err_ExB_r_y*ones(size(VExB_r_mean,1),1);
+                            % ar_ExB=area(ExBdata2D.rq(:,idx_IDSP_z),[VExB_r_mean-errarea_ExB_r_y errarea_ExB_r_y+errarea_ExB_r_y]);
+                            % set(ar_ExB(1),'FaceColor','None','LineStyle',':','EdgeColor','b')
+                            % set(ar_ExB(2),'FaceColor','b','FaceAlpha',0.2,'LineStyle',':','EdgeColor','b')
+                    end
+                else
+                    switch profileplot
+                        case 'Vz'
+                            errorbar(ExBdata2D.rq(:,idx_IDSP_z),ExBdata2D.VExB_z(:,idx_IDSP_z,idx_ExB_time),err_ExB_z_y,err_ExB_z_y,err_ExB_x,err_ExB_x,'bo','LineWidth',3)
+                        case 'Vr'
+                            errorbar(ExBdata2D.rq(:,idx_IDSP_z),ExBdata2D.VExB_r(:,idx_IDSP_z,idx_ExB_time),err_ExB_r_y,err_ExB_r_y,err_ExB_x,err_ExB_x,'bo','LineWidth',3)
+                    end
+                end
+        end
+        hold on
+        h = plot(nan,nan,'bo-','LineWidth',3);
+        hold on
+        if isempty(hs)
+            hs = h;
+        else
+            hs = [hs h];
+        end
+        if legendStrings == ""
+            legendStrings = "ExB";
+        else
+            legendStrings = [legendStrings "ExB"];
+        end
+    else
+        warning([savename.ExB, 'does not exist.'])
+    end
+end
+
+if plot_VnablaB
+    if exist(savename.nablaB,"file")
+        load(savename.nablaB,'NablaBdata2D')
+        idx_IDSP_z = knnsearch(NablaBdata2D.zq(1,:)',IDSP.z(1));
+        idx_IDSP_z_min = knnsearch(NablaBdata2D.zq(1,:)',IDSP.z(1)-0.016);
+        idx_IDSP_z_max = knnsearch(NablaBdata2D.zq(1,:)',IDSP.z(1)+0.016);
+        idx_nablaB_time = knnsearch(NablaBdata2D.trange,plot_time);
+        VnablaB_z_mean = mean(NablaBdata2D.VnablaB_z(:,idx_IDSP_z_min:idx_IDSP_z_max,:),3);
+        VnablaB_z_mean = mean(VnablaB_z_mean,2);
+        VnablaB_r_mean = mean(NablaBdata2D.VnablaB_r(:,idx_IDSP_z_min:idx_IDSP_z_max,:),3);
+        VnablaB_r_mean = mean(VnablaB_r_mean,2);
+        err_nablaB_z_y = 2E-2;
+        err_nablaB_r_y = 4E-3;
+        err_nablaB_x = 0.01;
+        switch plot_time
+            case {470,482}
+                if nablaB_mean
+                    switch profileplot
+                        case 'Vz'
+                            % errorbar(NablaBdata2D.rq(:,idx_IDSP_z),VnablaB_z_mean,err_nablaB_z_y,err_nablaB_z_y,err_nablaB_x,err_nablaB_x,'co','LineWidth',3)
+                            %平均値表示
+                            plot(NablaBdata2D.rq(:,idx_IDSP_z),VnablaB_z_mean,'c','LineWidth',3)
+                            hold on
+                            %標準偏差表示
+                            errarea_nablaB_z_y = err_nablaB_z_y*ones(size(VnablaB_z_mean,1),1);
+                            ar_nablaB=area(NablaBdata2D.rq(:,idx_IDSP_z),[VnablaB_z_mean-errarea_nablaB_z_y errarea_nablaB_z_y+errarea_nablaB_z_y]);
+                            set(ar_nablaB(1),'FaceColor','None','LineStyle',':','EdgeColor','c')
+                            set(ar_nablaB(2),'FaceColor','c','FaceAlpha',0.2,'LineStyle',':','EdgeColor','c')
+                        case 'Vr'
+                            % errorbar(NablaBdata2D.rq(:,idx_IDSP_z),VnablaB_r_mean,err_nablaB_r_y,err_nablaB_r_y,err_nablaB_x,err_nablaB_x,'co','LineWidth',3)
+                            %平均値表示
+                            plot(NablaBdata2D.rq(:,idx_IDSP_z),VnablaB_r_mean,'c','LineWidth',3)
+                            hold on
+                            %標準偏差表示
+                            errarea_nablaB_r_y = err_nablaB_r_y*ones(size(VnablaB_r_mean,1),1);
+                            ar_nablaB=area(NablaBdata2D.rq(:,idx_IDSP_z),[VnablaB_r_mean-errarea_nablaB_r_y errarea_nablaB_r_y+errarea_nablaB_r_y]);
+                            set(ar_nablaB(1),'FaceColor','None','LineStyle',':','EdgeColor','c')
+                            set(ar_nablaB(2),'FaceColor','c','FaceAlpha',0.2,'LineStyle',':','EdgeColor','c')
+                    end
+                else
+                    switch profileplot
+                        case 'Vz'
+                            errorbar(NablaBdata2D.rq(:,idx_IDSP_z),NablaBdata2D.VnablaB_z(:,idx_IDSP_z,idx_nablaB_time),err_nablaB_z_y,err_nablaB_z_y,err_nablaB_x,err_nablaB_x,'co','LineWidth',3)
+                        case 'Vr'
+                            errorbar(NablaBdata2D.rq(:,idx_IDSP_z),NablaBdata2D.VnablaB_r(:,idx_IDSP_z,idx_nablaB_time),err_nablaB_r_y,err_nablaB_r_y,err_nablaB_x,err_nablaB_x,'co','LineWidth',3)
+                    end
+                end
+        end
+        hold on
+        h = plot(nan,nan,'c-','LineWidth',3);
+        hold on
+        if isempty(hs)
+            hs = h;
+        else
+            hs = [hs h];
+        end
+        if legendStrings == ""
+            legendStrings = "GradB";
+        else
+            legendStrings = [legendStrings "GradB"];
+        end
+    else
+        warning([savename.nablaB, 'does not exist.'])
+    end
+end
+
+if plot_Vcurve
+    if exist(savename.curve,"file")
+        load(savename.curve,'Curvedata2D')
+        idx_IDSP_z = knnsearch(Curvedata2D.zq(1,:)',IDSP.z(1));
+        idx_IDSP_z_min = knnsearch(Curvedata2D.zq(1,:)',IDSP.z(1)-0.016);
+        idx_IDSP_z_max = knnsearch(Curvedata2D.zq(1,:)',IDSP.z(1)+0.016);
+        idx_curve_time = knnsearch(Curvedata2D.trange,plot_time);
+        Vcurve_z_mean = mean(Curvedata2D.Vcurve_z(:,idx_IDSP_z_min:idx_IDSP_z_max,:),3);
+        Vcurve_z_mean = mean(Vcurve_z_mean,2);
+        Vcurve_r_mean = mean(Curvedata2D.Vcurve_r(:,idx_IDSP_z_min:idx_IDSP_z_max,:),3);
+        Vcurve_r_mean = mean(Vcurve_r_mean,2);
+        err_curve_z_y = 4E-2;
+        err_curve_r_y = 4E-3;
+        err_curve_x = 0.01;
+        switch plot_time
+            case {470,482}
+                if curve_mean
+                    switch profileplot
+                        case 'Vz'
+                            % errorbar(Curvedata2D.rq(:,idx_IDSP_z),Vcurve_z_mean,err_curve_z_y,err_curve_z_y,err_curve_x,err_curve_x,'mo','LineWidth',3)
+                            %平均値表示
+                            plot(Curvedata2D.rq(:,idx_IDSP_z),Vcurve_z_mean,'m','LineWidth',3)
+                            hold on
+                            %標準偏差表示
+                            errarea_curve_z_y = err_curve_z_y*ones(size(Vcurve_z_mean,1),1);
+                            ar_curve=area(Curvedata2D.rq(:,idx_IDSP_z),[Vcurve_z_mean-errarea_curve_z_y errarea_curve_z_y+errarea_curve_z_y]);
+                            set(ar_curve(1),'FaceColor','None','LineStyle',':','EdgeColor','m')
+                            set(ar_curve(2),'FaceColor','m','FaceAlpha',0.2,'LineStyle',':','EdgeColor','m')
+                        case 'Vr'
+                            % errorbar(Curvedata2D.rq(:,idx_IDSP_z),Vcurve_r_mean,err_curve_r_y,err_curve_r_y,err_curve_x,err_curve_x,'mo','LineWidth',3)
+                            %平均値表示
+                            plot(Curvedata2D.rq(:,idx_IDSP_z),Vcurve_r_mean,'m','LineWidth',3)
+                            hold on
+                            %標準偏差表示
+                            errarea_curve_r_y = err_curve_r_y*ones(size(Vcurve_r_mean,1),1);
+                            ar_curve=area(Curvedata2D.rq(:,idx_IDSP_z),[Vcurve_r_mean-errarea_curve_r_y errarea_curve_r_y+errarea_curve_r_y]);
+                            set(ar_curve(1),'FaceColor','None','LineStyle',':','EdgeColor','m')
+                            set(ar_curve(2),'FaceColor','m','FaceAlpha',0.2,'LineStyle',':','EdgeColor','m')
+                    end
+                else
+                    switch profileplot
+                        case 'Vz'
+                            errorbar(Curvedata2D.rq(:,idx_IDSP_z),Curvedata2D.Vcurve_z(:,idx_IDSP_z,idx_curve_time),err_curve_z_y,err_curve_z_y,err_curve_x,err_curve_x,'mo','LineWidth',3)
+                        case 'Vr'
+                            errorbar(Curvedata2D.rq(:,idx_IDSP_z),Curvedata2D.Vcurve_r(:,idx_IDSP_z,idx_curve_time),err_curve_r_y,err_curve_r_y,err_curve_x,err_curve_x,'mo','LineWidth',3)
+                    end
+                end
+        end
+        hold on
+        h = plot(nan,nan,'m-','LineWidth',3);
+        hold on
+        if isempty(hs)
+            hs = h;
+        else
+            hs = [hs h];
+        end
+        if legendStrings == ""
+            legendStrings = "Curvature";
+        else
+            legendStrings = [legendStrings "Curvature"];
+        end
+    else
+        warning([savename.curve, 'does not exist.'])
+    end
+end
+
 title([num2str(plot_time),'us'])
 xlabel('R [m]')
 switch profileplot
@@ -439,6 +491,64 @@ switch profileplot
         yline(0,'--k','LineWidth',2)
     case 'T'
         ylabel('T_i [eV]')
+end
+
+if plot_Vmagline
+    if exist(savename.magline,"file")
+        load(savename.magline,'Maglinedata2D')
+        idx_IDSP_z = knnsearch(Maglinedata2D.zq(1,:)',IDSP.z(1));
+        idx_IDSP_z_min = knnsearch(Maglinedata2D.zq(1,:)',IDSP.z(1)-0.016);
+        idx_IDSP_z_max = knnsearch(Maglinedata2D.zq(1,:)',IDSP.z(1)+0.016);
+        idx_magline_time = knnsearch(Maglinedata2D.trange,plot_time);
+        Vmagline_z_mean = mean(Maglinedata2D.Vmagline_z(:,idx_IDSP_z_min:idx_IDSP_z_max,:),3);
+        Vmagline_z_mean = mean(Vmagline_z_mean,2);
+        Vmagline_r_mean = mean(Maglinedata2D.Vmagline_r(:,idx_IDSP_z_min:idx_IDSP_z_max,:),3);
+        Vmagline_r_mean = mean(Vmagline_r_mean,2);
+        err_magline_z_y = 2;
+        err_magline_r_y = 2;
+        err_magline_x = 0.01;
+        switch plot_time
+            case {470,482}
+                if magline_mean
+                    switch profileplot
+                        case 'Vz'
+                            errorbar(Maglinedata2D.rq(:,idx_IDSP_z),Vmagline_z_mean,err_magline_z_y,err_magline_z_y,err_magline_x,err_magline_x,'go','LineWidth',3)
+                        case 'Vr'
+                            % errorbar(Maglinedata2D.rq(:,idx_IDSP_z),Vmagline_r_mean,err_magline_r_y,err_magline_r_y,err_magline_x,err_magline_x,'go','LineWidth',3)
+                            %平均値表示
+                            plot(Maglinedata2D.rq(:,idx_IDSP_z),Vmagline_r_mean,'g','LineWidth',3)
+                            hold on
+                            %標準偏差表示
+                            errarea_magline_r_y = err_magline_r_y*ones(size(Vmagline_r_mean,1),1);
+                            ar_magline=area(Maglinedata2D.rq(:,idx_IDSP_z),[Vmagline_r_mean-errarea_magline_r_y errarea_magline_r_y+errarea_magline_r_y]);
+                            set(ar_magline(1),'FaceColor','None','LineStyle',':','EdgeColor','g')
+                            set(ar_magline(2),'FaceColor','g','FaceAlpha',0.2,'LineStyle',':','EdgeColor','g')
+                    end
+                else
+                    switch profileplot
+                        case 'Vz'
+                            errorbar(Maglinedata2D.rq(:,idx_IDSP_z),Maglinedata2D.Vmagline_z(:,idx_IDSP_z,idx_magline_time),err_magline_z_y,err_magline_z_y,err_magline_x,err_magline_x,'go','LineWidth',3)
+                        case 'Vr'
+                            errorbar(Maglinedata2D.rq(:,idx_IDSP_z),Maglinedata2D.Vmagline_r(:,idx_IDSP_z,idx_magline_time),err_magline_r_y,err_magline_r_y,err_magline_x,err_magline_x,'go','LineWidth',3)
+                    end
+                end
+        end
+        hold on
+        h = plot(nan,nan,'g-','LineWidth',3);
+        hold on
+        if isempty(hs)
+            hs = h;
+        else
+            hs = [hs h];
+        end
+        if legendStrings == ""
+            legendStrings = "Magnetic Line";
+        else
+            legendStrings = [legendStrings "Magnetic Line"];
+        end
+    else
+        warning([savename.magline, 'does not exist.'])
+    end
 end
 
 if plot_magpres
@@ -533,7 +643,7 @@ xlim([0.07 0.27])
 %         ylabel('V_R [km/s]')
 % end
 % legendStrings = string(WAV_IDSPdata.time(1:2)) +"us";
-legend(hs,legendStrings,'Location','southwest')
+legend(hs,legendStrings,'Location','northwest')
 
 % grid on
 

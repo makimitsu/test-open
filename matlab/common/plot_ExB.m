@@ -70,7 +70,7 @@ for i = 1:FIG.tate*FIG.yoko
             c.Label.String = 'B_r [T]';
         case 'Bz'
             contourf(ESPdata2D.zq,ESPdata2D.rq,newPCBdata2D.Bz(:,:,idx_PCB_t),100,'LineStyle','none')
-            clim([-0.04,0.04])%Bz
+            clim([-0.08,0.08])%Bz
             c = colorbar;
             c.Label.String = 'B_z [T]';
         case 'absB'
@@ -115,42 +115,46 @@ for i = 1:FIG.tate*FIG.yoko
     % q.Color = "k";
     % q.LineWidth = 2;
     % hold on
-    % %電場ベクトル
-    % q = quiver(ESPdata2D.zq,ESPdata2D.rq,squeeze(ESPdata2D.Ez(idx_ESP_t,:,:)),squeeze(ESPdata2D.Er(idx_ESP_t,:,:)),1.5);
-    % q.Color = "k";
-    % q.LineWidth = 2;
-    % hold on
-    % %ESP計測点
-    % for i_r = 1: size(ESPdata2D.rprobe,1)
-    %     for i_z = 1: size(ESPdata2D.zprobe,2)
-    %         p = plot(ESPdata2D.zprobe(1,i_z),ESPdata2D.rprobe(i_r,1),"g+");%測定位置
-    %         p.LineWidth = 2;
-    %         p.MarkerSize = 8;
-    %     end
-    % end
+    %電場ベクトル
+    q = quiver(ESPdata2D.zq(2:end-1,2:end-1),ESPdata2D.rq(2:end-1,2:end-1),squeeze(ESPdata2D.Ez(idx_ESP_t,2:end-1,2:end-1)),squeeze(ESPdata2D.Er(idx_ESP_t,2:end-1,2:end-1)),1.5);
+    q.Color = "k";
+    q.LineWidth = 2;
+    hold on
+    %ESP計測点
+    for i_r = 1: size(ESPdata2D.rprobe,1)
+        for i_z = 1: size(ESPdata2D.zprobe,2)
+            if not(ismember(i_z,[4 6 16]))
+                p = plot(ESPdata2D.zprobe(1,i_z),ESPdata2D.rprobe(i_r,1),"g+");%測定位置
+                p.LineWidth = 2;
+                p.MarkerSize = 8;
+            end
+        end
+    end
     hold on
     %IDSP計測点
-    IDSP.r1 = linspace(0.09,0.235,7);
-    IDSP.r1(5) = [];
-    IDSP.z(5) = [];
-    IDSP.r2 = IDSP.r1+0.01;
-    IDSP.r3 = IDSP.r1+0.02;
-    plot(IDSP.z,IDSP.r1,'r+',"MarkerSize",8/FIG.tate+2,"LineWidth",2/FIG.tate)
-    hold on
-    plot(IDSP.z,IDSP.r2,'r+',"MarkerSize",8/FIG.tate+2,"LineWidth",2/FIG.tate)
-    hold on
-    plot(IDSP.z,IDSP.r3,'r+',"MarkerSize",8/FIG.tate+2,"LineWidth",2/FIG.tate)
+    % IDSP.r1 = linspace(0.09,0.235,7);
+    % IDSP.r1(5) = [];
+    % IDSP.z(5) = [];
+    % IDSP.r2 = IDSP.r1+0.01;
+    % IDSP.r3 = IDSP.r1+0.02;
+    % plot(IDSP.z,IDSP.r1,'r+',"MarkerSize",8/FIG.tate+2,"LineWidth",2/FIG.tate)
+    % hold on
+    % plot(IDSP.z,IDSP.r2,'r+',"MarkerSize",8/FIG.tate+2,"LineWidth",2/FIG.tate)
+    % hold on
+    % plot(IDSP.z,IDSP.r3,'r+',"MarkerSize",8/FIG.tate+2,"LineWidth",2/FIG.tate)
     title([num2str(ESPdata2D.trange(idx_ESP_t)) 'us'])
     % xlim([-0.05 0.1])
-    xlim([-0.17 0.17])
+    % xlim([-0.15 0.15])
+    xlim([-0.1275 0.1275])
     % ylim([0.08 0.27])
-    xlabel('Z [m]')
-    ylabel('R [m]')
+    % xlabel('Z [m]')
+    % ylabel('R [m]')
     grid on
     daspect([1 1 1])
+    view([90 -90])%RZ反転
 end
-if not(multi_analysis)
-    sgtitle(colorplot)
-    fontsize(18/FIG.tate+5,"points")
-end
-view([90 -90])%RZ反転
+% if not(multi_analysis)
+%     sgtitle(colorplot)
+%     fontsize(18/FIG.tate+5,"points")
+% end
+

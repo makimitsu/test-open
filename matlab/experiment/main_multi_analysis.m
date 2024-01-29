@@ -67,7 +67,7 @@ tiledlayout(3,3)
 for i=1:n_clist
     ax = nexttile;
     % subplot(3,3,i)
-    plot_ExB(PCBdata2D,ESPdata2D,ExBdata2D,newPCBdata2D,IDSP,FIG,colorplotlist(i),true)
+    plot_ExB(PCBgrid2D,PCBdata2D,ESPdata2D,ExBdata2D,newPCBdata2D,IDSP,FIG,colorplotlist(i),true)
     switch colorplotlist(i)
         case {'phi','Ez','Er','Et','Jt'}
             colormap(ax,redblue(3000));

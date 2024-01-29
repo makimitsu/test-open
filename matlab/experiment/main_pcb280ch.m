@@ -15,7 +15,7 @@ dims = [1 35];
 if exist('PCB','var') && exist('colorplot','var') && exist('FIG','var') && exist('doCheck','var')
     definput = {num2str(PCB.date),num2str(PCB.IDX),colorplot,num2str(FIG.tate),num2str(FIG.yoko),num2str(FIG.start),num2str(FIG.dt),num2str(doCheck)};
 else
-    definput = {'','','psi','2','2','470','4','0'};
+    definput = {'230830','22','psi','2','2','470','4','0'};
 end
 answer = inputdlg(prompt,dlgtitle,dims,definput);
 if isempty(answer)

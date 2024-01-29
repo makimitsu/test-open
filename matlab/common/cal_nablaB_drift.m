@@ -44,15 +44,15 @@ else
         Br = Br(idx_r_min:idx_r_max,idx_z_min:idx_z_max);
         Bt_ext = Bt_ext(idx_r_min:idx_r_max,idx_z_min:idx_z_max);
         Bt = Bt(idx_r_min:idx_r_max,idx_z_min:idx_z_max);
-        % absB = sqrt(Bz.^2+Br.^2+Bt_ext.^2);
-        absB = sqrt(Bz.^2+Br.^2+Bt.^2);
+        absB = sqrt(Bz.^2+Br.^2+Bt_ext.^2);
+        % absB = sqrt(Bz.^2+Br.^2+Bt.^2);
         NablaBdata2D.FnablaB_z(:,1:end-1,i_t) = -m_i*V_L^2./(2*absB(:,1:end-1)).*diff(absB(:,:),1,2)./dz;%∇B力のz成分[N]
         NablaBdata2D.FnablaB_r(1:end-1,:,i_t) = -m_i*V_L^2./(2*absB(1:end-1,:)).*diff(absB(:,:),1,1)./dr;%∇B力のr成分[N]
         NablaBdata2D.FnablaB(:,:,i_t) = sqrt(NablaBdata2D.FnablaB_z(:,:,i_t).^2 + NablaBdata2D.FnablaB_r(:,:,i_t).^2);
-        % NablaBdata2D.VnablaB_z(:,:,i_t) = NablaBdata2D.FnablaB_r(:,:,i_t).*Bt_ext./(q_i*absB.^2)*1E-3;%∇Bドリフトのz成分[km/s]
-        % NablaBdata2D.VnablaB_r(:,:,i_t) = -NablaBdata2D.FnablaB_z(:,:,i_t).*Bt_ext./(q_i*absB.^2)*1E-3;%∇Bドリフトのr成分[km/s]
-        NablaBdata2D.VnablaB_z(:,:,i_t) = NablaBdata2D.FnablaB_r(:,:,i_t).*Bt./(q_i*absB.^2)*1E-3;%∇Bドリフトのz成分[km/s]
-        NablaBdata2D.VnablaB_r(:,:,i_t) = -NablaBdata2D.FnablaB_z(:,:,i_t).*Bt./(q_i*absB.^2)*1E-3;%∇Bドリフトのr成分[km/s]
+        NablaBdata2D.VnablaB_z(:,:,i_t) = NablaBdata2D.FnablaB_r(:,:,i_t).*Bt_ext./(q_i*absB.^2)*1E-3;%∇Bドリフトのz成分[km/s]
+        NablaBdata2D.VnablaB_r(:,:,i_t) = -NablaBdata2D.FnablaB_z(:,:,i_t).*Bt_ext./(q_i*absB.^2)*1E-3;%∇Bドリフトのr成分[km/s]
+        % NablaBdata2D.VnablaB_z(:,:,i_t) = NablaBdata2D.FnablaB_r(:,:,i_t).*Bt./(q_i*absB.^2)*1E-3;%∇Bドリフトのz成分[km/s]
+        % NablaBdata2D.VnablaB_r(:,:,i_t) = -NablaBdata2D.FnablaB_z(:,:,i_t).*Bt./(q_i*absB.^2)*1E-3;%∇Bドリフトのr成分[km/s]
         NablaBdata2D.VnablaB(:,:,i_t) = sqrt(NablaBdata2D.VnablaB_z(:,:,i_t).^2 + NablaBdata2D.VnablaB_r(:,:,i_t).^2);
     end
     NablaBdata2D.zq(end,:,:) = [];

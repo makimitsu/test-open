@@ -24,13 +24,13 @@ for i_t = 1:FIG.tate*FIG.yoko
             c = colorbar;
             colormap(jet)
             clim([min(Curvedata2D.Fcurve_r,[],"all") max(Curvedata2D.Fcurve_r,[],"all")])
-            c.Label.String = 'R component of Centrifugal Force [N]';
+            % c.Label.String = 'R component of Centrifugal Force [N]';
         case 'F_z'
             contourf(Curvedata2D.zq,Curvedata2D.rq,squeeze(Curvedata2D.Fcurve_z(:,:,i_t)),100,'edgecolor','none')
             c = colorbar;
             colormap(jet)
             clim([min(Curvedata2D.Fcurve_z,[],"all") max(Curvedata2D.Fcurve_z,[],"all")])
-            c.Label.String = 'Z component of Centrifugal Force [N]';
+            % c.Label.String = 'Z component of Centrifugal Force [N]';
         case 'F'
             contourf(Curvedata2D.zq,Curvedata2D.rq,squeeze(Curvedata2D.Fcurve(:,:,i_t)),100,'edgecolor','none')
             c = colorbar;
@@ -77,23 +77,29 @@ for i_t = 1:FIG.tate*FIG.yoko
         idx_pcb = knnsearch(PCBdata2D.trange',FIG.start+(i_t-1)*FIG.dt);
         contour(PCBgrid2D.zq(1,:),PCBgrid2D.rq(:,1),squeeze(PCBdata2D.psi(:,:,idx_pcb)),[-20e-3:0.1e-3:40e-3],'black','LineWidth',1)
     end
-    title([num2str(Curvedata2D.trange(i_t)) 'us'])
+    % title([num2str(Curvedata2D.trange(i_t)) 'us'])
     daspect([1 1 1])
-    xlim([z_min z_max])
-    ylim([r_min r_max])
+    % xlim([z_min z_max])
+    % ylim([r_min r_max])
+    xlim([-0.05 0.08])
+    ylim([0.1 0.27])
     xlabel('Z [m]')
     ylabel('R [m]')
     ax = gca;
-    ax.FontSize = 12;
+    ax.FontSize = 60;
 end
 
-switch plot_type
-    case {'F_r','F_z','F','V_r','V_z','V'}
-        sgtitle(c.Label.String)
-    case 'F_zr'
-        sgtitle('Centrifugal Force Vector')
-    case 'V_zr'
-        sgtitle('Curvature Drift Vector')
-end
+% switch plot_type
+%     case {'F_r','F_z','F','V_r','V_z','V'}
+%         sgtitle(c.Label.String)
+%     case 'F_zr'
+%         sgtitle('Centrifugal Force Vector')
+%     case 'V_zr'
+%         sgtitle('Curvature Drift Vector')
+% end
 
-
+view([90 -90])%RZ反転
+% clim([0 1.2E-17])
+clim([-1E-18 1E-18])
+xlim([-0.01 0.05])
+c.Location = "north";

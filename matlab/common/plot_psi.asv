@@ -9,7 +9,8 @@ for m=1:FIG.tate*FIG.yoko
         case 'psi'
             contourf(PCBgrid2D.zq(1,:),PCBgrid2D.rq(:,1),PCBdata2D.psi(:,:,i),80,'LineStyle','none')
             colormap(jet)
-            clim([-10e-3,10e-3])%psi
+            % clim([-10e-3,10e-3])%psi
+            clim([0,18e-3])%psi
             c = colorbar;
             c.Label.String = 'Psi [Wb]';
         case 'Bt'
@@ -48,10 +49,11 @@ for m=1:FIG.tate*FIG.yoko
             clim([-500,500])%Et
             c = colorbar;
             c.Label.String = 'E_t [V/m]';
+            
         case 'Jt'
-            contourf(PCBgrid2D.zq(1,:),PCBgrid2D.rq(:,1),PCBdata2D.Jt(:,:,i),30,'LineStyle','none')
+            contourf(PCBgrid2D.zq(1,:),PCBgrid2D.rq(:,1),PCBdata2D.Jt(:,:,i),[-1.5e6:2e4:1.5e6],'LineStyle','none')
             colormap(jet)
-            clim([-1E6,1E6])%Jt
+            clim([-1.5E6,1.5E6])%Jt
             c = colorbar;
             c.Label.String = 'Jt [A/m^{2}]';
     end
@@ -64,7 +66,7 @@ for m=1:FIG.tate*FIG.yoko
     for i_r = 1: size(PCBgrid2D.ok_bz_matrix,1)
         for i_z = 1: size(PCBgrid2D.ok_bz_matrix,2)
             % if PCBgrid2D.ok_bz_matrix(i_r,i_z) == 1
-                p = plot(PCBgrid2D.zprobepcb(i_z),PCBgrid2D.rprobepcb(i_r),"r+");%測定位置
+                p = plot(PCBgrid2D.zprobepcb(i_z),PCBgrid2D.rprobepcb(i_r),"m+");%測定位置
                 p.LineWidth = 3;
                 p.MarkerSize = 12;
             % end
@@ -78,8 +80,8 @@ for m=1:FIG.tate*FIG.yoko
     % %IDSP計測点
     % plot(IDSP.z,IDSP.r,'r+')
     % hold on
-    % title(string(t)+' us')
-    xlim([-0.17 0.17])
+    title(string(t)+' us')
+    xlim([-0.1275 0.1275])
     % ylim([0.07 0.3])
     daspect([1 1 1])
     xlabel('Z [m]')

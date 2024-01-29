@@ -7,6 +7,7 @@ pathname.NIFS=getenv('NIFS_path');%resultsまでのpath（ドップラー、SXR�
 setenv("Local_NIFS","/Users/rsomeya/Documents/NIFS_copy")%ローカルにコピーしたNIFS
 pathname.IDSP=[pathname.NIFS,'/Doppler/Andor/IDSP'];%smb接続
 pathname.IDS288ch=[pathname.NIFS,'/Doppler/Andor/320CH'];%smb接続
+pathname.ST40_CX=[pathname.NIFS,'/ST40/2023/Doppler'];%smb接続
 pathname.ESP=[pathname.NIFS,'/ElectroStaticProbe'];%smb接続
 % pathname.IDSP=getenv('Local_NIFS');%ローカルにコピーした
 addpath(fullfile(getenv('MDSPLUS_DIR'), 'matlab'));
