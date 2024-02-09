@@ -1,6 +1,6 @@
 % function MyFindCircleApp
 clearvars -except date
-close all
+% close all
 global OFFSET_fiber
 
 %%%%実験オペレーションの取得

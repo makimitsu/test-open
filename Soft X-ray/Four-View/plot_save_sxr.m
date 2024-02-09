@@ -1,8 +1,21 @@
-function plot_save_sxr(grid2D,data2D,range,date,shot,t,EE,show_localmax,show_xpoint,doSave,doFilter,doNLR)
+function plot_save_sxr(PCBdata,SXR,SXRdata)
 
-% f = figure;
-% f.Units = 'normalized';
-% f.Position = [0.1,0.2,0.8,0.8];
+grid2D = PCBdata.grid2D;
+data2D = PCBdata.data2D;
+date = SXR.date;
+shot = SXR.shot;
+% show_xpoint = SXR.show_xpoint;
+show_localmax = SXR.show_localmax;
+% start = SXR.start;
+% interval = SXR.interval;
+doSave = SXR.doSave;
+doFilter = SXR.doFilter;
+doNLR = SXR.doNLR;
+% SXRfilename = SXR.SXRfilename;
+
+EE = SXRdata.EE;
+t = SXRdata.t;
+range = SXRdata.range;
 
 range = range./1000;
 zmin1 = range(1);
@@ -28,32 +41,34 @@ z_space_SXR2 = z_space_SXR2(z_range2);
 % EE3 = EE(r_range,z_range,3);
 % EE4 = EE(r_range,z_range,4);
 
-% if show_flux_surface
-    psi_mesh_z = grid2D.zq;
-    psi_mesh_r = grid2D.rq;
-    t_idx = find(data2D.trange==t);
-    psi = data2D.psi(:,:,t_idx);
-    
-    psi_min = min(min(psi));
-    psi_max = max(max(psi));
-    contour_layer = linspace(psi_min,psi_max,20);
-% end
+psi_mesh_z = grid2D.zq;
+psi_mesh_r = grid2D.rq;
+t_idx = find(data2D.trange==t);
+psi = data2D.psi(:,:,t_idx);
+
+psi_min = min(min(psi));
+psi_max = max(max(psi));
+contour_layer = linspace(psi_min,psi_max,20);
 
 [SXR_mesh_z1,SXR_mesh_r] = meshgrid(z_space_SXR1,r_space_SXR);
 [SXR_mesh_z2,~] = meshgrid(z_space_SXR2,r_space_SXR);
-
 
 % f = figure;
 % f.Units = 'normalized';
 % f.Position = [0.1,0.2,0.8,0.8];
 
+[magAxisList,xPointList] = get_axis_x_multi(grid2D,data2D); %時間ごとの磁気軸、X点を検索
+
 positionList = [2,4,1,3];
 nameList = {'1um Al', '2.5um Al', '2um Mylar', '1um Mylar'};
 % cLimList = {[0 0.15],[0 0.15],[0 0.05],[0 0.2]};
-cLimList = {[0 0.15],[0 0.15],[0 0.05],[0 0.1]};
+% cLimList = {[0 0.15],[0 0.15],[0 0.05],[0 0.1]};
 % cLimList = {[0 0.15],[0 0.075],[0 0.05],[0 0.075]};
 % cLimList = {[0 0.5],[0 0.5],[0 0.1],[0 0.5]};
 % cLimList = {[0 0.1],[0 0.1],[0 0.02],[0 0.1]};
+% cLimList = {[0 1],[0 1.8],[0 1],[0 1]};
+% cLimList = {[0 1],[0 1.8],[0 0.8],[0 0.5]};
+cLimList = {[0 1],[0 1.8],[0 0.8],[0 0.2]};
 
 % 負の要素を0で置換
 negativeEE = find(EE<0);
@@ -84,21 +99,11 @@ for i = 1:4
         localmax_pos_z = SXR_mesh_z(localmax_idx);
         plot(localmax_pos_z,localmax_pos_r,'r*');
     end
-    % if show_flux_surface
-        [~,hp]=contourf(psi_mesh_z,psi_mesh_r,psi,contour_layer,'white','Fill','off');axis([-0.12 0.12 0.06 0.33]);
-        % [~,hp]=contourf(psi_mesh_z,psi_mesh_r,psi,contour_layer,'-k','Fill','off');
-        hp.LineWidth = 1.5;
-        if show_xpoint
-            [~,~,pos_xz,pos_xr,~,~] = search_xo(psi,z_space,r_space);
-            dz = 0.02;
-            dr = 0.03;
-            pos_xz_lower = pos_xz - dz;
-            pos_xr_lower = pos_xr - dr;
-            r = rectangle('Position',[pos_xz_lower pos_xr_lower dz*2 dr*2]);
-            r.EdgeColor = 'red';
-            r.LineWidth = 1.5;
-        end
-    % end    
+    [~,hp]=contourf(psi_mesh_z,psi_mesh_r,psi,contour_layer,'white','Fill','off');axis([-0.12 0.12 0.06 0.33]);
+    % [~,hp]=contourf(psi_mesh_z,psi_mesh_r,psi,contour_layer,'-k','Fill','off');
+    hp.LineWidth = 1.5;
+    plot(magAxisList.z(:,t_idx),magAxisList.r(:,t_idx),'wo','LineWidth',3);
+    plot(xPointList.z(t_idx),xPointList.r(t_idx),'wx','LineWidth',3);
     hold off;
     title(string(nameList(i)));
 end

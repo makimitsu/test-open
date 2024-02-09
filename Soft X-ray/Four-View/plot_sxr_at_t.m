@@ -1,12 +1,12 @@
 % function plot_sxr_at_t(grid2D,data2D,date,shot,t,show_xpoint,show_localmax,start,interval,save,SXRfilename,filter,NL)
 function plot_sxr_at_t(PCBdata,SXR)
 
-grid2D = PCBdata.grid2D;
-data2D = PCBdata.data2D;
+% grid2D = PCBdata.grid2D;
+% data2D = PCBdata.data2D;
 date = SXR.date;
 shot = SXR.shot;
-show_xpoint = SXR.show_xpoint;
-show_localmax = SXR.show_localmax;
+% show_xpoint = SXR.show_xpoint;
+% show_localmax = SXR.show_localmax;
 start = SXR.start;
 interval = SXR.interval;
 doFilter = SXR.doFilter;
@@ -16,7 +16,7 @@ t = SXR.t;
 doCheck = SXR.doCheck;
 
 
-save = false;
+% save = false;
 
 newProjectionNumber = 50;
 newGridNumber = 90;
@@ -34,6 +34,9 @@ matrixFolder = strcat('/Users/shinjirotakeda/OneDrive - The University of Tokyo/
     ,options,'/',num2str(date),'/shot',num2str(shot));
 
 if exist(matrixFolder,'dir') == 0 || doCheck
+    if ~doCheck
+        mkdir(matrixFolder)
+    end
     doCalculation = true;
 else
     doCalculation = false;
@@ -122,7 +125,11 @@ if doCheck
     f.Units = 'normalized';
     f.Position = [0.1,0.2,0.8,0.8];
     EE_new = cat(3,EE_new1,EE_new2,EE_new3,EE_new4);
-    plot_save_sxr(grid2D,data2D,range,date,shot,t,EE_new,show_localmax,show_xpoint,save,doFilter,doNLR);
+    SXRdata.EE = EE_new;
+    SXRdata.t = t;
+    SXRdata.range = range;
+    % plot_save_sxr(grid2D,data2D,range,date,shot,t,EE_new,show_localmax,show_xpoint,save,doFilter,doNLR);
+    plot_save_sxr(PCBdata,SXR,SXRdata);
 
     error1 = sum((EE_new1-EE1).^2/max(EE1,[],'all'),'all')/numel(EE1);
     error2 = sum((EE_new2-EE2).^2/max(EE2,[],'all'),'all')/numel(EE2);
@@ -137,6 +144,7 @@ if doCheck
     return
 end
 
+matrixPath = strcat(matrixFolder,'/',num2str(number),'.mat');
 if doCalculation
 
     [Iwgn1,Iwgn2,Iwgn3,Iwgn4] = get_sxr_image(date,number,newProjectionNumber,rawImage);
@@ -145,8 +153,9 @@ if doCalculation
     EE2 = get_distribution(M,K,gm2d2,U2,s2,v2,Iwgn2,doPlot,doNLR);
     EE3 = get_distribution(M,K,gm2d3,U3,s3,v3,Iwgn3,doPlot,doNLR);
     EE4 = get_distribution(M,K,gm2d4,U4,s4,v4,Iwgn4,doPlot,doNLR);
+    save(matrixPath,'EE1','EE2','EE3','EE4');
 else
-    matrixPath = strcat(matrixFolder,'/',num2str(number),'.mat');
+    % matrixPath = strcat(matrixFolder,'/',num2str(number),'.mat');
     load(matrixPath,'EE1','EE2','EE3','EE4');
 end
 
@@ -155,7 +164,13 @@ f.Units = 'normalized';
 f.Position = [0.1,0.2,0.8,0.8];
 
 EE = cat(3,EE1,EE2,EE3,EE4);
-plot_save_sxr(grid2D,data2D,range,date,shot,t,EE,show_localmax,show_xpoint,save,doFilter,doNLR);
+
+SXRdata.EE = EE;
+SXRdata.t = t;
+SXRdata.range = range;
+
+% plot_save_sxr(grid2D,data2D,range,date,shot,t,EE,show_localmax,show_xpoint,save,doFilter,doNLR);
+plot_save_sxr(PCBdata,SXR,SXRdata);
 
 end
 

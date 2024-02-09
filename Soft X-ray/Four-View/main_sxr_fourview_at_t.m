@@ -48,6 +48,7 @@ SXR.t = time;
 SXR.doCheck = doCheck;
 SXR.doFilter = doFilter;
 SXR.doNLR = doNLR;
+SXR.doSave = false;
 
 DOCID='1wG5fBaiQ7-jOzOI-2pkPAeV6SDiHc_LrOdcbWlvhHBw';%スプレッドシートのID
 T=getTS6log(DOCID);
@@ -74,6 +75,7 @@ SXR.show_localmax = false;
 
 for i=1:n_data
     disp(strcat('(',num2str(i),'/',num2str(n_data),')'));
+    PCB.idx = IDXlist(i);
     PCB.shot=shotlist(i,:);
     PCB.tfshot=tfshotlist(i,:);
     if PCB.shot == PCB.tfshot

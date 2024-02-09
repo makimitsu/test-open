@@ -10,6 +10,7 @@ addpath '/Users/shinjirotakeda/Documents/GitHub/test-open/pcb_experiment'; %getM
 %%%%%ここが各PCのパス
 %【※コードを使用する前に】環境変数を設定しておくか、matlab内のコマンドからsetenv('パス名','アドレス')で指定してから動かす
 pathname.NIFS=getenv('NIFS_path');%192.168.1.111
+pathname.fourier=getenv('fourier_path');%fourierのmd0（データックのショットが入ってる）までのpath
 pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所;
 pathname.pre_processed_directory = getenv('pre_processed_directory_path');%計算結果の保存先（どこでもいい）
 
@@ -39,6 +40,9 @@ dims = [1 35];
 %     definput = {'',''};
 % end
 answer = inputdlg(prompt,dlgtitle,dims,definput);
+if isempty(answer)
+    return
+end
 date = str2double(cell2mat(answer(1)));
 IDXlist = str2num(cell2mat(answer(2)));
 doSave = logical(str2num(cell2mat(answer(3))));
@@ -87,6 +91,7 @@ SXR.show_localmax = false;
 for i=1:n_data
     disp(strcat('(',num2str(i),'/',num2str(n_data),')'));
     % dtacq_num=dtacqlist;
+    PCB.idx = IDXlist(i);
     PCB.shot=shotlist(i,:);
     PCB.tfshot=tfshotlist(i,:);
     if PCB.shot == PCB.tfshot
@@ -98,7 +103,8 @@ for i=1:n_data
     SXR.start = startlist(i);
     SXR.interval = intervallist(i);
     % [PCBdata.grid2D,PCBdata.data2D] = process_PCBdata_280ch(date, shot, tfshot, pathname, n,i_EF,trange);
-    [PCBdata.grid2D,PCBdata.data2D] = process_PCBdata_280ch(PCB,pathname);
+    % [PCBdata.grid2D,PCBdata.data2D] = process_PCBdata_280ch(PCB,pathname);
+    [PCBdata.grid2D,PCBdata.data2D] = process_PCBdata_200ch(PCB,pathname);
     % grid2D = NaN;
     % data2D = NaN;
     SXR.date = date;

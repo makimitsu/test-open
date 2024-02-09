@@ -163,6 +163,7 @@ if doCalculation
         'psi',zeros(size(grid2D.rq,1),size(grid2D.rq,2),size(trange,2)),...
         'Bz',zeros(size(grid2D.rq,1),size(grid2D.rq,2),size(trange,2)),...
         'Bt',zeros(size(grid2D.rq,1),size(grid2D.rq,2),size(trange,2)),...
+        'Bt_th',zeros(size(grid2D.rq,1),size(grid2D.rq,2),size(trange,2)),...
         'Br',zeros(size(grid2D.rq,1),size(grid2D.rq,2),size(trange,2)),...
         'Jt',zeros(size(grid2D.rq,1),size(grid2D.rq,2),size(trange,2)),...
         'Jz',zeros(size(grid2D.rq,1),size(grid2D.rq,2),size(trange,2)),...
@@ -170,7 +171,24 @@ if doCalculation
         'Et',zeros(size(grid2D.rq,1),size(grid2D.rq,2),size(trange,2)),...
         'Lambda',zeros(size(grid2D.rq,1),size(grid2D.rq,2),size(trange,2)),...
         'trange',trange);
-    
+
+    if isfield(pathname,'fourier')
+        directory_rogo = strcat(pathname.fourier,'rogowski/');
+        current_folder = strcat(directory_rogo,num2str(date),'/');
+        rgwfile = strcat(current_folder,num2str(date),sprintf('%03d',PCB.idx),'.rgw');
+        if isfile(rgwfile)
+            [I_TF,x,aquisition_rate] = get_TF_current(PCB,pathname);
+            m0 = 4*pi*10^(-7);
+            rgwflag = true;
+        else
+            disp(strcat('No rgw file at shot ',num2str(PCB.idx)));
+            rgwflag = false;
+        end
+    else
+        disp('Path to fourier does not exist');
+        rgwflag = false;
+    end
+
     % ******************* no angle correction ********************
     for i=1:size(trange,2)
         t=trange(i);
@@ -190,8 +208,13 @@ if doCalculation
         data2D.Bt(:,:,i)=B_t;
         data2D.Jt(:,:,i)= curl(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bz(:,:,i),data2D.Br(:,:,i))./(4*pi*1e-7);
 
+        if rgwflag
+            timing = x/aquisition_rate==t;
+            data2D.Bt_th(:,:,i) = m0*I_TF(timing)*1e3*12./(2*pi()*grid2D.rq);
+        end
+
         if i>1
-            data2D.Et(:,:,i) = -1*(data2D.psi(:,:,i)-data2D.psi(:,:,i-1))./(2*pi()*grid2D.rq);
+            data2D.Et(:,:,i) = -1*(data2D.psi(:,:,i)-data2D.psi(:,:,i-1))./(2*pi()*grid2D.rq*1e-6);
         end
     end
 else

@@ -1,6 +1,6 @@
 % clear
 % close all
-clearvars -except date
+clearvars -except date doFilter doNLR
 addpath '/Users/shinjirotakeda/Documents/GitHub/test-open/pcb_experiment'; %getMDSdata.mとcoeff200ch.xlsxのあるフォルダへのパス
 addpath '/Users/shinjirotakeda/Documents/GitHub/test-open/Soft X-ray/Four-View_Simulation';
 
@@ -15,33 +15,52 @@ pathname.rawdata38=getenv('rawdata038_path');%dtacq a038のrawdataの保管場�
 pathname.woTFdata=getenv('woTFdata_path');%rawdata（TFoffset引いた）の保管場所
 pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所
 pathname.pre_processed_directory = getenv('pre_processed_directory_path');%計算結果の保存先（どこでもいい）
-pathname.MAGDATA = getenv('MAGDATA_DIR');
+pathname.SXRDATA = getenv('SXRDATA_DIR');
+
 
 %%%%実験オペレーションの取得
-prompt = {'Date:'};
-definput = {''};
+prompt = {'Date:','doFilter:','doNLR:'};
+definput = {'','',''};
 if exist('date','var')
     definput{1} = num2str(date);
 end
-
+if exist('doFilter','var')
+    definput{2} = num2str(doFilter);
+end
+if exist('doNLR','var')
+    definput{3} = num2str(doNLR);
+end
 dlgtitle = 'Input';
 dims = [1 35];
-% if exist('date','var') && exist('IDXlist','var') && exist('doCheck','var')
-%     definput = {num2str(date),num2str(IDXlist),num2str(doCheck)};
-% else
-%     definput = {'','',''};
-% end
-% definput = {'','',''};
-% definput = {num2str(date),num2str(IDXlist),num2str(doCheck)};
 answer = inputdlg(prompt,dlgtitle,dims,definput);
+if isempty(answer)
+    return
+end
+
 date = str2double(cell2mat(answer(1)));
+doFilter = logical(str2num(cell2mat(answer(2))));
+doNLR = logical(str2num(cell2mat(answer(3))));
+
+SXR.doFilter = doFilter;
+SXR.doNLR = doNLR;
+SXR.show_xpoint = false;
+SXR.show_localmax = false;
+SXR.date = date;
+
+if doFilter & doNLR
+    options = 'NLF_NLR';
+elseif ~doFilter & doNLR
+    options = 'LF_NLR';
+elseif doFilter & ~doNLR
+    options = 'NLF_LR';
+else
+    options = 'LF_LR';
+end
 
 DOCID='1wG5fBaiQ7-jOzOI-2pkPAeV6SDiHc_LrOdcbWlvhHBw';%スプレッドシートのID
 T=getTS6log(DOCID);
 node='date';
-% date=230714;
 T=searchlog(T,node,date);
-% IDXlist= 1; %[5:50 52:55 58:59];%[4:6 8:11 13 15:19 21:23 24:30 33:37 39:40 42:51 53:59 61:63 65:69 71:74];
 IDXlist = T.shot;
 IDXlist = IDXlist.';
 n_data=numel(IDXlist);%計測データ数
@@ -54,32 +73,25 @@ tfshotlist = [tfshotlist_a039, tfshotlist_a040];
 EFlist=T.EF_A_(IDXlist);
 TFlist=T.TF_kV_(IDXlist);
 dtacqlist=39.*ones(n_data,1);
+startlist = T.SXRStart(IDXlist);
+intervallist = T.SXRInterval(IDXlist);
 
 PCB.trange=400:800;%【input】計算時間範囲
 PCB.n=40; %【input】rz方向のメッシュ数
 PCB.start = 20; %plot開始時間-400
 
-% doCheck = false;
-% doCheck = true;
-% if ~doCheck
-%     figure('Position', [0 0 1500 1500],'visible','on');
-% end
-
-magDataDir = pathname.MAGDATA;
-magDataFile = strcat(magDataDir,'/',num2str(date),'.mat');
-if exist(magDataFile,'file')
-    load(magDataFile,'idxList','BrList','BtList','bList');
+sxrDataDir = pathname.SXRDATA;
+sxrDataFile = strcat(sxrDataDir,filesep,num2str(date),'_',options,'.mat');
+if exist(sxrDataFile,'file')
+    load(sxrDataFile,'idxList','xpointList');
 else
     idxList = zeros(numel(IDXlist),1);
-    BrList = zeros(numel(IDXlist),1);
-    BtList = zeros(numel(IDXlist),1);
-    bList = zeros(numel(IDXlist),1);
+    xpointData = struct('max',zeros(4,8),'mean',zeros(4,8),'std',zeros(4,8),'MR',zeros(1,8),'t',zeros(1,8));
+    xpointList = repmat(xpointData,numel(IDXlist),1);
+    % xpointList = zeros(numel(IDXlist),1);
 end
 
-directory_rogo = strcat(pathname.fourier,'rogowski/');
-
 for i=1:n_data
-    % dtacq_num=dtacqlist;
     PCB.idx = IDXlist(i);
     disp(PCB.idx);
     PCB.shot=shotlist(i,:);
@@ -90,30 +102,14 @@ for i=1:n_data
     PCB.i_EF=EFlist(i);
     PCB.TF=TFlist(i);
     PCB.date = date;
-
-    % current_folder = strcat(directory_rogo,num2str(date),'/');
-    if date == 230920
-        % date_rgw = 230929;
-        current_folder = strcat(directory_rogo,num2str(230929),'/');
-        filename = strcat(current_folder,num2str(230929),sprintf('%03d',8),'.rgw');
-        % if any(PCB.idx == [1,2,6,10,26,42,43,46,63])
-        if PCB.idx<=14 || any(PCB.idx==[18:26,31,32,40:43,45:48,58,59,63,66,67])
-            filename = strcat(current_folder,num2str(date),sprintf('%03d',PCB.idx),'.rgw');
-        end
-    else
-        current_folder = strcat(directory_rogo,num2str(date),'/');
-        filename = strcat(current_folder,num2str(date),sprintf('%03d',PCB.idx),'.rgw');
-    end
-    % filename = strcat(current_folder,num2str(date_rgw),sprintf('%03d',PCB.idx),'.rgw');
-    
-    if isfile(filename) && ~any(PCB.tfshot==0)
-        [B_r,B_t,b] = get_guide_field_ratio(PCB,pathname);
+    SXR.start = startlist(i);
+    SXR.interval = intervallist(i);
+    SXR.shot = IDXlist(i);
+    SXR.SXRfilename = strcat(getenv('SXR_IMAGE_DIR'),filesep,num2str(date),'/shot',num2str(SXR.shot,'%03i'),'.tif');
+    if isfile(SXR.SXRfilename)
         idxList(i) = PCB.idx;
-        BrList(i) = B_r;
-        BtList(i) = B_t;
-        bList(i) = b;
+        xpointList(i) = get_emission_xpoint(PCB,SXR,pathname);
     end
-
 end
 
-save(magDataFile,'idxList','BrList','BtList','bList');
+save(sxrDataFile,'idxList','xpointList');

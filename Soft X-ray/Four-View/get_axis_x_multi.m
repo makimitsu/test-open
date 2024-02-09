@@ -56,12 +56,6 @@ for i=1:numel(trange)
         magAxisList.r(:,i) = rqList(psiRidgeIdx_t(axisCandidate_t));
         magAxisList.z(:,i) = zqList(psiRidgeIdx_t(axisCandidate_t));
         magAxisList.psi(:,i) = psi(psiRidgeIdx_t(axisCandidate_t));
-        xpointIdx = islocalmin(smooth(psiRidge_t),'MaxNumExtrema', 1);
-        if ~isempty(find(xpointIdx, 1))
-            xPointList.r(i) = rqList(psiRidgeIdx_t(xpointIdx));
-            xPointList.z(i) = zqList(psiRidgeIdx_t(xpointIdx));
-            xPointList.psi(i) = psi(psiRidgeIdx_t(xpointIdx));
-        end
         % M_x = psiRidge_t(find(axisCandidate_t,1):find(axisCandidate_t,1,'last'));
         % I_x = psiRidgeIdx_t(find(axisCandidate_t,1):find(axisCandidate_t,1,'last'));
         % TF_x = islocalmin(M_x,'MaxNumExtrema',1);
@@ -70,6 +64,12 @@ for i=1:numel(trange)
         %     xPointList.z(i) = zqList(I_x(TF_x));
         %     xPointList.psi(i) = psi(I_x(TF_x));
         % end
+    end
+    xpointIdx = islocalmin(smooth(psiRidge_t),'MaxNumExtrema', 1);
+    if ~isempty(find(xpointIdx, 1))
+        xPointList.r(i) = rqList(psiRidgeIdx_t(xpointIdx));
+        xPointList.z(i) = zqList(psiRidgeIdx_t(xpointIdx));
+        xPointList.psi(i) = psi(psiRidgeIdx_t(xpointIdx));
     end
     if any(ismember(magAxisList.r(:,i),rLim))
         magAxisList.r(:,i) = NaN;

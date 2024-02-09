@@ -86,7 +86,7 @@ subplot(1,3,1);plot(trange(plotRange),mergingRatio(plotRange));xlabel('time');yl
 subplot(1,3,2);plot(trange(plotRange),B_reconnection(plotRange));xlabel('time');ylabel('B_r');
 subplot(1,3,3);plot(trange(plotRange),B_guide(plotRange));xlabel('time');ylabel('B_g');
 
-figure;plot(trange,mergingRatio);
+% figure;plot(trange,mergingRatio);
 
 % timing = knnsearch(mergingRatio(plotRange).',0.5);
 % timing = find(mergingRatio==0,1,'last');

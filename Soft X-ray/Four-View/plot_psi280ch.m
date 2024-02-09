@@ -211,20 +211,22 @@ dt = 4;
      i=start+m.*dt; %end
      t=trange(i);
      subplot(4,4,m)
-    contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bz(:,:,i),30,'LineStyle','none')
+    % contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bz(:,:,i),30,'LineStyle','none')
+    % contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Br(:,:,i),30,'LineStyle','none')
     % contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.psi(:,:,i),40,'LineStyle','none')
     % contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bt(:,:,i),40,'LineStyle','none')
     % contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bt(:,:,i),-100e-3:0.5e-3:100e-3,'LineStyle','none')
     % contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Jt(:,:,i),30,'LineStyle','none')
-%     contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Et(:,:,i),20,'LineStyle','none')
+    contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Et(:,:,i),20,'LineStyle','none')
+    % contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Bt_th(:,:,i),20,'LineStyle','none')
     colormap(jet)
     axis image
     axis tight manual
 %     caxis([-0.8*1e+6,0.8*1e+6]) %jt%カラーバーの軸の範囲
-%     caxis([-0.01,0.01])%Bz
-     % clim([-0.1,0.1])%Bt
+    % clim([-0.1,0.1])%Bz
+     % clim([0,0.3])%Bt
     % clim([-5e-3,5e-3])%psi
-%     caxis([-500,400])%Et
+    clim([-500,400])%Et
 %     colorbar('Location','eastoutside')
     %カラーバーのラベル付け
 %     c = colorbar;
