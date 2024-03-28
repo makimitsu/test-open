@@ -68,7 +68,8 @@ nameList = {'1um Al', '2.5um Al', '2um Mylar', '1um Mylar'};
 % cLimList = {[0 0.1],[0 0.1],[0 0.02],[0 0.1]};
 % cLimList = {[0 1],[0 1.8],[0 1],[0 1]};
 % cLimList = {[0 1],[0 1.8],[0 0.8],[0 0.5]};
-cLimList = {[0 1],[0 1.8],[0 0.8],[0 0.2]};
+% cLimList = {[0 1],[0 1.8],[0 0.8],[0 0.2]};
+cLimList = {[0 0.4],[0 1],[0 0.4],[0 0.2]};
 
 % 負の要素を0で置換
 negativeEE = find(EE<0);
@@ -102,9 +103,10 @@ for i = 1:4
     [~,hp]=contourf(psi_mesh_z,psi_mesh_r,psi,contour_layer,'white','Fill','off');axis([-0.12 0.12 0.06 0.33]);
     % [~,hp]=contourf(psi_mesh_z,psi_mesh_r,psi,contour_layer,'-k','Fill','off');
     hp.LineWidth = 1.5;
-    plot(magAxisList.z(:,t_idx),magAxisList.r(:,t_idx),'wo','LineWidth',3);
-    plot(xPointList.z(t_idx),xPointList.r(t_idx),'wx','LineWidth',3);
+    % plot(magAxisList.z(:,t_idx),magAxisList.r(:,t_idx),'wo','LineWidth',3);
+    % plot(xPointList.z(t_idx),xPointList.r(t_idx),'wx','LineWidth',3);
     hold off;
+    xlim([-0.02,0.02]);ylim([0.2,0.3]);
     title(string(nameList(i)));
 end
 
@@ -233,7 +235,8 @@ drawnow;
 % hold off;
 
 if doSave
-    pathname = getenv('SXR_RECONSTRUCTED_DIR');
+    pathname_png = getenv('SXR_RECONSTRUCTED_DIR');
+    pathname_fig = getenv('SXR_RECONSTRUCTED_FIG_DIR');
     if doFilter & doNLR
         directory = '/NLF_NLR/';
     elseif ~doFilter & doNLR
@@ -243,12 +246,31 @@ if doSave
     else
         directory = '/LF_LR/';
     end
-    foldername = strcat(pathname,directory,'/',num2str(date),'/shot',num2str(shot));
-    if exist(foldername,'dir') == 0
-        mkdir(foldername);
+    foldername_png = strcat(pathname_png,directory,'/',num2str(date),'/shot',num2str(shot));
+    foldername_fig = strcat(pathname_fig,directory,'/',num2str(date),'/shot',num2str(shot));
+    if exist(foldername_png,'dir') == 0
+        mkdir(foldername_png);
     end
-    filename = strcat('/shot',num2str(shot),'_',num2str(t),'us.png');
-    saveas(gcf,strcat(foldername,filename));
+    if exist(foldername_fig,'dir') == 0
+        mkdir(foldername_fig);
+    end
+    filename_png = strcat('/shot',num2str(shot),'_',num2str(t),'us.png');
+    filename_fig = strcat('/shot',num2str(shot),'_',num2str(t),'us.fig');
+    saveas(gcf,strcat(foldername_png,filename_png));
+    saveas(gcf,strcat(foldername_fig,filename_fig));
 end
 
-end
+% [data2D_q,zq,rq] = interp_data(grid2D,data2D,SXRdata);
+% figure;
+% for i = 1:4
+%     subplot(2,2,positionList(i));
+%     [~,h] = contourf(zq,rq,data2D_q.EE(:,:,i),20);
+%     colormap('turbo');
+%     h.LineStyle = 'none';
+%     % c=colorbar;c.Label.String='Intensity [a.u.]';c.FontSize=18;
+%     clim(cell2mat(cLimList(i)));
+%     hold on
+%     [~,hp]=contourf(zq,rq,data2D_q.psi,contour_layer,'white','Fill','off');
+%     hp.LineWidth = 1.5;
+%     hold off
+% end

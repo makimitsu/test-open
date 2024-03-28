@@ -1,4 +1,4 @@
-function IxData = get_emission_xpoint(PCB,SXR,pathname)
+function IdData = get_emission_downstream(PCB,SXR,pathname)
 
 trange = PCB.trange;
 [grid2D,data2D] = process_PCBdata_200ch(PCB,pathname);
@@ -11,7 +11,7 @@ mergingRatioSXR = mergingRatio(ismember(trange,trange_sxr));
 Imax = zeros(4,8);
 Imean = zeros(4,8);
 Istd = zeros(4,8);
-IxData = struct('max',Imax,'mean',Imean,'std',Istd,'MR',mergingRatioSXR,'t',trange_sxr);
+IdData = struct('max_l',Imax,'mean_l',Imean,'std_l',Istd,'max_r',Imax,'mean_r',Imean,'std_r',Istd,'MR',mergingRatioSXR,'t',trange_sxr);
 
 date = SXR.date;
 shot = SXR.shot;
@@ -35,7 +35,6 @@ dirPath = getenv('SXR_MATRIX_DIR');
 matrixFolder = strcat(dirPath,filesep,options,filesep,num2str(date),'/shot',num2str(shot));
 if exist(matrixFolder,'dir') == 0
     disp('No emission distribution calculation results');
-    
     return
 end
 
@@ -61,7 +60,7 @@ rmax = range(6);
 % Imax = zeros(4,8);
 % Imean = zeros(4,8);
 % Istd = zeros(4,8);
-% IxData = struct('max',Imax,'mean',Imean,'std',Istd,'MR',mergingRatioSXR,'t',trange_sxr);
+% IdData = struct('max_l',Imax,'mean_l',Imean,'std_l',Istd,'max_r',Imax,'mean_r',Imean,'std_r',Istd,'MR',mergingRatioSXR,'t',trange_sxr);
 
 for i = 1:8
     matrixPath = strcat(matrixFolder,filesep,num2str(i),'.mat');
@@ -77,16 +76,23 @@ for i = 1:8
     x_z = xPointList.z(t_idx);
     if ~isnan(x_r)
         for j = 1:4
+            % x点の左下・右下にあたる範囲をインデックスで取得したい
             r_idx = knnsearch(r_space_SXR.',x_r);
             if j <= 2
                 z_idx = knnsearch(z_space_SXR2.',x_z);
             else
                 z_idx = knnsearch(z_space_SXR1.',x_z);
             end
-            EE_x = EE(r_idx-2:r_idx+2,z_idx-2:z_idx+2,j);
-            IxData.max(j,i) = max(EE_x,[],'all');
-            IxData.mean(j,i) = mean(EE_x,'all');
-            IxData.std(j,i) = std(EE_x,0,'all');
+            % 左下の切り出し
+            EE_l = EE(1:r_idx,1:z_idx,j);
+            % 右下
+            EE_r = EE(r_idx:end,z_idx:end,j);
+            IdData.max_l(j,i) = max(EE_l,[],'all');
+            IdData.mean_l(j,i) = mean(EE_l,'all');
+            IdData.std_l(j,i) = std(EE_l,0,'all');
+            IdData.max_r(j,i) = max(EE_r,[],'all');
+            IdData.mean_r(j,i) = mean(EE_r,'all');
+            IdData.std_r(j,i) = std(EE_r,0,'all');
         end
     end
 

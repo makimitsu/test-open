@@ -1,6 +1,6 @@
 % clear
 % close all
-clearvars -except date doFilter doNLR
+clearvars -except date doFilter doNLR plotArea plotType
 addpath '/Users/shinjirotakeda/Documents/GitHub/test-open/pcb_experiment'; %getMDSdata.mとcoeff200ch.xlsxのあるフォルダへのパス
 addpath '/Users/shinjirotakeda/Documents/GitHub/test-open/Soft X-ray/Four-View_Simulation';
 
@@ -21,7 +21,7 @@ pathname.MAGDATA = getenv('MAGDATA_DIR');
 
 %%%%実験オペレーションの取得
 prompt = {'Date:','doFilter:','doNLR:'};
-definput = {'','',''};
+definput = {'','','','',''};
 if exist('date','var')
     definput{1} = num2str(date);
 end
@@ -41,6 +41,8 @@ end
 date = str2double(cell2mat(answer(1)));
 doFilter = logical(str2num(cell2mat(answer(2))));
 doNLR = logical(str2num(cell2mat(answer(3))));
+plotArea = answer(4);
+plotType = answer(5);
 
 SXR.doFilter = doFilter;
 SXR.doNLR = doNLR;
@@ -84,7 +86,7 @@ PCB.start = 20; %plot開始時間-400
 sxrDataDir = pathname.SXRDATA;
 sxrDataFile = strcat(sxrDataDir,filesep,num2str(date),'_',options,'.mat');
 if exist(sxrDataFile,'file')
-    load(sxrDataFile,'idxList','xpointList');
+    load(sxrDataFile,'idxList','xpointList','downstreamList','separatrixList');
     idxList_sxr = idxList;
 else
     disp('No sxr data');
@@ -101,35 +103,496 @@ else
     return
 end
 
-Imax = zeros(1,n_data);
-Imean = zeros(1,n_data);
+% 以下セパラトリクス
+
+% shotごとにプロット（最大値/平均値）
+Imax_r = zeros(4,n_data);
+Imean_r = zeros(4,n_data);
+Imax_l = zeros(4,n_data);
+Imean_l = zeros(4,n_data);
 TF = zeros(1,n_data);
 for i = 1:n_data
-    Imax(i) = xpointList(i).max(2,2);
-    Imean(i) = xpointList(i).mean(2,2);
-    if xpointList(i).MR(2) > 0.5
-        Imax(i) = xpointList(i).max(2,1);
-        Imean(i) = xpointList(i).mean(2,1);
-    end
-    if ismember(idxList(i),[6,11])
-        Imax(i) = NaN;
-        Imean(i) = NaN;
+    for j = 1:4
+        Imax_r(j,i) = max(separatrixList(i).max_r(j,1:2)); 
+        Imean_r(j,i) = max(separatrixList(i).mean_r(j,1:2));
+        Imax_l(j,i) = max(separatrixList(i).max_l(j,1:2)); 
+        Imean_l(j,i) = max(separatrixList(i).mean_l(j,1:2));
     end
     TF(i) = BtList(i);
 end
 TF(TF==0) = NaN;
-Imax(Imax==0) = NaN;
-Imean(Imean==0) = NaN;
-% figure;
-% subplot(1,2,1);plot(TF,Imax,'*');
-% subplot(1,2,2);plot(TF,Imean,'*');
-% figure;
-% subplot(1,2,1);plot(idxList,Imax,'*');
-% subplot(1,2,2);plot(idxList,Imean,'*');
+Imax_r(Imax_r==0) = NaN;
+Imean_r(Imean_r==0) = NaN;
+Imax_l(Imax_l==0) = NaN;
+Imean_l(Imean_l==0) = NaN;
+% for i = 1:4 %規格化
+%     Imax_r(i,:) = Imax_r(i,:)./max(Imax_r(i,:));
+%     Imax_l(i,:) = Imax_l(i,:)./max(Imax_l(i,:));
+%     Imean_r(i,:) = Imean_r(i,:)./max(Imean_r(i,:));
+%     Imean_l(i,:) = Imean_l(i,:)./max(Imean_l(i,:));
+% end
 
-figure;plot(TF,Imax,'*');
-xlabel('troidal field');ylabel('intensity');
+% figure;hold on;%shot, max
+% for i = 1:4
+%     plot(idxList_sxr,Imax_l(i,:),'*');
+% end
+% xlabel('shot number');ylabel('max intensity in lower left');
+% figure;hold on;
+% for i = 1:4
+%     plot(idxList_sxr,Imax_r(i,:),'*');
+% end
+% xlabel('shot number');ylabel('max intensity in lower right');
 
+figure;hold on;%shot, mean
+for i = 1:4
+    plot(idxList_sxr,Imax_l(i,:),'*');
+end
+xlabel('shot number');ylabel('mean intensity in lower left');
+figure;hold on;
+for i = 1:4
+    plot(idxList_sxr,Imax_r(i,:),'*');
+end
+xlabel('shot number');ylabel('mean intensity in lower right');
+
+% figure;hold on;%TF,max
+% for i = 1:4
+%     plot(BtList,Imax_l(i,:),'*');
+% end
+% xlabel('troidal field');ylabel('max intensity in lower left');xlim([0.08 0.16]);
+% figure;hold on;
+% for i = 1:4
+%     plot(BtList,Imax_r(i,:),'*');
+% end
+% xlabel('troidal field');ylabel('max intensity in lower right');xlim([0.08 0.16]);
+
+% figure;hold on;%TF, mean
+% for i = 1:4
+%     plot(BtList,Imean_l(i,:),'*');
+% end
+% xlabel('troidal field');ylabel('mean intensity in lower left');xlim([0.08 0.16]);
+% figure;hold on;
+% for i = 1:4
+%     plot(BtList,Imean_r(i,:),'*');
+% end
+% xlabel('troidal field');ylabel('mean intensity in lower right');xlim([0.08 0.16]);
+
+% % GFRごとにプロット,最初の2タイミングの最大値
+% Imax_r = zeros(4,4);
+% Imean_r = zeros(4,4);
+% Imax_l = zeros(4,4);
+% Imean_l = zeros(4,4);
+% GFR = zeros(1,4);
+% cnt = zeros(1,4);
+% for i = 1:n_data
+%     if isnan(TFlist(i))
+%        continue 
+%     end
+%     k = find([2.5,3,3.5,4]==TFlist(i));
+%     for j = 1:4
+%         Imax_r_tmp = max(separatrixList(i).max_r(j,1:2));
+%         Imean_r_tmp = max(separatrixList(i).mean_r(j,1:2));
+%         Imax_l_tmp = max(separatrixList(i).max_l(j,1:2));
+%         Imean_l_tmp = max(separatrixList(i).mean_l(j,1:2));
+%         Imax_r(j,k) = (Imax_r(j,k)*cnt(k)+Imax_r_tmp)/(cnt(k)+1);
+%         Imean_r(j,k) = (Imean_r(j,k)*cnt(k)+Imean_r_tmp)/(cnt(k)+1);
+%         Imax_l(j,k) = (Imax_l(j,k)*cnt(k)+Imax_l_tmp)/(cnt(k)+1);
+%         Imean_l(j,k) = (Imean_l(j,k)*cnt(k)+Imean_l_tmp)/(cnt(k)+1);
+%     end
+%     if BtList(i)~=0
+%         GFR(k) = (GFR(k)*cnt(k)+bList(i))/(cnt(k)+1);
+%     end
+%     cnt(k) = cnt(k)+1;
+% end
+% GFR(GFR==0) = NaN;
+% Imax_r(Imax_r==0) = NaN;
+% Imean_r(Imean_r==0) = NaN;
+% Imax_l(Imax_l==0) = NaN;
+% Imean_l(Imean_l==0) = NaN;
+% % for i = 1:4 %規格化
+% %     Imax_r(i,:) = Imax_r(i,:)./max(Imax_r(i,:));
+% %     Imax_l(i,:) = Imax_l(i,:)./max(Imax_l(i,:));
+% %     Imean_r(i,:) = Imean_r(i,:)./max(Imean_r(i,:));
+% %     Imean_l(i,:) = Imean_l(i,:)./max(Imean_l(i,:));
+% % end
+% % [GFR,I] = sort(GFR);
+% % Imax_r = Imax_r(:,I);
+% % Imean_r = Imean_r(:,I);
+% % Imax_l = Imax_l(:,I);
+% % Imean_l = Imean_l(:,I);
+% 
+% figure;hold on;
+% for i = 1:4
+%     plot(GFR,Imax_l(i,:),'-*');
+% end
+% xlabel('guide field ratio');ylabel('max intensity in lower left');%xlim([0.08 0.16]);
+% legend({'~50eV','50~80eV','200eV~','100eV~'},'Location','south');
+% figure;hold on;
+% for i = 1:4
+%     plot(GFR,Imax_r(i,:),'-*');
+% end
+% xlabel('guide field ratio');ylabel('max intensity in lower right');%xlim([0.08 0.16]);
+% legend({'~50eV','50~80eV','200eV~','100eV~'},'Location','south');
+
+% % GFRごとにプロット,最初の2タイミングの平均
+% Imax_r = zeros(4,4);
+% Imean_r = zeros(4,4);
+% Imax_l = zeros(4,4);
+% Imean_l = zeros(4,4);
+% GFR = zeros(1,4);
+% cnt = zeros(1,4);
+% for i = 1:n_data
+%     if isnan(TFlist(i))
+%        continue 
+%     end
+%     k = find([2.5,3,3.5,4]==TFlist(i));
+%     for j = 1:4
+%         Imax_r_tmp = mean(separatrixList(i).max_r(j,1:2));
+%         Imean_r_tmp = mean(separatrixList(i).mean_r(j,1:2));
+%         Imax_l_tmp = mean(separatrixList(i).max_l(j,1:2));
+%         Imean_l_tmp = mean(separatrixList(i).mean_l(j,1:2));
+%         Imax_r(j,k) = (Imax_r(j,k)*cnt(k)+Imax_r_tmp)/(cnt(k)+1);
+%         Imean_r(j,k) = (Imean_r(j,k)*cnt(k)+Imean_r_tmp)/(cnt(k)+1);
+%         Imax_l(j,k) = (Imax_l(j,k)*cnt(k)+Imax_l_tmp)/(cnt(k)+1);
+%         Imean_l(j,k) = (Imean_l(j,k)*cnt(k)+Imean_l_tmp)/(cnt(k)+1);
+%     end
+%     if BtList(i)~=0
+%         GFR(k) = (GFR(k)*cnt(k)+bList(i))/(cnt(k)+1);
+%     end
+%     cnt(k) = cnt(k)+1;
+% end
+% GFR(GFR==0) = NaN;
+% Imax_r(Imax_r==0) = NaN;
+% Imean_r(Imean_r==0) = NaN;
+% Imax_l(Imax_l==0) = NaN;
+% Imean_l(Imean_l==0) = NaN;
+% % for i = 1:4 %規格化
+% %     Imax_r(i,:) = Imax_r(i,:)./max(Imax_r(i,:));
+% %     Imax_l(i,:) = Imax_l(i,:)./max(Imax_l(i,:));
+% %     Imean_r(i,:) = Imean_r(i,:)./max(Imean_r(i,:));
+% %     Imean_l(i,:) = Imean_l(i,:)./max(Imean_l(i,:));
+% % end
+% % [GFR,I] = sort(GFR);
+% % Imax_r = Imax_r(:,I);
+% % Imean_r = Imean_r(:,I);
+% % Imax_l = Imax_l(:,I);
+% % Imean_l = Imean_l(:,I);
+% 
+% figure;hold on;
+% for i = 1:4
+%     plot(GFR,Imax_l(i,:),'-*');
+% end
+% xlabel('guide field ratio');ylabel('max intensity in lower left');%xlim([0.08 0.16]);
+% legend({'~50eV','50~80eV','200eV~','100eV~'},'Location','south');
+% figure;hold on;
+% for i = 1:4
+%     plot(GFR,Imax_r(i,:),'-*');
+% end
+% xlabel('guide field ratio');ylabel('max intensity in lower right');%xlim([0.08 0.16]);
+% legend({'~50eV','50~80eV','200eV~','100eV~'},'Location','south');
+
+% % GFRごとにプロット（最大値/平均値）
+% Imax_r = zeros(4,4);
+% Imean_r = zeros(4,4);
+% Imax_l = zeros(4,4);
+% Imean_l = zeros(4,4);
+% GFR = zeros(1,4);
+% cnt = zeros(1,4);
+% for i = 1:n_data
+%     if isnan(TFlist(i))
+%        continue 
+%     end
+%     k = find([2.5,3,3.5,4]==TFlist(i));
+%     for j = 1:4
+%         Imax_r(j,k) = (Imax_r(j,k)*cnt(k)+separatrixList(i).max_r(j,1))/(cnt(k)+1);
+%         Imean_r(j,k) = (Imean_r(j,k)*cnt(k)+separatrixList(i).mean_r(j,1))/(cnt(k)+1);
+%         Imax_l(j,k) = (Imax_l(j,k)*cnt(k)+separatrixList(i).max_l(j,1))/(cnt(k)+1);
+%         Imean_l(j,k) = (Imean_l(j,k)*cnt(k)+separatrixList(i).mean_l(j,1))/(cnt(k)+1);
+%     end
+%     if BtList(i)~=0
+%         GFR(k) = (GFR(k)*cnt(k)+bList(i))/(cnt(k)+1);
+%     end
+%     cnt(k) = cnt(k)+1;
+% end
+% GFR(GFR==0) = NaN;
+% Imax_r(Imax_r==0) = NaN;
+% Imean_r(Imean_r==0) = NaN;
+% Imax_l(Imax_l==0) = NaN;
+% Imean_l(Imean_l==0) = NaN;
+% % for i = 1:4 %規格化
+% %     Imax_r(i,:) = Imax_r(i,:)./max(Imax_r(i,:));
+% %     Imax_l(i,:) = Imax_l(i,:)./max(Imax_l(i,:));
+% %     Imean_r(i,:) = Imean_r(i,:)./max(Imean_r(i,:));
+% %     Imean_l(i,:) = Imean_l(i,:)./max(Imean_l(i,:));
+% % end
+% % [GFR,I] = sort(GFR);
+% % Imax_r = Imax_r(:,I);
+% % Imean_r = Imean_r(:,I);
+% % Imax_l = Imax_l(:,I);
+% % Imean_l = Imean_l(:,I);
+% 
+% figure;hold on;
+% for i = 1:4
+%     plot(GFR,Imax_l(i,:),'-*');
+% end
+% xlabel('guide field ratio');ylabel('max intensity in lower left');%xlim([0.08 0.16]);
+% legend({'~50eV','50~80eV','200eV~','100eV~'},'Location','south');
+% figure;hold on;
+% for i = 1:4
+%     plot(GFR,Imax_r(i,:),'-*');
+% end
+% xlabel('guide field ratio');ylabel('max intensity in lower right');%xlim([0.08 0.16]);
+% legend({'~50eV','50~80eV','200eV~','100eV~'},'Location','south');
+
+% % TFごとにプロット（最大値/平均値）
+% Imax_r = zeros(4,4);
+% Imean_r = zeros(4,4);
+% Imax_l = zeros(4,4);
+% Imean_l = zeros(4,4);
+% TF = zeros(1,4);
+% cnt = zeros(1,4);
+% for i = 1:n_data
+%     if isnan(TFlist(i))
+%        continue 
+%     end
+%     k = find([2.5,3,3.5,4]==TFlist(i));
+%     for j = 1:4
+%         Imax_r(j,k) = (Imax_r(j,k)*cnt(k)+separatrixList(i).max_r(j,1))/(cnt(k)+1);
+%         Imean_r(j,k) = (Imean_r(j,k)*cnt(k)+separatrixList(i).mean_r(j,1))/(cnt(k)+1);
+%         Imax_l(j,k) = (Imax_l(j,k)*cnt(k)+separatrixList(i).max_l(j,1))/(cnt(k)+1);
+%         Imean_l(j,k) = (Imean_l(j,k)*cnt(k)+separatrixList(i).mean_l(j,1))/(cnt(k)+1);
+%     end
+%     if BtList(i)~=0
+%         TF(k) = (TF(k)*cnt(k)+BtList(i))/(cnt(k)+1);
+%     end
+%     cnt(k) = cnt(k)+1;
+% end
+% TF(TF==0) = NaN;
+% Imax_r(Imax_r==0) = NaN;
+% Imean_r(Imean_r==0) = NaN;
+% Imax_l(Imax_l==0) = NaN;
+% Imean_l(Imean_l==0) = NaN;
+% for i = 1:4 %規格化
+%     Imax_r(i,:) = Imax_r(i,:)./max(Imax_r(i,:));
+%     Imax_l(i,:) = Imax_l(i,:)./max(Imax_l(i,:));
+%     Imean_r(i,:) = Imean_r(i,:)./max(Imean_r(i,:));
+%     Imean_l(i,:) = Imean_l(i,:)./max(Imean_l(i,:));
+% end
+% 
+% figure;hold on;
+% for i = 1:4
+%     plot(TF,Imax_l(i,:),'-*');
+% end
+% xlabel('troidal field');ylabel('max intensity in lower left');xlim([0.08 0.16]);
+% legend({'~50eV','50~80eV','200eV~','100eV~'},'Location','south');
+% figure;hold on;
+% for i = 1:4
+%     plot(TF,Imax_r(i,:),'-*');
+% end
+% xlabel('troidal field');ylabel('max intensity in lower right');xlim([0.08 0.16]);
+% legend({'~50eV','50~80eV','200eV~','100eV~'},'Location','south');
+
+% 以下下流領域
+
+% % TFごとにプロット（最大値/平均値）
+% Imax_r = zeros(4,4);
+% Imean_r = zeros(4,4);
+% Imax_l = zeros(4,4);
+% Imean_l = zeros(4,4);
+% TF = zeros(1,4);
+% cnt = zeros(1,4);
+% for i = 1:n_data
+%     if isnan(TFlist(i))
+%        continue 
+%     end
+%     k = find([2.5,3,3.5,4]==TFlist(i));
+%     for j = 1:4
+%         Imax_r(j,k) = (Imax_r(j,k)*cnt(k)+downstreamList(i).max_r(j,1))/(cnt(k)+1);
+%         Imean_r(j,k) = (Imean_r(j,k)*cnt(k)+downstreamList(i).mean_r(j,1))/(cnt(k)+1);
+%         Imax_l(j,k) = (Imax_l(j,k)*cnt(k)+downstreamList(i).max_l(j,1))/(cnt(k)+1);
+%         Imean_l(j,k) = (Imean_l(j,k)*cnt(k)+downstreamList(i).mean_l(j,1))/(cnt(k)+1);
+%     end
+%     if BtList(i)~=0
+%         TF(k) = (TF(k)*cnt(k)+BtList(i))/(cnt(k)+1);
+%     end
+%     cnt(k) = cnt(k)+1;
+% end
+% TF(TF==0) = NaN;
+% Imax_r(Imax_r==0) = NaN;
+% Imean_r(Imean_r==0) = NaN;
+% Imax_l(Imax_l==0) = NaN;
+% Imean_l(Imean_l==0) = NaN;
+% % for i = 1:4 %規格化
+% %     Imax_r(i,:) = Imax_r(i,:)./max(Imax_r(i,:));
+% %     Imax_l(i,:) = Imax_l(i,:)./max(Imax_l(i,:));
+% %     Imean_r(i,:) = Imean_r(i,:)./max(Imean_r(i,:));
+% %     Imean_l(i,:) = Imean_l(i,:)./max(Imean_l(i,:));
+% % end
+% 
+% % figure;hold on;
+% % for i = 1:4
+% %     plot(idxList_sxr,Imax_l(i,:),'*');
+% % end
+% % xlabel('shot number');ylabel('max intensity in lower left');
+% % figure;hold on;
+% % for i = 1:4
+% %     plot(idxList_sxr,Imax_r(i,:),'*');
+% % end
+% % xlabel('shot number');ylabel('max intensity in lower right');
+% 
+% figure;hold on;
+% for i = 1:4
+%     plot(TF,Imax_l(i,:),'*');
+% end
+% xlabel('troidal field');ylabel('max intensity in lower left');xlim([0.08 0.16]);
+% legend({'~50eV','50~80eV','200eV~','100eV~'},'Location','south');
+% figure;hold on;
+% for i = 1:4
+%     plot(TF,Imax_r(i,:),'*');
+% end
+% xlabel('troidal field');ylabel('max intensity in lower right');xlim([0.08 0.16]);
+% legend({'~50eV','50~80eV','200eV~','100eV~'},'Location','south');
+
+% % shotごとにプロット（最大値/平均値）
+% Imax_r = zeros(4,n_data);
+% Imean_r = zeros(4,n_data);
+% Imax_l = zeros(4,n_data);
+% Imean_l = zeros(4,n_data);
+% TF = zeros(1,n_data);
+% for i = 1:n_data
+%     for j = 1:4
+%         Imax_r(j,i) = downstreamList(i).max_r(j,1); 
+%         Imean_r(j,i) = downstreamList(i).mean_r(j,1);
+%         Imax_l(j,i) = downstreamList(i).max_l(j,1); 
+%         Imean_l(j,i) = downstreamList(i).mean_l(j,1);
+%     end
+%     TF(i) = BtList(i);
+% end
+% TF(TF==0) = NaN;
+% Imax_r(Imax_r==0) = NaN;
+% Imean_r(Imean_r==0) = NaN;
+% Imax_l(Imax_l==0) = NaN;
+% Imean_l(Imean_l==0) = NaN;
+% for i = 1:4 %規格化
+%     Imax_r(i,:) = Imax_r(i,:)./max(Imax_r(i,:));
+%     Imax_l(i,:) = Imax_l(i,:)./max(Imax_l(i,:));
+%     Imean_r(i,:) = Imean_r(i,:)./max(Imean_r(i,:));
+%     Imean_l(i,:) = Imean_l(i,:)./max(Imean_l(i,:));
+% end
+% 
+% % figure;hold on;
+% % for i = 1:4
+% %     plot(idxList_sxr,Imax_l(i,:),'*');
+% % end
+% % xlabel('shot number');ylabel('max intensity in lower left');
+% % figure;hold on;
+% % for i = 1:4
+% %     plot(idxList_sxr,Imax_r(i,:),'*');
+% % end
+% % xlabel('shot number');ylabel('max intensity in lower right');
+% 
+% figure;hold on;
+% for i = 1:4
+%     plot(BtList,Imax_l(i,:),'*');
+% end
+% xlabel('troidal field');ylabel('max intensity in lower left');xlim([0.08 0.16]);
+% figure;hold on;
+% for i = 1:4
+%     plot(BtList,Imax_r(i,:),'*');
+% end
+% xlabel('troidal field');ylabel('max intensity in lower right');xlim([0.08 0.16]);
+
+% 以下X点
+
+% % TFごとにグループ化してプロット（最大値）
+% Imax = zeros(1,4);
+% Imean = zeros(1,4);
+% TF = zeros(1,4);
+% cnt_i = [0,0,0,0];
+% for j = 1:n_data
+%     if isnan(TFlist(j))
+%        continue 
+%     end
+%     i = find([2.5,3,3.5,4]==TFlist(j));
+%     Imax(i) = (Imax(i)*cnt_i(i) + max(xpointList(j).max(2,[1,2])))/(cnt_i(i)+1); %こっちだと右肩下がり
+%     Imean(i) = (Imean(i)*cnt_i(i) + max(xpointList(j).mean(2,[1,2])))/(cnt_i(i)+1);
+%     if BtList(j)~=0
+%         TF(i) = (TF(i)*cnt_i(i)+BtList(j))/(cnt_i(i)+1);
+%     end
+%     cnt_i(i) = cnt_i(i) + 1;
+% end
+% TF(TF==0) = NaN;
+% Imax(Imax==0) = NaN;
+% Imean(Imean==0) = NaN;
+% 
+% figure;plot(TF,Imax,'*');
+% xlabel('troidal field');ylabel('max intensity');
+% 
+% figure;plot(TF,Imean,'*');
+% xlabel('troidal field');ylabel('mean intensity');
+
+% % TFごとにグループ化してプロット（最初の2枚の平均）
+% Imax = zeros(1,4);
+% Imean = zeros(1,4);
+% TF = zeros(1,4);
+% cnt_i = [0,0,0,0];
+% for j = 1:n_data
+%     if isnan(TFlist(j))
+%        continue 
+%     end
+%     i = find([2.5,3,3.5,4]==TFlist(j));
+%     Imax(i) = (Imax(i)*cnt_i(i) + mean(xpointList(j).max(2,[1,2])))/(cnt_i(i)+1); %こっちだと右肩下がり
+%     Imean(i) = (Imean(i)*cnt_i(i) + mean(xpointList(j).mean(2,[1,2])))/(cnt_i(i)+1);
+%     if BtList(j)~=0
+%         TF(i) = (TF(i)*cnt_i(i)+BtList(j))/(cnt_i(i)+1);
+%     end
+%     cnt_i(i) = cnt_i(i) + 1;
+% end
+% TF(TF==0) = NaN;
+% Imax(Imax==0) = NaN;
+% Imean(Imean==0) = NaN;
+% 
+% figure;plot(TF,Imax,'*');
+% xlabel('troidal field');ylabel('max intensity');
+% 
+% figure;plot(TF,Imean,'*');
+% xlabel('troidal field');ylabel('mean intensity');
+
+% % shotごとにプロット（最大値/平均値）
+% Imax = zeros(1,n_data);
+% Imean = zeros(1,n_data);
+% TF = zeros(1,n_data);
+% for i = 1:n_data
+%     % Imax(i) = mean(xpointList(i).max(2,[1,2])); %こっちだと右肩下がり
+%     % Imean(i) = mean(xpointList(i).mean(2,[1,2]));
+%     Imax(i) = max(xpointList(i).max(2,[1,2])); %こっちだと右肩下がり
+%     Imean(i) = max(xpointList(i).mean(2,[1,2]));
+%     % Imax(i) = xpointList(i).max(2,2); %こっちだと右肩上がり
+%     % Imean(i) = xpointList(i).mean(2,2);
+%     % if xpointList(i).MR(2) > 0.5
+%     %     Imax(i) = xpointList(i).max(2,1);
+%     %     Imean(i) = xpointList(i).mean(2,1);
+%     % end
+%     % if ismember(idxList(i),[6,11])
+%     %     Imax(i) = NaN;
+%     %     Imean(i) = NaN;
+%     % end
+%     TF(i) = BtList(i);
+% end
+% TF(TF==0) = NaN;
+% Imax(Imax==0) = NaN;
+% Imean(Imean==0) = NaN;
+% 
+% % figure;plot(TF,Imax,'*');
+% % xlabel('troidal field');ylabel('max intensity');
+% % figure;plot(TF,Imean,'*');
+% % xlabel('troidal field');ylabel('mean intensity');
+% 
+% figure;plot(idxList_sxr,Imax,'*');
+% xlabel('shot number');ylabel('max intensity');
+% figure;plot(idxList_sxr,Imean,'*');
+% xlabel('shot number');ylabel('mean intensity');
+
+% % shotごとに合体率をプロット
 % MR = zeros(1,n_data);
 % TF = zeros(1,n_data);
 % for i = 1:n_data
@@ -144,7 +607,7 @@ xlabel('troidal field');ylabel('intensity');
 % figure;plot(TF,MR,'*');
 % figure;plot(idxList,MR,'*');
 
-
+% % TFごとに違う図で時間発展をプロット
 % MR40 = zeros(8,numel(find(TFlist==4)));
 % t40 = zeros(8,numel(find(TFlist==4)));
 % MR35 = zeros(8,numel(find(TFlist==3.5)));
@@ -180,7 +643,6 @@ xlabel('troidal field');ylabel('intensity');
 %         i25 = i25+1;
 %     end
 % end
-
 % figure;
 % subplot(2,2,1);
 % plot(t40,MR40,'*');
@@ -199,6 +661,7 @@ xlabel('troidal field');ylabel('intensity');
 % xlim([460 480]);
 % ylim([0 1]);
 
+% % ショットごとに発光強度（全時間での最大値）をプロット
 % Imax = NaN(numel(idxList_sxr),4);
 % Imean = NaN(numel(idxList_sxr),4);
 % for i = 1:n_data
@@ -222,12 +685,10 @@ xlabel('troidal field');ylabel('intensity');
 %     xlabel('guide field');
 % end
 
+% % 各ショットごとに発光強度（最大・平均）と合体率の時間発展をプロット
 % fmax = figure;
-% 
 % fmean = figure;
-% 
 % fMR = figure;
-% 
 % for i=1:n_data
 %     figure(fmax);
 %     for j = 1:4
@@ -253,7 +714,6 @@ xlabel('troidal field');ylabel('intensity');
 %     ylabel('max intensity [a.u.]');
 %     xlim([450 480]);
 % end
-% 
 % figure(fmean);
 % for i = 1:4
 %     subplot(2,2,i)
@@ -261,7 +721,6 @@ xlabel('troidal field');ylabel('intensity');
 %     ylabel('mean intensity [a.u.]');
 %     xlim([450 480]);
 % end
-% 
 % figure(fMR);
 % xlabel('time [us]');
 % ylabel('merging ratio');

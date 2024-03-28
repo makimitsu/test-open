@@ -72,6 +72,8 @@ PCB.start = 40; %plot開始時間-400
 % if ~doCheck
 %     figure('Position', [0 0 1500 1500],'visible','on');
 % end
+% psiList = zeros(n_data,numel(PCB.trange));
+% idxLegend = strsplit(num2str(IDXlist),' ');
 for i=1:n_data
     % dtacq_num=dtacqlist;
     PCB.idx = IDXlist(i);
@@ -87,7 +89,16 @@ for i=1:n_data
         check_signal(PCB,pathname);
     else
         plot_psi280ch(PCB,pathname);
-        % [B_r,B_t,b] = get_guide_field_ratio(PCB,pathname)
+        [B_r,B_t,b] = get_guide_field_ratio(PCB,pathname);
         % get_B_reconnection(PCB,pathname);
+        % [grid2D,data2D] = process_PCBdata_200ch(PCB,pathname);
+        % [magAxisList,xPointList] = get_axis_x_multi(grid2D,data2D);
+        % psiList(i,:) = xPointList.psi;
     end
 end
+% figure;hold on
+% for i = 1:n_data
+%     plot(PCB.trange,psiList(i,:),LineWidth=3);
+% end
+% xlim([455 485]);
+% legend(idxLegend);

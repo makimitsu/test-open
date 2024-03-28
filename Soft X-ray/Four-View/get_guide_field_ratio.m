@@ -79,14 +79,18 @@ B_reconnection(nanMask) = NaN;
 B_guide(nanMask) = NaN;
 mergingRatio(nanMask) = NaN;
 
-% 合体率・Br・Btの時間発展を表示
-plotRange = find(trange>=430&trange<=510);
-figure('Position', [0 0 1500 1500],'visible','on');
-subplot(1,3,1);plot(trange(plotRange),mergingRatio(plotRange));xlabel('time');ylabel('merging ratio');
-subplot(1,3,2);plot(trange(plotRange),B_reconnection(plotRange));xlabel('time');ylabel('B_r');
-subplot(1,3,3);plot(trange(plotRange),B_guide(plotRange));xlabel('time');ylabel('B_g');
+% % x点psiの時間発展を表示
+% figure;plot(trange,xPointList.psi);xlim([455 485]);
+% plot(trange,xPointList.psi);xlim([455 485]);hold on;
 
-% figure;plot(trange,mergingRatio);
+% % 合体率・Br・Btの時間発展を表示
+% plotRange = find(trange>=430&trange<=510);
+% figure('Position', [0 0 1500 1500],'visible','on');
+% subplot(1,3,1);plot(trange(plotRange),mergingRatio(plotRange));xlabel('time');ylabel('merging ratio');
+% subplot(1,3,2);plot(trange(plotRange),B_reconnection(plotRange));xlabel('time');ylabel('B_r');
+% subplot(1,3,3);plot(trange(plotRange),B_guide(plotRange));xlabel('time');ylabel('B_g');
+
+% figure;plot(trange,mergingRatio);xlim([465 485]);
 
 % timing = knnsearch(mergingRatio(plotRange).',0.5);
 % timing = find(mergingRatio==0,1,'last');
@@ -95,10 +99,10 @@ B_r = B_reconnection(1,timing);
 B_t = B_guide(1,timing);
 b = B_t/B_r;
 
-% ガイド磁場比の計算に使用した磁気面を表示
-time = trange(timing);
-PCB.time = time;
-plot_psi280ch_at_t(PCB,pathname);
+% % ガイド磁場比の計算に使用した磁気面を表示
+% time = trange(timing);
+% PCB.time = time;
+% plot_psi280ch_at_t(PCB,pathname);
 
 % if exist(magDataFile,'file')
 %     idxList(end+1) = PCB.idx;

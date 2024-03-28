@@ -82,14 +82,51 @@ PCB.start = 20; %plot開始時間-400
 
 sxrDataDir = pathname.SXRDATA;
 sxrDataFile = strcat(sxrDataDir,filesep,num2str(date),'_',options,'.mat');
+doX = false;
+doDown = false;
 if exist(sxrDataFile,'file')
-    load(sxrDataFile,'idxList','xpointList');
+    % load(sxrDataFile,'idxList','xpointList');
+    load(sxrDataFile)
+    if ~exist('xpointList','var')
+        doX = true;
+        xpointData = struct('max',zeros(4,8),'mean',zeros(4,8),'std',zeros(4,8), ...
+            'MR',zeros(1,8),'t',zeros(1,8));
+        xpointList = repmat(xpointData,numel(IDXlist),1);
+    end
+    if ~exist('downstreamList','var')
+        doDown = true;
+        downstreamData = struct('max_l',zeros(4,8),'mean_l',zeros(4,8),'std_l',zeros(4,8), ...
+            'max_r',zeros(4,8),'mean_r',zeros(4,8),'std_r',zeros(4,8), ...
+            'MR',zeros(1,8),'t',zeros(1,8));
+        downstreamList = repmat(downstreamData,numel(IDXlist),1);
+    end
+    if ~exist('separatrixList','var')
+        doSep = true;
+        separatrixData = struct('max_l',zeros(4,8),'mean_l',zeros(4,8),'std_l',zeros(4,8), ...
+            'max_r',zeros(4,8),'mean_r',zeros(4,8),'std_r',zeros(4,8), ...
+            'MR',zeros(1,8),'t',zeros(1,8));
+        separatrixList = repmat(separatrixData,numel(IDXlist),1);
+    end
+
 else
+    doX = true;
+    doDown = true;
+    doSep = true;
     idxList = zeros(numel(IDXlist),1);
-    xpointData = struct('max',zeros(4,8),'mean',zeros(4,8),'std',zeros(4,8),'MR',zeros(1,8),'t',zeros(1,8));
+    xpointData = struct('max',zeros(4,8),'mean',zeros(4,8),'std',zeros(4,8), ...
+        'MR',zeros(1,8),'t',zeros(1,8));
     xpointList = repmat(xpointData,numel(IDXlist),1);
-    % xpointList = zeros(numel(IDXlist),1);
+    downstreamData = struct('max_l',zeros(4,8),'mean_l',zeros(4,8),'std_l',zeros(4,8), ...
+        'max_r',zeros(4,8),'mean_r',zeros(4,8),'std_r',zeros(4,8), ...
+        'MR',zeros(1,8),'t',zeros(1,8));
+    downstreamList = repmat(downstreamData,numel(IDXlist),1);
+    separatrixData = struct('max_l',zeros(4,8),'mean_l',zeros(4,8),'std_l',zeros(4,8), ...
+        'max_r',zeros(4,8),'mean_r',zeros(4,8),'std_r',zeros(4,8), ...
+        'MR',zeros(1,8),'t',zeros(1,8));
+    separatrixList = repmat(separatrixData,numel(IDXlist),1);
 end
+
+% doSep = 1;
 
 for i=1:n_data
     PCB.idx = IDXlist(i);
@@ -108,8 +145,16 @@ for i=1:n_data
     SXR.SXRfilename = strcat(getenv('SXR_IMAGE_DIR'),filesep,num2str(date),'/shot',num2str(SXR.shot,'%03i'),'.tif');
     if isfile(SXR.SXRfilename)
         idxList(i) = PCB.idx;
-        xpointList(i) = get_emission_xpoint(PCB,SXR,pathname);
+        if doX
+            xpointList(i) = get_emission_xpoint(PCB,SXR,pathname);
+        end
+        if doDown
+            downstreamList(i) = get_emission_downstream(PCB,SXR,pathname);
+        end
+        if doSep
+            separatrixList(i) = get_emission_separatrix(PCB,SXR,pathname);
+        end
     end
 end
 
-save(sxrDataFile,'idxList','xpointList');
+save(sxrDataFile,'idxList','xpointList','downstreamList','separatrixList');
