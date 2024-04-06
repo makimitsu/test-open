@@ -38,8 +38,8 @@ if exist(excelFilePath, 'file') == 2
         % シートを読み込み
         calibrationTable = readtable(excelFilePath, 'Sheet', sheetName);
         disp(['Successfully loaded the content of sheet "', sheetName, '".']);
-        centerX = reshape(calibrationTable.center_X,4,8).';
-        centerY = reshape(calibrationTable.center_Y,4,8).';
+        centerX = reshape(calibrationTable.center_X,8,4).';
+        centerY = reshape(calibrationTable.center_Y,8,4).';
         CenterPositions = cat(3,centerX,centerY);
         radii = calibrationTable.radii;
         disp('Select one image file to test the position calibration.');

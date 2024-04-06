@@ -69,7 +69,8 @@ nameList = {'1um Al', '2.5um Al', '2um Mylar', '1um Mylar'};
 % cLimList = {[0 1],[0 1.8],[0 1],[0 1]};
 % cLimList = {[0 1],[0 1.8],[0 0.8],[0 0.5]};
 % cLimList = {[0 1],[0 1.8],[0 0.8],[0 0.2]};
-cLimList = {[0 0.4],[0 1],[0 0.4],[0 0.2]};
+% cLimList = {[0 0.4],[0 1],[0 0.4],[0 0.2]};
+cLimList = {[0 0.4],[0 6],[0 0.4],[0 0.2]};
 
 % 負の要素を0で置換
 negativeEE = find(EE<0);
@@ -106,7 +107,7 @@ for i = 1:4
     % plot(magAxisList.z(:,t_idx),magAxisList.r(:,t_idx),'wo','LineWidth',3);
     % plot(xPointList.z(t_idx),xPointList.r(t_idx),'wx','LineWidth',3);
     hold off;
-    xlim([-0.02,0.02]);ylim([0.2,0.3]);
+    % xlim([-0.02,0.02]);ylim([0.2,0.3]);
     title(string(nameList(i)));
 end
 

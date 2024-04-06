@@ -30,7 +30,10 @@ calibration = 116.6647; % calibration factor for TF coil
 % rgw2txt(date_str,'mag_probe');
 % rgw2txt(date_str);
 
-rgw2txt_shot(date_str,shot_str,directory_rogo);
+% rgw2txt_shot(date_str,shot_str,directory_rogo);
+
+current_folder = strcat(directory_rogo,date_str,'/');
+path = strcat(current_folder,date_str,shot_str,'.rgw');
 
 if ~isfile(path)
     disp(strcat('No such file: ',path));
@@ -43,7 +46,8 @@ elseif aquisition_rate * time_step < 1
     return
 end
     
-data = readmatrix(path);
+% data = readmatrix(path);
+data = readmatrix(path,"FileType","text");
 step = aquisition_rate * time_step;
 x = t_start * aquisition_rate : step : t_end * aquisition_rate;
 I_TF = data(x,1+2)*calibration;

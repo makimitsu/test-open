@@ -214,6 +214,7 @@ dt = 4;
      % ポロイダル磁場ベースでのプロット
      % Bp = sqrt((data2D.Br(:,:,i)).^2+(data2D.Bz(:,:,i)).^2);
      % contourf(grid2D.zq(1,:),grid2D.rq(:,1),Bp,30,'LineStyle','none');clim([0,0.02]);
+     % contourf(grid2D.zq(1,:),grid2D.rq(:,1),abs(data2D.Bt(:,:,i)./data2D.Bz(:,:,i)),30,'LineStyle','none');clim([-1,1]);
      % sepa = zeros(size(data2D.psi(:,:,i)));
      % x_psi = xPointList.psi(i);
      % sepa(((data2D.psi(:,:,i)<=x_psi+5e-4&data2D.psi(:,:,i)>=x_psi-5e-5)|(data2D.psi(:,:,i)<=x_psi*1.1&data2D.psi(:,:,i)>=x_psi*0.9)))=1;
