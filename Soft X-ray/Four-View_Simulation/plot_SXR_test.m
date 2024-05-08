@@ -2,13 +2,9 @@ function plot_SXR_test()
 
 NL = false;
 
-N_projection_new = 80;
-N_grid_new = 100;
-% N_projection_new = 40;
-% N_grid_new = 50;
-
-% 'econ'の有無で実行時間比較
-% 基本N_projection>N_gridなので'econ'でいい
+% 再構成条件の定義
+N_projection_new = 80; %投影数＝視線数の平方根
+N_grid_new = 100; %グリッド数（再構成結果の画素数の平方根）
 
 % 再構成計算に必要なパラメータを計算するなら読み込む、しない場合も範囲に関しては読み込む
 filepath = '/Users/shinjirotakeda/Documents/GitHub/test-open/Soft X-ray/Four-View_Simulation/parameters.mat';
@@ -30,15 +26,17 @@ else
 end
     
 % number = (t-start)/interval+1;
-plot_flag = false;
-% [~,Iwgn1] = Assumption(N_projection,gm2d1,true);
-% [~,Iwgn2] = Assumption(N_projection,gm2d2,false);
-% [~,Iwgn3] = Assumption(N_projection,gm2d3,false);
-% [~,Iwgn4] = Assumption(N_projection,gm2d4,false);
-[~,Iwgn1] = Assumption_2(N_projection,gm2d1,true);
-[~,Iwgn2] = Assumption_2(N_projection,gm2d2,false);
-[~,Iwgn3] = Assumption_2(N_projection,gm2d3,false);
-[~,Iwgn4] = Assumption_2(N_projection,gm2d4,false);
+plot_flag = true;
+% ファントムテスト用の画像を準備（4視点分）
+[~,Iwgn1] = Assumption(N_projection,gm2d1,true);
+[~,Iwgn2] = Assumption(N_projection,gm2d2,false);
+[~,Iwgn3] = Assumption(N_projection,gm2d3,false);
+[~,Iwgn4] = Assumption(N_projection,gm2d4,false);
+% % こっちを使う時は N_projection_new = 80, N_grid_new = 100
+% [~,Iwgn1] = Assumption_2(N_projection,gm2d1,true);
+% [~,Iwgn2] = Assumption_2(N_projection,gm2d2,false);
+% [~,Iwgn3] = Assumption_2(N_projection,gm2d3,false);
+% [~,Iwgn4] = Assumption_2(N_projection,gm2d4,false);
 EE1 = clc_distribution(M,K,gm2d1,U1,s1,v1,Iwgn1,plot_flag,NL);
 EE2 = clc_distribution(M,K,gm2d2,U2,s2,v2,Iwgn2,plot_flag,NL);
 EE3 = clc_distribution(M,K,gm2d3,U3,s3,v3,Iwgn3,plot_flag,NL);

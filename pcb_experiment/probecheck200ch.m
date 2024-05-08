@@ -13,14 +13,14 @@ pathname.save=getenv('savedata_path');%outputデータ保存先
 pathname.rawdata38=getenv('rawdata038_path');%dtacq a038のrawdataの保管場所
 pathname.woTFdata=getenv('woTFdata_path');%rawdata（TFoffset引いた）の保管場所
 
-pathname.rawdata='/Users/yunhancai/Google Drive/Data/pcb/raw';%dtacqのrawdataの保管場所
+pathname.rawdata=getenv('rawdata_path'); %保存先
 
 %%%%実験オペレーションの取得
 %直接入力の場合
 dtacqlist=39;
-shotlist=918;%【input】dtacqの保存番号
+shotlist=1836;%【input】dtacqの保存番号
 tfshotlist=0;
-date = 230217;%【input】計測日
+date = 230707;%【input】計測日
 n=numel(shotlist);%計測データ数
 
 % %磁気面出す場合は適切な値を入力、磁場信号のみプロットする場合は変更不要
@@ -105,10 +105,10 @@ ok_bt([4 5 6 7 8 9 10 15 21 27 30 42 43 49 53 69 84 87 92 94 95 96 97 98 99 100]
 %生信号描画用パラメータ
 r = 5;%プローブ本数＝グラフ出力時の縦に並べる個数
 col = 10;%グラフ出力時の横に並べる個数
-y_upper_lim = 0.1;%3e-3;%0.1;%縦軸プロット領域（b_z上限）
-y_lower_lim = -0.1;%3e-3;%-0.1;%縦軸プロット領域（b_z下限）
-t_start=350;%430;%455;%横軸プロット領域（開始時間）
-t_end=600;%550;%横軸プロット領域（終了時間）
+y_upper_lim = 0.4;%3e-3;%0.1;%縦軸プロット領域（b_z上限）
+y_lower_lim = -0.4;%3e-3;%-0.1;%縦軸プロット領域（b_z下限）
+t_start=1;%430;%455;%横軸プロット領域（開始時間）
+t_end=1000;%550;%横軸プロット領域（終了時間）
 % r_ch=col1+col2;%r方向から挿入した各プローブのチャンネル数
 
 f1=figure;

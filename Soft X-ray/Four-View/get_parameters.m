@@ -3,18 +3,18 @@ function [] = get_parameters(N_projection,N_grid,filepath)
 % filepath = '/Users/shinjirotakeda/Documents/GitHub/test-open/Soft X-ray/Four-View_Simulation/parameters.mat';
 
 % 視線の分布、重み行列の作成
-zhole1=40;zhole2=-40;
-zmin1=-240;zmax1=320;zmin2=-320;zmax2=240;
+zhole1=40;zhole2=-40;                                  
+zmin1=-240;zmax1=320;zmin2=-320;zmax2=240;             
 rmin=55;rmax=375;
-range = [zmin1,zmax1,zmin2,zmax2,rmin,rmax];
-l1 = MCPLine_up(N_projection,zhole1,false);
-gm2d1 = LineProjection(l1,N_grid,zmin1,zmax1,rmin,rmax,false);
-l2 = MCPLine_up(N_projection,zhole2,false);
-gm2d2 = LineProjection(l2,N_grid,zmin2,zmax2,rmin,rmax,false);
-l3 = MCPLine_down(N_projection,zhole1,false);
-gm2d3 = LineProjection(l3,N_grid,zmin1,zmax1,rmin,rmax,false);
-l4 = MCPLine_down(N_projection,zhole2,false);
-gm2d4 = LineProjection(l4,N_grid,zmin2,zmax2,rmin,rmax,false);
+range = [zmin1,zmax1,zmin2,zmax2,rmin,rmax];            
+l1 = MCPLine_up(N_projection,zhole2,false);
+gm2d1 = LineProjection(l1,N_grid,zmin2,zmax2,rmin,rmax,false,true); 
+l2 = MCPLine_down(N_projection,zhole2,false);
+gm2d2 = LineProjection(l2,N_grid,zmin2,zmax2,rmin,rmax,false,false);
+l3 = MCPLine_up(N_projection,zhole1,false);
+gm2d3 = LineProjection(l3,N_grid,zmin1,zmax1,rmin,rmax,false,true);
+l4 = MCPLine_down(N_projection,zhole1,false);
+gm2d4 = LineProjection(l4,N_grid,zmin1,zmax1,rmin,rmax,false,false);
 
 % ラプラシアン行列の計算と特異値分解
 C = Laplacian(N_grid);
@@ -67,12 +67,15 @@ k = find(R<L);
 end
 
 function l = MCPLine_up(N_projection,Z_hole,plot_flag)
-d_hole =24.4; % distance between the hole and the MCP
-r_mcp=10;  %radius of the MCP plate
-% Y_hole=425.24;  X_hole=195.13;          % position of the hole
-Y_hole = 427.85+12; 
-X_hole = 209.62; 
-% X_hole_new_down = X_hole_new_up - 64;
+d_hole = 24.4; % distance between the hole and the MCP
+r_mcp=10;  % radius of the MCP plate
+
+% Y_hole = 427.85+12; 
+Y_hole = 413.24+12; %?
+
+% X_hole = 209.62;
+X_hole = 208.13; %?
+
 Y_initial=Y_hole+d_hole;  X_initial=X_hole-r_mcp;  Z_initial=Z_hole+r_mcp;    %CCD position
 X_end=X_hole+r_mcp;      Z_end=Z_hole-r_mcp;
 
@@ -89,7 +92,9 @@ r_device = 375;
 ll(N_projection,N_projection) = struct('x',[],'y',[],'z',[]);
 if plot_flag
     f1=figure;
+    f1.Name = "Upper MCP Line - Lightlines";
     f2=figure;
+    f2.Name = "Upper MCP Line - 視線の行列";
 end
 for i=1:N_projection
     for j=1:N_projection
@@ -137,10 +142,13 @@ function l = MCPLine_down(N_projection,Z_hole,plot_flag)
 d_hole =24.4; % distance between the hole and the MCP
 r_mcp=10;  %radius of the MCP plate
 % Y_hole=425.24;  X_hole=195.13;          % position of the hole
-Y_hole = 427.85+12; 
-% X_hole = 209.62; 
-% X_hole_new_down = X_hole_new_up - 64;
-X_hole = 145.62;
+
+% Y_hole = 427.85+12; %
+Y_hole = 413.24+12; %?
+
+% X_hole = 145.62; 
+X_hole = 144.13; %?
+
 Y_initial=Y_hole+d_hole;  X_initial=X_hole-r_mcp;  Z_initial=Z_hole+r_mcp;    %CCD position
 X_end=X_hole+r_mcp;      Z_end=Z_hole-r_mcp;
 
@@ -157,11 +165,13 @@ r_device = 375;
 ll(N_projection,N_projection) = struct('x',[],'y',[],'z',[]);
 if plot_flag
     f1=figure;
+    f1.Name = "Lower MCP Line - Lightlines";
     f2=figure;
+    f2.Name = "Lower MCP Line - 視線の行列";
 end
 for i=1:N_projection
     for j=1:N_projection
-        ll(i,j).y=Y(j):-10:-400;
+        ll(i,j).y=Y(j):-10:-400; %大から小
         length = numel(ll(i,j).y);
         ll(i,j).x=(ll(i,j).y-Y_hole)*(X(i)-X_hole)/(Y(j)-Y_hole)+X_hole;
         ll(i,j).z=(ll(i,j).y-Y_hole)*(Z(j)-Z_hole)/(Y(j)-Y_hole)+Z_hole;
@@ -267,7 +277,7 @@ if plot_flag
 end
 end
 
-function gm2d = LineProjection(l,N_grid,zmin,zmax,rmin,rmax,plot_flag)
+function gm2d = LineProjection(l,N_grid,zmin,zmax,rmin,rmax,plot_flag,up_flag)
 % rmin=70;rmax=330;
 % rmin=55;rmax=375;
 % rmin=70;rmax=280;
@@ -281,6 +291,13 @@ gm2d = zeros(N_p,N_g^2);
 if plot_flag
     f1=figure;
     f2=figure;
+    if up_flag
+        f1.Name = "Upper Line Projection";
+        f2.Name = "Upper Line Projection";
+    else
+        f1.Name = "Lower Line Projection";
+        f2.Name = "Lower Line Projection";
+    end
 end
 
 for i = 1:N_p

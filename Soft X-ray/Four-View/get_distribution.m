@@ -3,6 +3,7 @@ function EE = get_distribution(M,K,gm2d,U,s,v,VectorImage,plot_flag,NL)
 Z=U'*VectorImage.';
 
 gmin=-15;gmax=15;
+% gmin=-30;gmax=0;
 lg_gamma=gmin:1:gmax;
 l_g = numel(lg_gamma);
 gamma=10.^(lg_gamma);
@@ -21,7 +22,8 @@ for n=1:l_g
 end
 
 if plot_flag
-    figure;plot(lg_gamma,Vgamma,'*');
+    figure;semilogy(lg_gamma,Vgamma,'*');
+    % figure;plot(lg_gamma,Vgamma,'*');
     xlabel('logγ');
     ylabel('GCV');
 end
@@ -58,9 +60,14 @@ if NL
         E(i)=sum(E1);
     end
     EE = E;
+    EE(EE<1e-5) = -1;
+    % ここで10^-5未満を0に設定？
     W(diag_idx) = 1./EE;
-    W(W==Inf) = -1;
+    % W(W==Inf) = -1;
     W(W<0) = max(W, [], 'all');
+    % if plot_flag
+    %     figure;histogram(W(diag_idx));
+    % end
     EE = (H' * H + (M * gamma) .* (C'* W * C))^(-1) * H' * G'; 
 
     EE = reshape(EE, sqrt(K), sqrt(K));

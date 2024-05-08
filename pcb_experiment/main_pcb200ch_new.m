@@ -17,9 +17,9 @@ pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所
 DOCID='1wG5fBaiQ7-jOzOI-2pkPAeV6SDiHc_LrOdcbWlvhHBw';%スプレッドシートのID
 T=getTS6log(DOCID);
 node='date';
-date=230428;
+date=230707;
 T=searchlog(T,node,date);
-IDXlist= 20; %[5:50 52:55 58:59];%[4:6 8:11 13 15:19 21:23 24:30 33:37 39:40 42:51 53:59 61:63 65:69 71:74];
+IDXlist= 6; %[5:50 52:55 58:59];%[4:6 8:11 13 15:19 21:23 24:30 33:37 39:40 42:51 53:59 61:63 65:69 71:74];
 n_data=numel(IDXlist);%計測データ数
 shotlist=T.a039(IDXlist);
 tfshotlist=T.a039_TF(IDXlist);
@@ -180,7 +180,7 @@ if isstruct(grid2D)==0 %もしdtacqデータがない場合次のloopへ(デー�
 end
 
 figure('Position', [0 0 1500 1500],'visible','on');
-start=20;
+start=50;
 dt = 4;
 %  t_start=470+start;
  for m=1:16 %図示する時間
