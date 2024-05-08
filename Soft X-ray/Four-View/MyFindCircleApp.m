@@ -96,7 +96,12 @@ if doCalculation
     CalibrationImage = imadjust(CalibrationImage);% imagesc(CalibrationImage);title(CalibrationImage,'ContrastAdjusted<WienerFiltered<RawImage');
     % 円を検出します．range,sensitivity,method がパラメータです．
     % この画像なら，range=[70,~], sensitivity=0.995がよさそう．[85,~]でも検知するけど，ちょっと大きめの円を取ってしまう
-    [centers,radii] = imfindcircles(CalibrationImage,[65,75],'Sensitivity',0.995,"Method","twostage");
+    if date == 230316
+        radiusRange = [85,105];
+    else    
+        radiusRange = [65,75];
+    end
+    [centers,radii] = imfindcircles(CalibrationImage,radiusRange,'Sensitivity',0.995,"Method","twostage");
     % 検出した円をnumber個だけ描画します．このとき，numberは32個の円が全て含まれる程度に大きく設定します．
     % numberに許される最大値はnumel(radii)です．優先度の低い円を考慮から外すためにnumberをある程度小さくする必要があります．
     % こちらを整理前のcentersとします．
@@ -106,13 +111,14 @@ if doCalculation
     % 中心が近く同じ円を指すと判断されるものをgroupnumberでまとめます
     centers = [centers(1:number,:) radii(1:number) zeros([number,1])];
     groupnumber = 1;
+    r_min = min(radii(1:number));
     for i=1:number
-        x1=centers(i,1);y1=centers(i,2);
+        x1=centers(i,1);y1=centers(i,2);%r1=centers(i,3);
         if centers(i,4) == 0
             for j=i:number
                 x2=centers(j,1);y2=centers(j,2);
                 r = sqrt((x1-x2)^2+(y1-y2)^2);
-                if r < 80
+                if r < 2*r_min%100
                     centers(j,4) = groupnumber;
                 end
             end

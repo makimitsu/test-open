@@ -70,7 +70,10 @@ nameList = {'1um Al', '2.5um Al', '2um Mylar', '1um Mylar'};
 % cLimList = {[0 1],[0 1.8],[0 0.8],[0 0.5]};
 % cLimList = {[0 1],[0 1.8],[0 0.8],[0 0.2]};
 % cLimList = {[0 0.4],[0 1],[0 0.4],[0 0.2]};
-cLimList = {[0 0.4],[0 6],[0 0.4],[0 0.2]};
+% cLimList = {[0 0.4],[0 6],[0 0.4],[0 0.2]};
+% cLimList = {[0 1],[0 2],[0 0.3],[0 0.15]};
+% cLimList = {[0 1],[0 0.5],[0 0.3],[0 0.15]};
+cLimList = {[0 1.5],[0 0.5],[0 1],[0 1.5]};
 
 % 負の要素を0で置換
 negativeEE = find(EE<0);
@@ -87,11 +90,12 @@ for i = 1:4
     EE_plot = EE(r_range,z_range,i);
     p = positionList(i);
     subplot(2,2,p);
-    [~,h] = contourf(SXR_mesh_z,SXR_mesh_r,EE_plot,20);
+    cRange = cell2mat(cLimList(i));
+    [~,h] = contourf(SXR_mesh_z,SXR_mesh_r,EE_plot,linspace(cRange(1),cRange(2),20));clim(cRange);
+    % [~,h] = contourf(SXR_mesh_z,SXR_mesh_r,EE_plot,20);
     colormap('turbo');
     h.LineStyle = 'none';
     c=colorbar;c.Label.String='Intensity [a.u.]';c.FontSize=18;
-    clim(cell2mat(cLimList(i)));
     hold on
     if show_localmax
         localmax_idx = imregionalmax(EE_plot);
@@ -107,7 +111,7 @@ for i = 1:4
     % plot(magAxisList.z(:,t_idx),magAxisList.r(:,t_idx),'wo','LineWidth',3);
     % plot(xPointList.z(t_idx),xPointList.r(t_idx),'wx','LineWidth',3);
     hold off;
-    % xlim([-0.02,0.02]);ylim([0.2,0.3]);
+    % xlim([-0.05,0.05]);ylim([0.18,0.32]);
     title(string(nameList(i)));
 end
 

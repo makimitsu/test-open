@@ -3,12 +3,16 @@ pathFirstHalf = '/Users/shinjirotakeda/Library/CloudStorage/OneDrive-TheUniversi
 pathLastHalf = '/3.mat';
 
 nShot_25_1 = 21;
+nShot_25_2 = 19;
+nShot_25_3 = 19;
+nShot_25_4 = 19;
 nShot_30_1 = 14;
+nShot_30_2 = 24;
 nShot_30_3 = 24;
-nShot_30_4 = 13;
+nShot_30_4 = 23;
 nShot_35_1 = 11;
-nShot_35_3 = 12;
-nShot_35_4 = 7;
+nShot_35_3 = 25;
+nShot_35_4 = 12;
 nShot_40_1 = 30;
 nShot_40_2 = 29;
 nShot_40_3 = 25; %or29
@@ -16,11 +20,11 @@ nShot_40_3 = 25; %or29
 nShot_40_4 = 12;
 
 mPath_25_1 = strcat(pathFirstHalf,num2str(nShot_25_1),pathLastHalf);
-% mPath_25_2 = mPath_25_1;
-% mPath_25_3 = mPath_25_1;
-% mPath_25_4 = mPath_25_1;
+mPath_25_2 = strcat(pathFirstHalf,num2str(nShot_25_2),'/2.mat');
+mPath_25_3 = strcat(pathFirstHalf,num2str(nShot_25_3),'/2.mat');
+mPath_25_4 = strcat(pathFirstHalf,num2str(nShot_25_4),pathLastHalf);
 mPath_30_1 = strcat(pathFirstHalf,num2str(nShot_30_1),pathLastHalf);
-% mPath_30_2 = mPath_30_1;
+mPath_30_2 = strcat(pathFirstHalf,num2str(nShot_30_2),pathLastHalf);
 mPath_30_3 = strcat(pathFirstHalf,num2str(nShot_30_3),pathLastHalf);
 mPath_30_4 = strcat(pathFirstHalf,num2str(nShot_30_4),pathLastHalf);
 mPath_35_1 = strcat(pathFirstHalf,num2str(nShot_35_1),pathLastHalf);
@@ -32,12 +36,18 @@ mPath_40_2 = strcat(pathFirstHalf,num2str(nShot_40_2),pathLastHalf);
 mPath_40_3 = strcat(pathFirstHalf,num2str(nShot_40_3),pathLastHalf);
 mPath_40_4 = strcat(pathFirstHalf,num2str(nShot_40_4),pathLastHalf);
 
-load(mPath_25_1,'EE1','EE2','EE3','EE4');
-EE_25_1=EE1;EE_25_2=EE2;EE_25_3=EE3;EE_25_4=EE4;
+% load(mPath_25_1,'EE1','EE2','EE3','EE4');
+% EE_25_1=EE1;EE_25_2=EE2;EE_25_3=EE3;EE_25_4=EE4;
+load(mPath_25_1,'EE1');EE_25_1=EE1;
+load(mPath_25_2,'EE2');EE_25_2=EE2;
+load(mPath_25_3,'EE3');EE_25_3=EE3;
+load(mPath_25_4,'EE4');EE_25_4=EE4;
 EE_25 = cat(3,EE_25_1,EE_25_2,EE_25_3,EE_25_4);
 
-load(mPath_30_1,'EE1','EE2');
-EE_30_1=EE1;EE_30_2=EE2;
+% load(mPath_30_1,'EE1','EE2');
+% EE_30_1=EE1;EE_30_2=EE2;
+load(mPath_30_1,'EE1');EE_30_1=EE1;
+load(mPath_30_2,'EE2');EE_30_2=EE2;
 load(mPath_30_3,'EE3');EE_30_3=EE3;
 load(mPath_30_4,'EE4');EE_30_4=EE4;
 EE_30 = cat(3,EE_30_1,EE_30_2,EE_30_3,EE_30_4);
@@ -91,16 +101,16 @@ SXRdata25.range = range;
 SXRdata30.range = range;
 SXRdata35.range = range;
 SXRdata40.range = range;
-SXRdata25.t = t;
+SXRdata25.t = 465;
 SXRdata30.t = t;
 SXRdata35.t = t;
 SXRdata40.t = t;
 
-f = figure;f.Units = 'normalized';f.Position = [0.1,0.2,0.8,0.8];
-plot_save_sxr(PCBdata25,SXR,SXRdata25);
+% f = figure;f.Units = 'normalized';f.Position = [0.1,0.2,0.8,0.8];
+% plot_save_sxr(PCBdata25,SXR,SXRdata25);
 f = figure;f.Units = 'normalized';f.Position = [0.1,0.2,0.8,0.8];
 plot_save_sxr(PCBdata30,SXR,SXRdata30);
 f = figure;f.Units = 'normalized';f.Position = [0.1,0.2,0.8,0.8];
 plot_save_sxr(PCBdata35,SXR,SXRdata35);
-f = figure;f.Units = 'normalized';f.Position = [0.1,0.2,0.8,0.8];
-plot_save_sxr(PCBdata40,SXR,SXRdata40);
+% f = figure;f.Units = 'normalized';f.Position = [0.1,0.2,0.8,0.8];
+% plot_save_sxr(PCBdata40,SXR,SXRdata40);

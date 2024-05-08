@@ -49,8 +49,14 @@ dz = abs(zq_new(1,1)-zq_new(1,2));
 % [~,xpoint] = get_axis_x(grid2D,data2D,467);
 % x_e(1,1) = knnsearch(rq(:,1),xpoint.r);
 % x_e(2,1) = knnsearch(zq(1,:).',xpoint.z);
-x_e(1,1) = knnsearch(rq_new(:,1),xpoint.r);
-x_e(2,1) = knnsearch(zq_new(1,:).',xpoint.z);
+% x_e(1,1) = knnsearch(rq_new(:,1),xpoint.r);
+% x_e(2,1) = knnsearch(zq_new(1,:).',xpoint.z);
+
+Bp = sqrt(Br_new.^2+Bz_new.^2);
+[~,I] = min(Bp,[],'all');
+[r_ind, z_ind] = ind2sub(size(Bt_new),I);
+x_e(1,1) = r_ind;
+x_e(2,1) = z_ind;
 
 % 1fsごとにステップ
 for i = 2:1000
@@ -74,7 +80,7 @@ for i = 2:1000
         maxStep = i;
         break
     else
-        gfr_new = Bt_new(r_idx_new,z_idx_new)/sqrt(Br_new(r_idx_new,z_idx_new)^2+Bz_new(r_idx_new,z_idx_new));
+        gfr_new = Bt_new(r_idx_new,z_idx_new)/Bp(r_idx_new,z_idx_new);
         if gfr_new <= 0.3
             maxStep = i;
             break
@@ -89,3 +95,10 @@ end
 step = 1:maxStep;
 figure;
 plot(step,vecnorm(v_e(:,1:maxStep)));
+
+figure;
+plot(z_new(x_e(2,1:maxStep-1)),r_new(x_e(1,1:maxStep-1)));
+
+Ee = 0.5*me*v_e.^2./e;
+figure;
+plot(step,vecnorm(Ee(:,1:maxStep)));

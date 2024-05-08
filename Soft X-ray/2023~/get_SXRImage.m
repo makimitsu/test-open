@@ -7,8 +7,8 @@ function [VectorImage1,VectorImage2] = get_SXRImage(date,number,SXRfilename,filt
 % % 画像を切り取る
 N_projection = 80;
 % VectorImages = CutImage(date,shot,N_projection/230,false);
-CheckFlag = true;
-% CheckFlag = false;
+% CheckFlag = true;
+CheckFlag = false;
 VectorImages = CutImage(date,N_projection,CheckFlag,SXRfilename,filter);
 VectorImages1 = squeeze(VectorImages(1,:,:));
 VectorImages2 = squeeze(VectorImages(2,:,:));

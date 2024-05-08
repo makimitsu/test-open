@@ -226,7 +226,7 @@ dt = 4;
     % contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bt(:,:,i),-100e-3:0.5e-3:100e-3,'LineStyle','none')
     % contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Jt(:,:,i),30,'LineStyle','none');clim([-0.8*1e+6,0]);%clim([-0.8*1e+6,0.8*1e+6]) %jt%カラーバーの軸の範囲
     % contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Et(:,:,i),20,'LineStyle','none');clim([-500,400])%Et
-    % contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Bt_th(:,:,i),20,'LineStyle','none')
+    % contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Bt_th(:,:,i),20,'LineStyle','none');clim([0,0.3])%Bt
     colormap(jet)
     axis image
     axis tight manual
