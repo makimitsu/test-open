@@ -56,7 +56,7 @@ doCheck = false;
 % end
 
 % 位置情報ファイルからファイバーの位置（＋半径）を取得
-positionPath = '/Users/shinjirotakeda/Documents/GitHub/test-open/Soft X-ray/Four-View/fiberPositions.xlsx';
+positionPath = '/Users/shohgookazaki/Documents/GitHub/test-open/Soft X-ray/Four-View/fiberPositions.xlsx';
 positionData = readmatrix(positionPath,'Sheet',num2str(date),'Range','C2:E33');
 Center = zeros(4,8,2);
 for i = 1:4
