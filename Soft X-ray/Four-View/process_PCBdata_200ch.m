@@ -22,11 +22,12 @@ end
 
 if doCalculation
     %較正係数のバージョンを日付で判別
-    sheets = sheetnames('coeff200ch.xlsx');
-    sheets = str2double(sheets);
+    % sheets = sheetnames('coeff200ch.xlsx');
+    % sheets = str2double(sheets);
+    sheets = str2double(sheetnames('coeff200ch.xlsx'));
     sheet_date=max(sheets(sheets<=date));
     C = readmatrix('coeff200ch.xlsx','Sheet',num2str(sheet_date));
-    C_200ch = C(1:192,:);
+    C_200ch = C(1:192,:); % なんでdtacq_chが192までで193までじゃない？
     r_shift = 0.00;
     ok = logical(C_200ch(:,14));
     dtacq_num_list = C_200ch(:,1);

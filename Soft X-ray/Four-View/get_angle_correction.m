@@ -31,7 +31,7 @@ end
 
 D1 = reshape(D,1,[]);
 D1 = unique(D1);
-filename = '/Users/shinjirotakeda/Library/CloudStorage/OneDrive-TheUniversityofTokyo/研究資料/機器マニュアル/MCP/Default Dataset.csv';
+filename = '/Users/shohgookazaki/Documents/GitHub/test-open/Soft X-ray/MCP/Default Dataset.csv';
 Data = readmatrix(filename);
 Angle = Data(:,1);
 Sensitivity = Data(:,2);

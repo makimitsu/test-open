@@ -23,6 +23,11 @@ else
 end
 
 dirPath = getenv('SXR_MATRIX_DIR');
+checkFolder = strcat(dirPath, '/',options,'/',num2str(date));
+if exist(checkFolder, 'dir') ~=7 % フォルダがなかったら作る
+    mkdir(checkFolder);
+end
+
 matrixFolder = strcat(dirPath,'/',options,'/',num2str(date),'/shot',num2str(shot));
 if exist(matrixFolder,'dir') == 0
     doCalculation = true;
