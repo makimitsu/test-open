@@ -32,7 +32,7 @@ matrixFolder = strcat(dirPath,'/',options,'/',num2str(date),'/shot',num2str(shot
 if exist(matrixFolder,'dir') == 0
     doCalculation = true;
     mkdir(matrixFolder);
-elseif length(dir(matrixFolder))-2 ~= 8 %フォルダが存在しても全結果がない場合は計算する
+elseif length(dir(matrixFolder))-2 ~= 8 %フォルダが存在しても全結果がない場合は計算する % なぜ-2で-1じゃないの
     doCalculation = true;
 else
     doCalculation = false; 

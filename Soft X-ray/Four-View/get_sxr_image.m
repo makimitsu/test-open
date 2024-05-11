@@ -54,9 +54,13 @@ doCheck = false;
 % else
 %     [Center,IW] = find_fibers2(calibrationImage,[65,75]);
 % end
-
 % 位置情報ファイルからファイバーの位置（＋半径）を取得
 positionPath = '/Users/shohgookazaki/Documents/GitHub/test-open/Soft X-ray/Four-View/fiberPositions.xlsx';
+[~, sheetNames] = xlsfinfo(positionPath);
+sheetExists = ismember(num2str(date), sheetNames);
+if sheetExists == 0
+    run("MyFindCircleApp.m");
+end
 positionData = readmatrix(positionPath,'Sheet',num2str(date),'Range','C2:E33');
 Center = zeros(4,8,2);
 for i = 1:4

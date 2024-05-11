@@ -91,6 +91,8 @@ SXR.show_localmax = false;
 % doFilter = true;
 % doNLR = false; %do non-linear reconstruction
 
+copyFolderIfNotExist(strcat(getenv('SXR_IMAGE_DIR'),'/',num2str(date)), strcat(getenv('NIFS_path'),'/',num2str(date)));
+
 for i=1:n_data
     disp(strcat('(',num2str(i),'/',num2str(n_data),')'));
     % dtacq_num=dtacqlist;
