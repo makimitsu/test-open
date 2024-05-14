@@ -24,9 +24,10 @@ switch IDSP.date
         savename.nablaB = [pathname.mat,'/nablaB/','230828_a039_2301_', num2str(plot_time - 2), '_1_5.mat'];
     case 230830
         savename.ExB = [pathname.mat,'/ExB/','230830_shot11-60-a039_2437_' , num2str(plot_time - 2), '_1_5.mat'];
-        savename.magline = [pathname.mat,'/magline/','230830_a039_2437_', num2str(plot_time - 2), '_1_5.mat'];
         savename.curve = [pathname.mat,'/curve/','230830_a039_2437_', num2str(plot_time - 2), '_1_5.mat'];
         savename.nablaB = [pathname.mat,'/nablaB/','230830_a039_2437_', num2str(plot_time - 2), '_1_5.mat'];
+        savename.magline = [pathname.mat,'/magline/','230830_a039_2437_', num2str(plot_time - 2), '_1_5.mat'];
+        savename.contop = [pathname.mat,'/contourtop/','230830_a039_2437_', num2str(plot_time - 2), '_1_5.mat'];
 end
 
 IDSP.n_CH = 28;%【input】IDSPファイバーCH数(28)
@@ -38,18 +39,20 @@ cal_type = 'ionflow';%【input】IDSP計算法('ionflow','ionvdist')
 ExB_mean = true;
 nablaB_mean = true;
 curve_mean = true;
-magline_mean = true;
-magpresplot = 'Pz';%【input】プロット種類('Pr','Pz','Pt',Pall)
+magline_mean = false;
+contop_mean = true;
+magpresplot = 'Pz';%【input】プロット種類('Pr','Pz','Pt','Pzt','Pall')
 magpres_mean = true;
 single_range = [1:4 6 7];%【input】プロットCH([1:4 7])
 wav_range = [1:12 16:21];%【input】プロットr([1:21],[1:12 19:21])
 plot_single = false;%【input】IDSPシングルショットをプロット
-plot_WAV = false;%【input】IDSP重み付き平均をプロット
-plot_VExB = false;%【input】ExBをプロット
-plot_VnablaB = true;%【input】∇B driftをプロット
-plot_Vcurve = true;%【input】curve driftをプロット
+plot_WAV = true;%【input】IDSP重み付き平均をプロット
+plot_VExB = true;%【input】ExBをプロット
+plot_VnablaB = false;%【input】∇B driftをプロット
+plot_Vcurve = false;%【input】curve driftをプロット
 plot_Vmagline = false;%【input】磁力線ドリフトをプロット
-plot_magpres = false;%【input】磁気圧をプロット
+plot_Vcontop = false;%【input】磁力線ドリフトをプロット
+plot_magpres = true;%【input】磁気圧をプロット
 
 %------IDSP詳細設定【input】------
 plot_fit = false;%【input】ガウスフィッティングを表示(true,false)
@@ -511,8 +514,6 @@ if plot_Vmagline
             case {470,482}
                 if magline_mean
                     switch profileplot
-                        case 'Vz'
-                            errorbar(Maglinedata2D.rq(:,idx_IDSP_z),Vmagline_z_mean,err_magline_z_y,err_magline_z_y,err_magline_x,err_magline_x,'go','LineWidth',3)
                         case 'Vr'
                             % errorbar(Maglinedata2D.rq(:,idx_IDSP_z),Vmagline_r_mean,err_magline_r_y,err_magline_r_y,err_magline_x,err_magline_x,'go','LineWidth',3)
                             %平均値表示
@@ -526,10 +527,16 @@ if plot_Vmagline
                     end
                 else
                     switch profileplot
-                        case 'Vz'
-                            errorbar(Maglinedata2D.rq(:,idx_IDSP_z),Maglinedata2D.Vmagline_z(:,idx_IDSP_z,idx_magline_time),err_magline_z_y,err_magline_z_y,err_magline_x,err_magline_x,'go','LineWidth',3)
                         case 'Vr'
-                            errorbar(Maglinedata2D.rq(:,idx_IDSP_z),Maglinedata2D.Vmagline_r(:,idx_IDSP_z,idx_magline_time),err_magline_r_y,err_magline_r_y,err_magline_x,err_magline_x,'go','LineWidth',3)
+                            % errorbar(Maglinedata2D.rq(:,idx_IDSP_z),Maglinedata2D.Vmagline_r(:,idx_IDSP_z,idx_magline_time),err_magline_r_y,err_magline_r_y,err_magline_x,err_magline_x,'go','LineWidth',3)
+                            %平均値表示
+                            plot(Maglinedata2D.rq(:,idx_IDSP_z),Maglinedata2D.Vmagline_r(:,idx_IDSP_z,idx_magline_time),'g','LineWidth',3)
+                            hold on
+                            %標準偏差表示
+                            errarea_magline_r_y = err_magline_r_y*ones(size(Maglinedata2D.Vmagline_r(:,idx_IDSP_z,idx_magline_time),1),1);
+                            ar_magline=area(Maglinedata2D.rq(:,idx_IDSP_z),[Maglinedata2D.Vmagline_r(:,idx_IDSP_z,idx_magline_time)-errarea_magline_r_y errarea_magline_r_y+errarea_magline_r_y]);
+                            set(ar_magline(1),'FaceColor','None','LineStyle',':','EdgeColor','g')
+                            set(ar_magline(2),'FaceColor','g','FaceAlpha',0.2,'LineStyle',':','EdgeColor','g')
                     end
                 end
         end
@@ -551,6 +558,60 @@ if plot_Vmagline
     end
 end
 
+if plot_Vcontop
+    if exist(savename.contop,"file")
+        load(savename.contop,'Contopdata')
+        idx_contop_time = knnsearch(Contopdata.trange,plot_time);
+        Vcontop_r_mean = mean(Contopdata.Vcontop_r,2);
+        err_contop_r_y = 3;
+        switch plot_time
+            case {470,482}
+                if contop_mean
+                    switch profileplot
+                        case 'Vr'
+                            % errorbar(Contopdata.rq(:,idx_IDSP_z),Vcontop_r_mean,err_contop_r_y,err_contop_r_y,err_contop_x,err_contop_x,'go','LineWidth',3)
+                            %平均値表示
+                            plot(Contopdata.rq,Vcontop_r_mean,'g','LineWidth',3)
+                            hold on
+                            %標準偏差表示
+                            errarea_contop_r_y = err_contop_r_y*ones(size(Vcontop_r_mean,1),1);
+                            ar_contop=area(Contopdata.rq,[Vcontop_r_mean-errarea_contop_r_y errarea_contop_r_y+errarea_contop_r_y]);
+                            set(ar_contop(1),'FaceColor','None','LineStyle',':','EdgeColor','g')
+                            set(ar_contop(2),'FaceColor','g','FaceAlpha',0.2,'LineStyle',':','EdgeColor','g')
+                    end
+                else
+                    switch profileplot
+                        case 'Vr'
+                            % errorbar(Contopdata.rq(:,idx_IDSP_z),Contopdata.Vcontop_r(:,idx_IDSP_z,idx_contop_time),err_contop_r_y,err_contop_r_y,err_contop_x,err_contop_x,'go','LineWidth',3)
+                            %平均値表示
+                            plot(Contopdata.rq,Contopdata.Vcontop_r(:,idx_contop_time),'g','LineWidth',3)
+                            hold on
+                            %標準偏差表示
+                            errarea_contop_r_y = err_contop_r_y*ones(size(Contopdata.Vcontop_r(:,idx_contop_time),1),1);
+                            ar_contop=area(Contopdata.rq,[Contopdata.Vcontop_r(:,idx_contop_time)-errarea_contop_r_y errarea_contop_r_y+errarea_contop_r_y]);
+                            set(ar_contop(1),'FaceColor','None','LineStyle',':','EdgeColor','g')
+                            set(ar_contop(2),'FaceColor','g','FaceAlpha',0.2,'LineStyle',':','EdgeColor','g')
+                    end
+                end
+        end
+        hold on
+        h = plot(nan,nan,'g-','LineWidth',3);
+        hold on
+        if isempty(hs)
+            hs = h;
+        else
+            hs = [hs h];
+        end
+        if legendStrings == ""
+            legendStrings = "Magnetic Line";
+        else
+            legendStrings = [legendStrings "Magnetic Line"];
+        end
+    else
+        warning([savename.contop, 'does not exist.'])
+    end
+end
+
 if plot_magpres
     if exist(savename.ExB,"file")
         load(savename.ExB,'newPCBdata2D')
@@ -569,9 +630,10 @@ if plot_magpres
         magpres_r_mean = mean(magpres_r_mean,2);
         magpres_t_mean = mean(newPCBdata2D.Bt_ext(:,idx_IDSP_z_min:idx_IDSP_z_max,idx_pcb_time-2:idx_pcb_time+2).^2/(2*mu0),3);
         magpres_t_mean = mean(magpres_t_mean,2);
+        magpres_zt_mean = magpres_z_mean + magpres_t_mean;
         magpres_all_mean = magpres_z_mean + magpres_r_mean + magpres_t_mean;
         yyaxis right
-        err_magpres_z_y = 2E1;
+        err_magpres_z_y = 2E2;
         err_magpres_r_y = 1E1;
         err_magpres_t_y = 3E3;
         err_magpres_x = 0.01;
@@ -585,6 +647,8 @@ if plot_magpres
                             errorbar(newPCBdata2D.rq(:,idx_IDSP_z),magpres_r_mean,err_magpres_r_y,err_magpres_r_y,err_magpres_x,err_magpres_x,'g^','LineWidth',3)
                         case 'Pt'
                             errorbar(newPCBdata2D.rq(:,idx_IDSP_z),magpres_t_mean,err_magpres_t_y,err_magpres_t_y,err_magpres_x,err_magpres_x,'g^','LineWidth',3)
+                        case 'Pzt'
+                            errorbar(newPCBdata2D.rq(:,idx_IDSP_z),magpres_zt_mean,err_magpres_t_y,err_magpres_t_y,err_magpres_x,err_magpres_x,'g^','LineWidth',3)
                         case 'Pall'
                             errorbar(newPCBdata2D.rq(:,idx_IDSP_z),magpres_all_mean,err_magpres_t_y,err_magpres_t_y,err_magpres_x,err_magpres_x,'g^','LineWidth',3)
                     end
@@ -596,6 +660,8 @@ if plot_magpres
                             errorbar(newPCBdata2D.rq(:,idx_IDSP_z),magpres_r,err_magpres_r_y,err_magpres_r_y,err_magpres_x,err_magpres_x,'g^','LineWidth',3)
                         case 'Pt'
                             errorbar(newPCBdata2D.rq(:,idx_IDSP_z),magpres_t,err_magpres_t_y,err_magpres_t_y,err_magpres_x,err_magpres_x,'g^','LineWidth',3)
+                        case 'Pzt'
+                            errorbar(newPCBdata2D.rq(:,idx_IDSP_z),magpres_zt,err_magpres_t_y,err_magpres_t_y,err_magpres_x,err_magpres_x,'g^','LineWidth',3)
                         case 'Pall'
                             errorbar(newPCBdata2D.rq(:,idx_IDSP_z),magpres_all,err_magpres_t_y,err_magpres_t_y,err_magpres_x,err_magpres_x,'g^','LineWidth',3)
                     end
@@ -608,6 +674,8 @@ if plot_magpres
                 ylabel('B_R^2/2\mu_0 [Pa]')
             case 'Pt'
                 ylabel('B_t^2/2\mu_0 [Pa]')
+            case 'Pzt'
+                ylabel('(B_z^2+B_t^2)/2\mu_0 [Pa]')
             case 'Pall'
                 ylabel('B^2/2\mu_0 [Pa]')
         end
@@ -619,9 +687,9 @@ if plot_magpres
             hs = [hs h];
         end
         if legendStrings == ""
-            legendStrings = "Manetic Pressure";
+            legendStrings = "Magnetic Pressure";
         else
-            legendStrings = [legendStrings "Manetic Pressure"];
+            legendStrings = [legendStrings "Magnetic Pressure"];
         end
     else
         warning([savename.ExB, 'does not exist.'])

@@ -46,7 +46,8 @@ for i_t = 1:FIG.tate*FIG.yoko
     xlabel('Z [m]')
     ylabel('R [m]')
     ax = gca;
-    % ax.FontSize = 60;
+    ax.FontSize = 12;
+    view([90 -90])%RZ反転
 end
 
 % switch plot_type
@@ -58,7 +59,6 @@ end
 %         sgtitle('Curvature Drift Vector')
 % end
 
-% view([90 -90])%RZ反転
 % clim([0 1.2E-17])
 % clim([-1E-18 1E-18])
 % xlim([-0.01 0.05])

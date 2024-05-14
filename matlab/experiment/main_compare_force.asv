@@ -5,7 +5,6 @@ run define_path.m
 
 PCB.date = 230830;
 
-CONTOP.ds_rate = 1;
 MAGLINE.ds_rate = 5;
 CURVE.c_width = 5;
 CURVE.ds_rate = 5;
@@ -28,8 +27,8 @@ range.r_max = 0.33;
 FIG.tate = 2;%【input】プロット枚数(縦)
 FIG.yoko = 2.5;%【input】プロット枚数(横)
 FIG.dt = 1;%【input】プロット時間間隔[us]
-cal_type = 'contop';%'contop','magline','curve','ExB','nablaB'
-plot_type = 'V_r';%'V_zr','V_z','V_r','V','F_zr','F_z','F_r','F','scatter'
+cal_type = 'magline';%'magline','curve','ExB','nablaB'
+plot_type = 'V_r';%'V_zr','V_z','V_r','V','F_zr','F_z','F_r','F'
 
 switch PCB.date
     case 230828
@@ -56,14 +55,6 @@ end
 
 
 switch cal_type
-    case 'contop'
-        range.z_min = -0.02;
-        range.z_max = 0.05;
-        range.r_min = 0.06;
-        range.r_cal_max = 0.33;
-        range.r_max = 0.32;
-        [Contopdata] = cal_contourtop_drift(CONTOP,PCB,FIG,pathname,savename,range);
-        plot_contourtop_drift(Contopdata,plot_type,FIG,savename)
     case 'magline'
         range.z_min = -0.05;
         range.z_max = 0.08;

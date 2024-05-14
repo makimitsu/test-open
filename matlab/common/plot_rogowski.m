@@ -1,25 +1,11 @@
-function [] = rogowski_plot(date,shot,ch,calib)
+function [] = plot_rogowski(pathname,date,shot,ch,calib,FIG)
 
 % ch_cal = 1;
 % ch_rogo = 1;
 discharge = 1;
 
-if discharge == 1
-    t_start = 3500;
-    t_end = 6000;
-    p_start = 680;
-    p_end = 700;
-end
-
-if discharge == 2
-    t_start = 1;
-    t_end = 10000;
-    p_start = 4000;
-    p_end = 6000;
-end
-
 % folder_directory_rogo = '/Users/Ryo/mountpoint/';
-folder_directory_rogo = '/Volumes/md0/rogowski/';
+folder_directory_rogo = [pathname.fourier,'/rogowski/'];
 date_str = num2str(date);
 
 if shot < 10
@@ -38,18 +24,24 @@ end
 
 txt_name = strcat(data_dir,'.txt');
 rgw = importdata(txt_name);
-t_ax = rgw.data(t_start:t_end,2);
-% data_cal = rgw.data(t_start:t_end,ch_cal+2);
-data_rogo = rgw.data(t_start:t_end,3:end);
+t_ax = rgw.data(FIG.start*10+1:FIG.end*10+1,2);
+% data_cal = rgw.data(FIG.start:FIG.end,ch_cal+2);
+data_rogo = rgw.data(FIG.start*10+1:FIG.end*10+1,3:end);
 [~,n_ch] = size(data_rogo);
-
+if FIG.smooth > 1
+    smooth_rogo = movmean(data_rogo,FIG.smooth);
+end
 % offset_cal = mean(data_cal(1:50));
 % data_cal = data_cal - offset_cal;
 % data_rogo = data_rogo - mean(data_rogo(1:50,:));
 
 figure('Position', [0 0 800 800],'visible','on');
 for i = ch
-    plot(t_ax,data_rogo(:,i)*calib(i))
+    if FIG.smooth > 1
+        plot(t_ax,smooth_rogo(:,i)*calib(i))
+    else
+        plot(t_ax,data_rogo(:,i)*calib(i))
+    end
     hold on
 end
 % title('TF: Before calibration')
@@ -58,8 +50,9 @@ legendStrings = "CH" + string(ch);
 legend(legendStrings)
 xlabel('us')
 ylabel('V')
-xlim([400 500])
-ylim([-30 50])
+xlim([FIG.start FIG.end])
+% ylim([0 40])
+% ylim([-30 50])
 % savefig('TF_Before')
 % close(f1)
 

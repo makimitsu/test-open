@@ -49,7 +49,7 @@ for m=1:FIG.tate*FIG.yoko
             clim([-500,500])%Et
             c = colorbar;
             c.Label.String = 'E_t [V/m]';
-            
+
         case 'Jt'
             contourf(PCBgrid2D.zq(1,:),PCBgrid2D.rq(:,1),PCBdata2D.Jt(:,:,i),[-1.5e6:2e4:1.5e6],'LineStyle','none')
             colormap(jet)
@@ -63,15 +63,15 @@ for m=1:FIG.tate*FIG.yoko
     % plot(PCBgrid2D.zq(1,squeeze(mid(opoint(:,:,i),:,i))),PCBgrid2D.rq(opoint(:,:,i),1),"bo")
     % plot(PCBgrid2D.zq(1,squeeze(mid(xpoint(:,:,i),:,i))),PCBgrid2D.rq(xpoint(:,:,i),1),"bx")
     hold on
-    for i_r = 1: size(PCBgrid2D.ok_bz_matrix,1)
-        for i_z = 1: size(PCBgrid2D.ok_bz_matrix,2)
-            % if PCBgrid2D.ok_bz_matrix(i_r,i_z) == 1
-                p = plot(PCBgrid2D.zprobepcb(i_z),PCBgrid2D.rprobepcb(i_r),"m+");%測定位置
-                p.LineWidth = 3;
-                p.MarkerSize = 12;
-            % end
-        end
-    end
+    % for i_r = 1: size(PCBgrid2D.ok_bz_matrix,1)
+    %     for i_z = 1: size(PCBgrid2D.ok_bz_matrix,2)
+    %         if PCBgrid2D.ok_bz_matrix(i_r,i_z) == 1
+    %             p = plot(PCBgrid2D.zprobepcb(i_z),PCBgrid2D.rprobepcb(i_r),"m+");%測定位置
+    %             p.LineWidth = 3;
+    %             p.MarkerSize = 12;
+    %         end
+    %     end
+    % end
     % [ok_z,ok_r] = meshgrid(PCBgrid2D.zprobepcb,PCBgrid2D.rprobepcb);
     % p = plot(ok_z,ok_r,"r+");%測定位置
     % p.LineWidth = 3;
