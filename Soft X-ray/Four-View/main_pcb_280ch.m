@@ -1,8 +1,8 @@
 % clear
 % close all
 clearvars -except date IDXlist doCheck
-addpath '/Users/shinjirotakeda/Documents/GitHub/test-open/pcb_experiment'; %getMDSdata.mとcoeff200ch.xlsxのあるフォルダへのパス
-addpath '/Users/shinjirotakeda/Documents/GitHub/test-open/Soft X-ray/Four-View_Simulation';
+addpath '/Users/shohgookazaki/Documents/GitHub/test-open/pcb_experiment'; %getMDSdata.mとcoeff200ch.xlsxのあるフォルダへのパス
+addpath '/Users/shohgookazaki/Documents/GitHub/test-open/Soft X-ray/Four-View';
 
 %%%%%%%%%%%%%%%%%%%%%%%%
 %280ch用新規pcbプローブのみでの磁気面（Bz）

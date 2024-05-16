@@ -26,6 +26,7 @@ if doCalculation
     % sheets = str2double(sheets);
     sheets = str2double(sheetnames('coeff200ch.xlsx'));
     sheet_date=max(sheets(sheets<=date));
+
     C = readmatrix('coeff200ch.xlsx','Sheet',num2str(sheet_date));
     C_200ch = C(1:192,:); % なんでdtacq_chが192までで193までじゃない？
     r_shift = 0.00;

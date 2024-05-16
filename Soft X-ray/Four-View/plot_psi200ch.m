@@ -1,61 +1,48 @@
-%%%%%%%%%%%%%%%%%%%%%%%%
-%200ch用新規pcbプローブのみでの磁気面（Bz）
-%dtacqのshot番号を直接指定する場合
-%%%%%%%%%%%%%%%%%%%%%%%%
+function plot_psi200ch(PCB, pathname)
+shot = PCB.shot;
+trange = PCB.trange;
+start = PCB.start;
 
-%%%%%ここが各PCのパス
-%【※コードを使用する前に】環境変数を設定しておくか、matlab内のコマンドからsetenv('パス名','アドレス')で指定してから動かす
-pathname.ts3u=getenv('ts3u_path');%old-koalaのts-3uまでのパス（mrdなど）
-pathname.fourier=getenv('fourier_path');%fourierのmd0（データックのショットが入ってる）までのpath
-pathname.NIFS=getenv('NIFS_path');%resultsまでのpath（ドップラー、SXR）
-pathname.save=getenv('savedata_path');%outputデータ保存先
-pathname.rawdata38=getenv('rawdata038_path');%dtacq a038のrawdataの保管場所
-pathname.woTFdata=getenv('woTFdata_path');%rawdata（TFoffset引いた）の保管場所
-pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所
+[grid2D,data2D] = process_PCBdata_200ch(PCB,pathname);
 
-%%%%実験オペレーションの取得
-DOCID='1wG5fBaiQ7-jOzOI-2pkPAeV6SDiHc_LrOdcbWlvhHBw';%スプレッドシートのID
-T=getTS6log(DOCID);
-node='date';
-date=230707;
-T=searchlog(T,node,date);
-IDXlist= 6; %[5:50 52:55 58:59];%[4:6 8:11 13 15:19 21:23 24:30 33:37 39:40 42:51 53:59 61:63 65:69 71:74];
-n_data=numel(IDXlist);%計測データ数
-shotlist=T.a039(IDXlist);
-tfshotlist=T.a039_TF(IDXlist);
-EFlist=T.EF_A_(IDXlist);
-TFlist=T.TF_kV_(IDXlist);
-dtacqlist=39.*ones(n_data,1);
-
-% % %直接入力の場合
-% dtacqlist=39;
-% shotlist=889;%240;%【input】dtacqの保存番号
-% tfshotlist=0;%0;
-% date = 230203;%【input】計測日
-% n_data=numel(shotlist);%計測データ数
-% EFlist = 0;%150;%【input】EF電流
-% TFlist = 0;
-
-trange=400:600;%【input】計算時間範囲
-n=50; %【input】rz方向のメッシュ数
-
-for i=1:n_data
-    dtacq_num=dtacqlist;
-    shot=shotlist(i);
-    tfshot=tfshotlist;
-    i_EF=EFlist;
-    TF=TFlist;
-    plot_psi200ch(date, dtacq_num, shot, tfshot, pathname,n,i_EF,trange,TF); 
+if isstruct(grid2D)==0 %もしdtacqデータがない場合次のloopへ(データがない場合NaNを返しているため)
+    return
 end
 
-%%%%%%%%%%%%%%%%%%%%%%%%
-%以下、local関数
-%%%%%%%%%%%%%%%%%%%%%%%%
+[magAxisList,xPointList] = get_axis_x_multi(grid2D,data2D); %時間ごとの磁気軸、X点を検索
 
-function plot_psi200ch(date, dtacq_num, shot, tfshot, pathname, n,i_EF,trange,TF)
+% プロット部分
+figure('Position', [0 0 1500 1500],'visible','on');
+
+dt = 4;
+
+for m=1:16 %図示する時間
+    i=start+m.*dt; %end
+    t=trange(i);
+    subplot(4,4,m)
+    contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bz(:,:,i),30,'LineStyle','none');clim([-0.1,0.1])%Bz
+    colormap(jet)
+    axis image
+    axis tight manual
+    hold on
+    contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),20,'black')
+    plot(magAxisList.z(:,i),magAxisList.r(:,i),'ko');
+    plot(xPointList.z(i),xPointList.r(i),'kx');
+
+    hold off
+    title(string(t)+' us')
+end
+
+sgtitle(strcat('shot',num2str(shot)));
+
+end
+%{
 filename=strcat(pathname.rawdata,'/rawdata_dtacq',num2str(dtacq_num),'_shot',num2str(shot),'_tfshot',num2str(tfshot),'.mat');
 if exist(filename,"file")==0
-    return
+    disp('No rawdata file -- Start generating!')
+    rawdataPath = pathname.rawdata;
+    save_dtacq_data(dtacq_num, shot, tfshot,rawdataPath)
+    % return
 end
 load(filename,'rawdata');%1000×192
 
@@ -65,22 +52,24 @@ if numel(rawdata)< 500
 end
 
 %較正係数のバージョンを日付で判別
-sheets = sheetnames('coeff200ch.xlsx');
-sheets = str2double(sheets);
+% sheets = sheetnames('coeff200ch.xlsx');
+% sheets = str2double(sheets);
+sheets = str2double(sheetnames('coeff200ch.xlsx'));
 sheet_date=max(sheets(sheets<=date));
 
-C = readmatrix('coeff200ch.xlsx','Sheet',num2str(sheet_date));
+C_raw = readmatrix('coeff200ch.xlsx','Sheet',num2str(sheet_date));
+C = C_raw(1:192,:); 
 ok = logical(C(:,14));
 P=C(:,13);
 coeff=C(:,12);
 zpos=C(:,9);
 rpos=C(:,10);
-probe_num=C(:,5);
-probe_ch=C(:,6);
+% probe_num=C(:,5);
+% probe_ch=C(:,6);
 ch=C(:,7);
-d2p=C(:,15);
-d2bz=C(:,16);
-d2bt=C(:,17);
+% d2p=C(:,15);
+% d2bz=C(:,16);
+% d2bt=C(:,17);
 
 b=rawdata.*coeff';%較正係数RC/NS
 b=b.*P';%極性揃え
@@ -217,8 +206,8 @@ dt = 4;
 %     xlabel('z [m]')
 %     ylabel('r [m]')
  end
-
-clearvars -except data2D grid2D shot;
-filename = strcat(getenv('pre_processed_directory_path'), '/a039_',num2str(shot),'.mat');
+filename = strcat(pathname.pre_processed_directory_path, '/a039_',num2str(shot),'.mat');
 save(filename)
-end
+clearvars -except data2D grid2D shot;
+%}
+

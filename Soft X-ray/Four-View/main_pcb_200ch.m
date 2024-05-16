@@ -1,4 +1,4 @@
-addpath '/Users/shinjirotakeda/Documents/GitHub/test-open/pcb_experiment';
+addpath '/Users/shohgookazaki/Documents/GitHub/test-open/pcb_experiment';
 
 %%%%%%%%%%%%%%%%%%%%%%%%
 %200ch用新規pcbプローブのみでの磁気面（Bz）
@@ -14,15 +14,36 @@ pathname.save=getenv('savedata_path');%outputデータ保存先
 pathname.rawdata38=getenv('rawdata038_path');%dtacq a038のrawdataの保管場所
 pathname.woTFdata=getenv('woTFdata_path');%rawdata（TFoffset引いた）の保管場所
 pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所
+pathname.pre_processed_directory_path=getenv('pre_processed_directory_path');
+
 
 %%%%実験オペレーションの取得
-prompt = {'Date:','Shot number:'};
+% prompt = {'Date:','Shot number:','doCheck:'};
+% dlgtitle = 'Input';
+% dims = [1 35];
+% definput = {'','',''};
+% answer = inputdlg(prompt,dlgtitle,dims,definput);
+% date = str2double(cell2mat(answer(1)));
+% IDXlist = str2num(cell2mat(answer(2)));
+% doCheck = num2str(cell2mat(answer(3)));
+prompt = {'Date:','Shot number:','doCheck:'};
+definput = {'','',''};
+if exist('date','var')
+    definput{1} = num2str(date);
+end
+if exist('IDXlist','var')
+    definput{2} = num2str(IDXlist);
+end
+if exist('doCheck','var')
+    definput{3} = num2str(doCheck);
+end
 dlgtitle = 'Input';
 dims = [1 35];
-definput = {'',''};
+
 answer = inputdlg(prompt,dlgtitle,dims,definput);
 date = str2double(cell2mat(answer(1)));
 IDXlist = str2num(cell2mat(answer(2)));
+doCheck = logical(str2num(cell2mat(answer(3))));
 
 DOCID='1wG5fBaiQ7-jOzOI-2pkPAeV6SDiHc_LrOdcbWlvhHBw';%スプレッドシートのID
 T=getTS6log(DOCID);
@@ -31,34 +52,42 @@ node='date';
 T=searchlog(T,node,date);
 % IDXlist= 1; %[5:50 52:55 58:59];%[4:6 8:11 13 15:19 21:23 24:30 33:37 39:40 42:51 53:59 61:63 65:69 71:74];
 n_data=numel(IDXlist);%計測データ数
-shotlist=T.a039(IDXlist);
-tfshotlist=T.a039_TF(IDXlist);
+% shotlist=T.a039(IDXlist);
+shotlist = [T.a039(IDXlist), T.a040(IDXlist)];
+% tfshotlist=T.a039_TF(IDXlist);
+tfshotlist = [T.a039_TF(IDXlist), T.a040_TF(IDXlist)];
 EFlist=T.EF_A_(IDXlist);
 TFlist=T.TF_kV_(IDXlist);
 dtacqlist=39.*ones(n_data,1);
 
-trange=400:600;%【input】計算時間範囲
-n=50; %【input】rz方向のメッシュ数
+% trange=400:600;%【input】計算時間範囲
+% n=50; %【input】rz方向のメッシュ数
+PCB.trange=400:800;%【input】計算時間範囲
+PCB.n=40; %【input】rz方向のメッシュ数
+PCB.start = 40; %plot開始時間-400
 
-doCheck = false;
+% doCheck = false;
 % doCheck = true;
 
 for i=1:n_data
-    dtacq_num=dtacqlist;
-    shot=shotlist(i);
-    tfshot=tfshotlist;
-    if shot == tfshot
-        tfshot = 0;
+    % dtacq_num=dtacqlist;
+    PCB.idx = IDXlist(i);
+    PCB.shot=shotlist(i,:);
+    PCB.tfshot=tfshotlist(i,:);
+    if PCB.shot == PCB.tfshot
+        PCB.tfshot = [0,0];
     end
-    i_EF=EFlist;
-    TF=TFlist;
+    PCB.i_EF=EFlist;
+    PCB.TF=TFlist;
     if doCheck
-        check_signal(date, dtacq_num, shot, tfshot, pathname);
+        check_signal(PCB, pathname);
     else
-        plot_psi200ch(date, dtacq_num, shot, tfshot, pathname,n,i_EF,trange,TF);
+        plot_psi200ch(PCB, pathname);
     end
 end
 
+
+%{
 %%%%%%%%%%%%%%%%%%%%%%%%
 %以下、local関数
 %%%%%%%%%%%%%%%%%%%%%%%%
@@ -79,22 +108,24 @@ if numel(rawdata)< 500
 end
 
 %較正係数のバージョンを日付で判別
-sheets = sheetnames('coeff200ch.xlsx');
-sheets = str2double(sheets);
+% sheets = sheetnames('coeff200ch.xlsx');
+% sheets = str2double(sheets);
+sheets = str2double(sheetnames('coeff200ch.xlsx'));
 sheet_date=max(sheets(sheets<=date));
 
-C = readmatrix('coeff200ch.xlsx','Sheet',num2str(sheet_date));
+C_raw = readmatrix('coeff200ch.xlsx','Sheet',num2str(sheet_date));
+C = C_raw(1:192,:); 
 ok = logical(C(:,14));
 P=C(:,13);
 coeff=C(:,12);
 zpos=C(:,9);
 rpos=C(:,10);
-probe_num=C(:,5);
-probe_ch=C(:,6);
+% probe_num=C(:,5);
+% probe_ch=C(:,6);
 ch=C(:,7);
-d2p=C(:,15);
-d2bz=C(:,16);
-d2bt=C(:,17);
+% d2p=C(:,15);
+% d2bz=C(:,16);
+% d2bt=C(:,17);
 
 b=rawdata.*coeff';%較正係数RC/NS
 b=b.*P';%極性揃え
@@ -231,10 +262,11 @@ dt = 4;
 %     xlabel('z [m]')
 %     ylabel('r [m]')
  end
-
-clearvars -except data2D grid2D shot;
-filename = strcat('/Users/shinjirotakeda/Library/CloudStorage/OneDrive-TheUniversityofTokyo/Documents/probedata/processed/a039_',num2str(shot),'.mat');
+filename = strcat(pathname.pre_processed_directory_path, '/a039_',num2str(shot),'.mat');
 save(filename)
+clearvars -except data2D grid2D shot;
+
+
 end
 
 function save_dtacq_data(dtacq_num,shot,tfshot,rawdataPath)
@@ -318,7 +350,8 @@ sheets = sheetnames('coeff200ch.xlsx');
 sheets = str2double(sheets);
 sheet_date=max(sheets(sheets<=date));
 
-C = readmatrix('coeff200ch.xlsx','Sheet',num2str(sheet_date));
+C_raw = readmatrix('coeff200ch.xlsx','Sheet',num2str(sheet_date));
+C = C_raw(1:192,:);
 ok = logical(C(:,14));
 P=C(:,13);
 coeff=C(:,12);
@@ -479,3 +512,4 @@ sgtitle('Bt signal probe6-10')
 
 end
 
+%}

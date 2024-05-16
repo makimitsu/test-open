@@ -91,7 +91,6 @@ for i=1:ch_num
     %各チャンネルにおいて「.AI:CHXXX」というノードを指定するためのノード名を作る
     chname=".AI:CH"+num2str(transpose(i),'%03i');
     % num2strで数値データをstrデータに変換。この時'%03i'で左側を(0)で埋めた(3)桁の整数(i)という形を指定できる。
-    % fprintf('%c', mdsvalue(chname));
     rawdata_wTF(:,i)=mdsvalue(chname);
     %データがとれていないときエラーメッセージが多分237文字で帰ってくるので、1000以下の要素はデータなしとしてリターンする
     if numel(rawdata_wTF(:,i)) <1000

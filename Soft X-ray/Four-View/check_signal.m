@@ -53,6 +53,10 @@ if ismember(39,dtacq_num_list)
     a039_raw = rawdata_woTF;
 end
 if ismember(40,dtacq_num_list)
+    dtaq40file = strcat(pathname.rawdata, '/mag_probe/dtacq',num2str(40));
+    if exist(dtaq40file, 'dir') ~=7 % フォルダがなかったら作る
+        mkdir(dtaq40file);
+    end
     filename2 = strcat(pathname.rawdata,'/mag_probe/dtacq',num2str(40),'/shot',num2str(shot(2)),'_tfshot',num2str(tfshot(2)),'.mat');
     if exist(filename2,"file")==0
         disp('No rawdata file of a040 -- Start generating!')
