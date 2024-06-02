@@ -92,6 +92,10 @@ centerInformation(1,:,:) = circleInformation([4,2,10,12,20,18,26,28],:);
 centerInformation(2,:,:) = circleInformation([3,1,9,11,19,17,25,27],:);
 centerInformation(3,:,:) = circleInformation([8,6,14,16,24,22,30,32],:);
 centerInformation(4,:,:) = circleInformation([7,5,13,15,23,21,29,31],:);
+% centerInformation(2,:,:) = circleInformation([4,2,10,12,20,18,26,28],:);
+% centerInformation(1,:,:) = circleInformation([3,1,9,11,19,17,25,27],:);
+% centerInformation(4,:,:) = circleInformation([8,6,14,16,24,22,30,32],:);
+% centerInformation(3,:,:) = circleInformation([7,5,13,15,23,21,29,31],:);
 % for i = 1:4
 %     % i = 1
 %     % 4,2,10,12,20,18,26,28

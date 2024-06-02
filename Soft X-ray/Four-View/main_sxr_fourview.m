@@ -5,7 +5,7 @@
 % clear
 % close all
 clearvars -except date IDXlist doSave doFilter doNLR
-addpath '/Users/shinjirotakeda/Documents/GitHub/test-open/pcb_experiment'; %getMDSdata.mとcoeff200ch.xlsxのあるフォルダへのパス
+addpath([getenv('GITHUB_DIR'),'test-open',filesep,'pcb_experiment']); %getMDSdata.mとcoeff200ch.xlsxのあるフォルダへのパス
 
 %%%%%ここが各PCのパス
 %【※コードを使用する前に】環境変数を設定しておくか、matlab内のコマンドからsetenv('パス名','アドレス')で指定してから動かす

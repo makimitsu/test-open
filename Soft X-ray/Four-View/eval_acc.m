@@ -58,6 +58,8 @@ Bp = sqrt(Br_new.^2+Bz_new.^2);
 x_e(1,1) = r_ind;
 x_e(2,1) = z_ind;
 
+% X点近傍の磁場が0になるように微修正
+
 % 1fsごとにステップ
 for i = 2:1000
     r_idx = x_e(1,i-1);
@@ -95,10 +97,13 @@ end
 step = 1:maxStep;
 figure;
 plot(step,vecnorm(v_e(:,1:maxStep)));
+xlabel('step');ylabel('electron velocity [m/s]');
 
 figure;
 plot(z_new(x_e(2,1:maxStep-1)),r_new(x_e(1,1:maxStep-1)));
+xlabel('z');ylabel('r');
 
 Ee = 0.5*me*v_e.^2./e;
 figure;
 plot(step,vecnorm(Ee(:,1:maxStep)));
+xlabel('step');ylabel('electron energy [eV]');

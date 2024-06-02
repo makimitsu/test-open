@@ -13,6 +13,7 @@ nShot_30_4 = 23;
 nShot_35_1 = 11;
 nShot_35_3 = 25;
 nShot_35_4 = 12;
+% nShot_35_4 = 7;
 nShot_40_1 = 30;
 nShot_40_2 = 29;
 nShot_40_3 = 25; %or29
@@ -110,7 +111,7 @@ SXRdata40.t = t;
 % plot_save_sxr(PCBdata25,SXR,SXRdata25);
 f = figure;f.Units = 'normalized';f.Position = [0.1,0.2,0.8,0.8];
 plot_save_sxr(PCBdata30,SXR,SXRdata30);
-f = figure;f.Units = 'normalized';f.Position = [0.1,0.2,0.8,0.8];
-plot_save_sxr(PCBdata35,SXR,SXRdata35);
+% f = figure;f.Units = 'normalized';f.Position = [0.1,0.2,0.8,0.8];
+% plot_save_sxr(PCBdata35,SXR,SXRdata35);
 % f = figure;f.Units = 'normalized';f.Position = [0.1,0.2,0.8,0.8];
 % plot_save_sxr(PCBdata40,SXR,SXRdata40);

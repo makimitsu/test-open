@@ -13,7 +13,7 @@ if exist(path2,'dir') == 0
     NumData = numel(MyFolderInfo);
     MyFolderInfo = MyFolderInfo(3:NumData);
 else
-    NumData = numel(MyFolderInfo)-1;
+    NumData = numel(MyFolderInfo);
     MyFolderInfo = MyFolderInfo(4:NumData);
 end
 % MyFolderInfo = MyFolderInfo(4:NumData);
