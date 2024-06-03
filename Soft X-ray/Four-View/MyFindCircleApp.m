@@ -176,15 +176,6 @@ if doCalculation
 
     CentersTimeRaps = zeros(4,8,3);
     for i = 1:4
-        % if i==1 || i==2
-        %     j = i-1;
-        %     CentersTimeRaps(i,:,:) = centers([1+j,3+j,11+j, ...
-        %         9+j,17+j,19+j,27+j,25+j],:);
-        % else
-        %     j=i-3;
-        %     CentersTimeRaps(i,:,:) = centers([5+j,7+j,15+j, ...
-        %         13+j,21+j,23+j,31+j,29+j],:);    
-        % end
         CentersTimeRaps(i,:,:) = centers(centerIdx(i,:),:);
     end
     CenterPositions = CentersTimeRaps(:,:,1:2);radii = repmat(max(CentersTimeRaps(:,:,3),[],'all'),[32,1]);%radii = repmat(min(CentersTimeRaps(:,:,3),[],'all'),[32,1]);

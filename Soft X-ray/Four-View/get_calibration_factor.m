@@ -13,9 +13,16 @@ calibrationImage = imread(strcat(calibrationPath,'/PositionCheck.tif'));
 % Center(2,:,:) = centers([2,4,5,7,10,12,13,15],:);
 
 % 校正用画像からファイバーの位置（＋半径）を取得
-[Center,IW] = find_fibers2(calibrationImage,[65,75]);
+if date == 230316
+    radiusRange = [85,105];
+else    
+    radiusRange = [65,75];
+end
+% [Center,IW] = find_fibers2(calibrationImage,[65,75]);
+[center,radii] = find_fibers_32ch(calibrationImage,radiusRange);
+IW = mean(radii);
 timeSeries = zeros(2,8,2*IW,2*IW);
-Center = round(Center);
+center = round(center);
 
 rawImage = calibrationImage;
 
@@ -43,14 +50,14 @@ resolution = N_projection/(IW*2);
 % 画像データの行列化
 for i=1:8
     % 画像切り取りの縦方向・横方向範囲を指定
-    horizontalRange1 = Center(1,i,1)-IW+1:Center(1,i,1)+IW;
-    verticalRange1 = Center(1,i,2)-IW+1:Center(1,i,2)+IW;
-    horizontalRange2 = Center(2,i,1)-IW+1:Center(2,i,1)+IW;
-    verticalRange2 = Center(2,i,2)-IW+1:Center(2,i,2)+IW;
-    horizontalRange3 = Center(3,i,1)-IW+1:Center(3,i,1)+IW;
-    verticalRange3 = Center(3,i,2)-IW+1:Center(3,i,2)+IW;
-    horizontalRange4 = Center(4,i,1)-IW+1:Center(4,i,1)+IW;
-    verticalRange4 = Center(4,i,2)-IW+1:Center(4,i,2)+IW;
+    horizontalRange1 = center(1,i,1)-IW+1:center(1,i,1)+IW;
+    verticalRange1 = center(1,i,2)-IW+1:center(1,i,2)+IW;
+    horizontalRange2 = center(2,i,1)-IW+1:center(2,i,1)+IW;
+    verticalRange2 = center(2,i,2)-IW+1:center(2,i,2)+IW;
+    horizontalRange3 = center(3,i,1)-IW+1:center(3,i,1)+IW;
+    verticalRange3 = center(3,i,2)-IW+1:center(3,i,2)+IW;
+    horizontalRange4 = center(4,i,1)-IW+1:center(4,i,1)+IW;
+    verticalRange4 = center(4,i,2)-IW+1:center(4,i,2)+IW;
     % 生画像を切り取ってファイバー数×フレーム数×IW×IWの配列に格納
     timeSeries(1,i,:,:) = rawImage(verticalRange1,horizontalRange1,1);
     timeSeries(2,i,:,:) = rawImage(verticalRange2,horizontalRange2,1);

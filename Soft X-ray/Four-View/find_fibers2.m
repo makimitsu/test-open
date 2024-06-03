@@ -92,31 +92,7 @@ centerInformation(1,:,:) = circleInformation([4,2,10,12,20,18,26,28],:);
 centerInformation(2,:,:) = circleInformation([3,1,9,11,19,17,25,27],:);
 centerInformation(3,:,:) = circleInformation([8,6,14,16,24,22,30,32],:);
 centerInformation(4,:,:) = circleInformation([7,5,13,15,23,21,29,31],:);
-% centerInformation(2,:,:) = circleInformation([4,2,10,12,20,18,26,28],:);
-% centerInformation(1,:,:) = circleInformation([3,1,9,11,19,17,25,27],:);
-% centerInformation(4,:,:) = circleInformation([8,6,14,16,24,22,30,32],:);
-% centerInformation(3,:,:) = circleInformation([7,5,13,15,23,21,29,31],:);
-% for i = 1:4
-%     % i = 1
-%     % 4,2,10,12,20,18,26,28
-%     % i = 2
-%     % 3,1,9,11,19,17,25,27
-%     % i = 3
-%     % 8,6,14,16,24,22,30,32
-%     % i = 4
-%     % 7,5,13,15,23,21,29,31
-%     if i==1 || i==2
-%     j = i-1;
-%     centerInformation(i,:,:) = circleInformation([1+j,3+j,11+j, ...
-%         9+j,17+j,19+j,27+j,25+j],:);
-%     else
-%     j=i-3;
-%     centerInformation(i,:,:) = circleInformation([5+j,7+j,15+j, ...
-%         13+j,21+j,23+j,31+j,29+j],:);    
-%     end
-% end
 
-% radius = mean(centerInformation(:,:,3),'all');
 radius = min(centerInformation(:,:,3),[],'all');
 centerInformation(:,:,3) = [];
 
