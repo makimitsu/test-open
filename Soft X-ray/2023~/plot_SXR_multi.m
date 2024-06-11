@@ -82,7 +82,8 @@ for t = times
         if date <= 210924
             [VectorImage1,VectorImage2] = get_SXRImage(date,number,SXRfilename,filter);
         else
-            [VectorImage2,VectorImage1] = get_SXRImage(date,number,SXRfilename,filter);
+            % [VectorImage2,VectorImage1] = get_SXRImage(date,number,SXRfilename,filter);
+            [VectorImage2,VectorImage1] = get_sxr_image_new(date,number,SXRfilename, filter);
         end
         
 %         再構成計算

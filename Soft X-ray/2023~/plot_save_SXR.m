@@ -78,8 +78,8 @@ subplot('Position',pos1);
 [SXR_mesh_z1,SXR_mesh_r1] = meshgrid(z_space_SXR1,r_space_SXR1);
 [~,h1] = contourf(SXR_mesh_z1,SXR_mesh_r1,EE1,20);
 h1.LineStyle = 'none';
-% caxis([0,0.2]);
-% caxis([0,1]);
+% clim([0,0.2]);
+clim([0,1.5]);
 c=colorbar;c.Label.String='Intensity [a.u.]';c.FontSize=18;
 hold on
 
@@ -120,8 +120,8 @@ subplot('Position',pos2);
 [SXR_mesh_z2,SXR_mesh_r2] = meshgrid(z_space_SXR2,r_space_SXR2);
 [~,h2] = contourf(SXR_mesh_z2,SXR_mesh_r2,EE2,20);
 h2.LineStyle = 'none';
-% caxis([0,0.1]);
-% % caxis([0,1]);
+% clim([0,0.1]);
+clim([0,2]);
 c=colorbar;c.Label.String='Intensity [a.u.]';c.FontSize=18;
 hold on
 
@@ -141,6 +141,8 @@ ylabel('r [m]');
 ax = gca;
 ax.FontSize = 18; 
 hold off
+
+drawnow
 
 if save
     pathname = '/Users/shinjirotakeda/OneDrive - The University of Tokyo/Documents/ReconstructionResults/';

@@ -29,12 +29,12 @@ z_space_SXR1 = linspace(zmin1,zmax1,size(EE,2));
 z_space_SXR2 = linspace(zmin2,zmax2,size(EE,2));
 
 r_range = find(0.060<=r_space_SXR & r_space_SXR<=0.330);
-r_space_SXR = r_space_SXR(r_range);
+r_space_SXR_plot = r_space_SXR(r_range);
 z_range1 = find(-0.12<=z_space_SXR1 & z_space_SXR1<=0.12);
 z_range2 = find(-0.12<=z_space_SXR2 & z_space_SXR2<=0.12);
 
-z_space_SXR1 = z_space_SXR1(z_range1);
-z_space_SXR2 = z_space_SXR2(z_range2);
+z_space_SXR1_plot = z_space_SXR1(z_range1);
+z_space_SXR2_plot = z_space_SXR2(z_range2);
 
 % EE1 = EE(r_range,z_range,1);
 % EE2 = EE(r_range,z_range,2);
@@ -50,12 +50,21 @@ psi_min = min(min(psi));
 psi_max = max(max(psi));
 contour_layer = linspace(psi_min,psi_max,20);
 
-[SXR_mesh_z1,SXR_mesh_r] = meshgrid(z_space_SXR1,r_space_SXR);
-[SXR_mesh_z2,~] = meshgrid(z_space_SXR2,r_space_SXR);
+[SXR_mesh_z1,SXR_mesh_r] = meshgrid(z_space_SXR1_plot,r_space_SXR_plot);
+[SXR_mesh_z2,~] = meshgrid(z_space_SXR2_plot,r_space_SXR_plot);
 
 % f = figure;
 % f.Units = 'normalized';
 % f.Position = [0.1,0.2,0.8,0.8];
+
+EE_q = zeros(50,50,4);
+for i = 1:4
+    if i <=2
+        EE_q(:,:,i) = griddata(z_space_SXR1,r_space_SXR,EE(:,:,i),psi_mesh_z,psi_mesh_r);
+    else
+        EE_q(:,:,i) = griddata(z_space_SXR2,r_space_SXR,EE(:,:,i),psi_mesh_z,psi_mesh_r);
+    end
+end
 
 [magAxisList,xPointList] = get_axis_x_multi(grid2D,data2D); %時間ごとの磁気軸、X点を検索
 
@@ -72,15 +81,22 @@ nameList = {'1um Al', '2.5um Al', '2um Mylar', '1um Mylar'};
 % cLimList = {[0 0.4],[0 1],[0 0.4],[0 0.2]};
 % cLimList = {[0 0.4],[0 6],[0 0.4],[0 0.2]};
 % cLimList = {[0 1],[0 2],[0 0.3],[0 0.15]};
-% cLimList = {[0 1],[0 0.5],[0 0.3],[0 0.15]};
+cLimList = {[0 1],[0 0.5],[0 0.3],[0 0.15]};
 % cLimList = {[0 1.5],[0 0.5],[0 1],[0 1.5]};
-cLimList = {[0 0.3],[0 0.3],[0 0.3],[0 0.15]};
+% cLimList = {[0 0.3],[0 0.3],[0 0.3],[0 0.15]};
+% cLimList = {[0 2],[0 2],[0 2],[0 2]};
 
 % 負の要素を0で置換
 negativeEE = find(EE<0);
 EE(negativeEE) = zeros(size(negativeEE));
+negativeEEq = find(EE_q<0);
+EE_q(negativeEEq) = zeros(size(negativeEEq));
 
 for i = 1:4
+    p = positionList(i);
+    subplot(2,2,p);
+    cRange = cell2mat(cLimList(i));
+
     if i <= 2
         z_range = z_range2;
         SXR_mesh_z = SXR_mesh_z2;
@@ -89,11 +105,12 @@ for i = 1:4
         SXR_mesh_z = SXR_mesh_z1;
     end
     EE_plot = EE(r_range,z_range,i);
-    p = positionList(i);
-    subplot(2,2,p);
-    % cRange = cell2mat(cLimList(i));
     % [~,h] = contourf(SXR_mesh_z,SXR_mesh_r,EE_plot,linspace(cRange(1),cRange(2),20));clim(cRange);
-    [~,h] = contourf(SXR_mesh_z,SXR_mesh_r,EE_plot,20);
+    % [~,h] = contourf(SXR_mesh_z,SXR_mesh_r,EE_plot,20);
+
+    % [~,h] = contourf(psi_mesh_z,psi_mesh_r,EE_q(:,:,i),linspace(cRange(1),cRange(2),20));clim(cRange);
+    [~,h] = contourf(psi_mesh_z,psi_mesh_r,EE_q(:,:,i),20);
+
     colormap('turbo');
     h.LineStyle = 'none';
     c=colorbar;c.Label.String='Intensity [a.u.]';c.FontSize=18;

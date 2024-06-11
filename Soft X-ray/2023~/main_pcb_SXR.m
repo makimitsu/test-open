@@ -25,7 +25,7 @@ pat = 230316;
 date = pat;
 T=searchlog(T,node,pat);
 % IDXlist=[23,24,26,27,32,35:40,42:51,53:59,61:69];%[4:6 8:11 13 15:19 21:23 24:30 33:37 39:40 42:51 53:59 61:63 65:69 71:74];
-IDXlist = 7;
+IDXlist = 7:14;
 n_data=numel(IDXlist);%計測データ数
 shotlist=T.a039(IDXlist);
 tfshotlist=T.a039_TF(IDXlist);
@@ -57,7 +57,7 @@ show_localmax = false;
 % interval = 5;
 save = true;
 filter = false;
-NL = true;
+NL = false;
 
 for i=1:n_data
     PCB.idx = IDXlist(i);

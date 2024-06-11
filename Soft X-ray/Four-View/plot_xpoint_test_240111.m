@@ -2,6 +2,8 @@
 pathFirstHalf = '/Users/shinjirotakeda/Library/CloudStorage/OneDrive-TheUniversityofTokyo/Documents/result_matrix/LF_NLR/240111/shot';
 pathLastHalf = '/3.mat';
 
+% 1:'1um Al', 2:'2.5um Al', 3:'2um Mylar', 4:'1um Mylar'
+
 nShot_25_1 = 21;
 nShot_25_2 = 19;
 nShot_25_3 = 19;
@@ -28,6 +30,7 @@ mPath_30_1 = strcat(pathFirstHalf,num2str(nShot_30_1),pathLastHalf);
 mPath_30_2 = strcat(pathFirstHalf,num2str(nShot_30_2),pathLastHalf);
 mPath_30_3 = strcat(pathFirstHalf,num2str(nShot_30_3),pathLastHalf);
 mPath_30_4 = strcat(pathFirstHalf,num2str(nShot_30_4),pathLastHalf);
+mpath_30_4_2 = '/Users/shinjirotakeda/Library/CloudStorage/OneDrive-TheUniversityofTokyo/Documents/result_matrix/LF_NLR/240111/shot13/3.mat';
 mPath_35_1 = strcat(pathFirstHalf,num2str(nShot_35_1),pathLastHalf);
 mPath_35_2 = mPath_35_1;
 mPath_35_3 = strcat(pathFirstHalf,num2str(nShot_35_3),pathLastHalf);
@@ -51,6 +54,12 @@ load(mPath_30_1,'EE1');EE_30_1=EE1;
 load(mPath_30_2,'EE2');EE_30_2=EE2;
 load(mPath_30_3,'EE3');EE_30_3=EE3;
 load(mPath_30_4,'EE4');EE_30_4=EE4;
+% load(mpath_30_4_2,'EE4');EE_30_4_2 = EE4;
+% EE_30_4 = EE_30_4_2;
+% EE_30_4 = (EE_30_4+EE_30_4_2)/2;
+% N = EE_30_4.*EE_30_4_2;
+% N(N<0) = 0;
+% EE_30_4 = sqrt(N);
 EE_30 = cat(3,EE_30_1,EE_30_2,EE_30_3,EE_30_4);
 
 load(mPath_35_1,'EE1','EE2');
