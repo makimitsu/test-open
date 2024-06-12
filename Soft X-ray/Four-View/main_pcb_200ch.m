@@ -26,31 +26,36 @@ pathname.pre_processed_directory_path=getenv('pre_processed_directory_path');
 % date = str2double(cell2mat(answer(1)));
 % IDXlist = str2num(cell2mat(answer(2)));
 % doCheck = num2str(cell2mat(answer(3)));
-prompt = {'Date:','Shot number:','doCheck:'};
-definput = {'','',''};
+prompt = {'Date:','Shot number:','dataType(1:Bz, 2:psi, 3:Bt, 4:Jt, 5:Et):','doCheck:'};
+definput = {'','','',''};
 if exist('date','var')
-    definput{1} = num2str(date);
+    definput{1} = num2str(PCB.date);
 end
 if exist('IDXlist','var')
     definput{2} = num2str(IDXlist);
 end
+if exist('dataType','var')
+    definput{3} = num2str(dataType);
+end
 if exist('doCheck','var')
-    definput{3} = num2str(doCheck);
+    definput{4} = num2str(doCheck);
 end
 dlgtitle = 'Input';
 dims = [1 35];
 
 answer = inputdlg(prompt,dlgtitle,dims,definput);
-date = str2double(cell2mat(answer(1)));
+if isempty(answer)
+    return
+end
+PCB.date = str2double(cell2mat(answer(1)));
 IDXlist = str2num(cell2mat(answer(2)));
-doCheck = logical(str2num(cell2mat(answer(3))));
+dataType = str2num(cell2mat(answer(3)));
+doCheck = logical(str2num(cell2mat(answer(4))));
 
 DOCID='1wG5fBaiQ7-jOzOI-2pkPAeV6SDiHc_LrOdcbWlvhHBw';%スプレッドシートのID
 T=getTS6log(DOCID);
 node='date';
-% date=230714;
-T=searchlog(T,node,date);
-% IDXlist= 1; %[5:50 52:55 58:59];%[4:6 8:11 13 15:19 21:23 24:30 33:37 39:40 42:51 53:59 61:63 65:69 71:74];
+T=searchlog(T,node,PCB.date);
 n_data=numel(IDXlist);%計測データ数
 % shotlist=T.a039(IDXlist);
 shotlist = [T.a039(IDXlist), T.a040(IDXlist)];
@@ -74,6 +79,7 @@ for i=1:n_data
     PCB.idx = IDXlist(i);
     PCB.shot=shotlist(i,:);
     PCB.tfshot=tfshotlist(i,:);
+    PCB.dataType = dataType;
     if PCB.shot == PCB.tfshot
         PCB.tfshot = [0,0];
     end

@@ -20,7 +20,23 @@ for m=1:16 %図示する時間
     i=start+m.*dt; %end
     t=trange(i);
     subplot(4,4,m)
-    contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bz(:,:,i),30,'LineStyle','none');clim([-0.1,0.1])%Bz
+    if PCB.dataType == 1
+        contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bz(:,:,i),30,'LineStyle','none');
+        clim([-0.1,0.1]);
+        dataTypeName = 'Bz';
+    elseif PCB.dataType == 2
+        contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.psi(:,:,i),40,'LineStyle','none')
+        dataTypeName = 'psi';
+    elseif PCB.dataType == 3
+        contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bt(:,:,i),-100e-3:0.5e-3:100e-3,'LineStyle','none')
+        dataTypeName = 'Bt';
+    elseif PCB.dataType == 4
+        contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Jt(:,:,i),30,'LineStyle','none')
+        dataTypeName = 'Jt';
+    elseif PCB.dataType == 5
+        contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Et(:,:,i),20,'LineStyle','none')
+        dataTypeName = 'Et';
+    end
     colormap(jet)
     axis image
     axis tight manual
@@ -28,12 +44,11 @@ for m=1:16 %図示する時間
     contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),20,'black')
     plot(magAxisList.z(:,i),magAxisList.r(:,i),'ko');
     plot(xPointList.z(i),xPointList.r(i),'kx');
-
     hold off
     title(string(t)+' us')
 end
 
-sgtitle(strcat('shot',num2str(shot)));
+sgtitle(strcat(dataTypeName, ' diagram of shot',num2str(shot)));
 
 end
 %{

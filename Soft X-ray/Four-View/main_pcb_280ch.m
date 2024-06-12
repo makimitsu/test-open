@@ -17,7 +17,7 @@ pathname.save=getenv('savedata_path');%outputデータ保存先
 pathname.rawdata38=getenv('rawdata038_path');%dtacq a038のrawdataの保管場所
 pathname.woTFdata=getenv('woTFdata_path');%rawdata（TFoffset引いた）の保管場所
 pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所
-pathname.pre_processed_directory = getenv('pre_processed_directory_path');%計算結果の保存先（どこでもいい）
+pathname.pre_processed_directory_path = getenv('pre_processed_directory_path');%計算結果の保存先（どこでもいい）
 pathname.MAGDATA = getenv('MAGDATA_DIR');
 
 %%%%実験オペレーションの取得
