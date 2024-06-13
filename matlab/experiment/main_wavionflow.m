@@ -23,8 +23,8 @@ switch IDSP.date
         savename.curve = [pathname.mat,'/curve/','230828_a039_2301_', num2str(plot_time - 2), '_1_5.mat'];
         savename.nablaB = [pathname.mat,'/nablaB/','230828_a039_2301_', num2str(plot_time - 2), '_1_5.mat'];
     case 230830
-        savename.ExB = [pathname.mat,'/ExB/','230830_shot11-60-a039_2437_' , num2str(plot_time - 2), '_1_5.mat'];
-        savename.curve = [pathname.mat,'/curve/','230830_a039_2437_', num2str(plot_time - 2), '_1_5.mat'];
+        savename.ExB = [pathname.mat,'/ExB/','230830_shot11_13-14_16-17_20_22-26_28-29_32_34_37_41-45_47_49_51_54-55_57_59-60-a039_2437_' , num2str(plot_time - 2), '_1_5.mat'];
+        savename.curve = [pathname.mat,'/curve/','230830_a039_2437_', num2str(plot_time - 2), '_1_5_movmean5.mat'];
         savename.nablaB = [pathname.mat,'/nablaB/','230830_a039_2437_', num2str(plot_time - 2), '_1_5.mat'];
         savename.magline = [pathname.mat,'/magline/','230830_a039_2437_', num2str(plot_time - 2), '_1_5.mat'];
         savename.contop = [pathname.mat,'/contourtop/','230830_a039_2437_', num2str(plot_time - 2), '_1_5.mat'];
@@ -46,13 +46,13 @@ magpres_mean = true;
 single_range = [1:4 6 7];%【input】プロットCH([1:4 7])
 wav_range = [1:12 16:21];%【input】プロットr([1:21],[1:12 19:21])
 plot_single = false;%【input】IDSPシングルショットをプロット
-plot_WAV = true;%【input】IDSP重み付き平均をプロット
-plot_VExB = true;%【input】ExBをプロット
-plot_VnablaB = false;%【input】∇B driftをプロット
-plot_Vcurve = false;%【input】curve driftをプロット
+plot_WAV = false;%【input】IDSP重み付き平均をプロット
+plot_VExB = false;%【input】ExBをプロット
+plot_VnablaB = true;%【input】∇B driftをプロット
+plot_Vcurve = true;%【input】curve driftをプロット
 plot_Vmagline = false;%【input】磁力線ドリフトをプロット
 plot_Vcontop = false;%【input】磁力線ドリフトをプロット
-plot_magpres = true;%【input】磁気圧をプロット
+plot_magpres = false;%【input】磁気圧をプロット
 
 %------IDSP詳細設定【input】------
 plot_fit = false;%【input】ガウスフィッティングを表示(true,false)
@@ -296,8 +296,8 @@ if plot_VExB
         VExB_z_mean = mean(VExB_z_mean,2);
         VExB_r_mean = mean(ExBdata2D.VExB_r(:,idx_IDSP_z_min:idx_IDSP_z_max,:),3);
         VExB_r_mean = mean(VExB_r_mean,2);
-        err_ExB_z_y = 3;
-        err_ExB_r_y = 3;
+        err_ExB_z_y = 4;
+        err_ExB_r_y = 4;
         err_ExB_x = 0.01;
         switch plot_time
             case {470,482}

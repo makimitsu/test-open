@@ -1,6 +1,28 @@
 function [ExBdata2D,newPCBdata2D] = cal_ExB(pathname,PCBgrid2D,PCBdata2D,ESPdata2D,ESP,PCB,FIG)
 
 savename = [pathname.mat,'/ExB/',num2str(ESP.date),'_shot',num2str(ESP.shotlist(1)),'-',num2str(ESP.shotlist(end)),'-a039_',num2str(PCB.shot(1)),'_',num2str(FIG.start),'_',num2str(FIG.dt),'_',num2str(FIG.tate*FIG.yoko),'.mat'];
+%ファイル名をshot番号リストに対応して命名
+savename = [pathname.mat,'/ExB/',num2str(ESP.date),'_shot'];
+for i_shot = 1:numel(ESP.shotlist)
+    if i_shot == 1
+        savename =[savename,num2str(ESP.shotlist(i_shot))];
+    else
+        if ESP.shotlist(i_shot) == ESP.shotlist(i_shot-1)+1%連番の場合間の番号をファイル名に含まない
+            if i_shot < numel(ESP.shotlist)
+                if ESP.shotlist(i_shot+1) > ESP.shotlist(i_shot)+1
+                    savename =[savename,'-',num2str(ESP.shotlist(i_shot))];
+                end
+            else
+                savename =[savename,'-',num2str(ESP.shotlist(i_shot))];
+            end
+        else%連番でない場合ファイル名に含む
+            savename =[savename,'_',num2str(ESP.shotlist(i_shot))];
+        end
+    end
+end
+savename = [savename,'-a039_',num2str(PCB.shot(1)),'_',num2str(FIG.start),'_',num2str(FIG.dt),'_',num2str(FIG.tate*FIG.yoko),'.mat'];
+
+
 if exist(savename,"file")
     load(savename,'ExBdata2D','newPCBdata2D')
 else

@@ -1,4 +1,4 @@
-function plot_ExB(PCBgrid2D,PCBdata2D,ESPdata2D,ExBdata2D,newPCBdata2D,IDSP,FIG,colorplot,multi_analysis)
+function plot_ExB(PCBgrid2D,PCBdata2D,ESPdata2D,ExBdata2D,newPCBdata2D,IDSP,FIG,color_type,vector_type,multi_analysis)
 %グラフ
 if not(multi_analysis)
     figure('Position', [0 0 1500 1500],'visible','on')
@@ -12,7 +12,7 @@ for i = 1:FIG.tate*FIG.yoko
         subplot(FIG.tate,round(FIG.yoko),i)
     end
     %カラープロット
-    switch colorplot
+    switch color_type
         case 'phi'
             contourf(ESPdata2D.zq,ESPdata2D.rq,squeeze(ESPdata2D.phi(idx_ESP_t,:,:)),100,'edgecolor','none');
             c = colorbar;
@@ -95,7 +95,7 @@ for i = 1:FIG.tate*FIG.yoko
             c.Label.String = 'Jt [A/m^{2}]';
     end
     if not(multi_analysis)
-        switch colorplot
+        switch color_type
             case {'phi','Ez','Er','Et','Jt'}
                 colormap(redblue(3000));
             case {'psi','Bz','Br','Bt_ext','Bt_plasma','absB','absB2','VExBr','VExBz','|VExB|'}
@@ -110,24 +110,26 @@ for i = 1:FIG.tate*FIG.yoko
     %磁気面
     contour(PCBgrid2D.zq,PCBgrid2D.rq,squeeze(PCBdata2D.psi(:,:,idx_PCB_t)),-20e-3:0.2e-3:40e-3,'black','LineWidth',1)
     hold on
-    % %ExBドリフトベクトル
-    % q = quiver(ESPdata2D.zq,ESPdata2D.rq,ExBdata2D.VExB_z(:,:,i),ExBdata2D.VExB_r(:,:,i),1.5/FIG.tate+0.5);
-    % q.Color = "k";
-    % q.LineWidth = 2;
-    % hold on
-    %電場ベクトル
-    q = quiver(ESPdata2D.zq(2:end-1,2:end-1),ESPdata2D.rq(2:end-1,2:end-1),squeeze(ESPdata2D.Ez(idx_ESP_t,2:end-1,2:end-1)),squeeze(ESPdata2D.Er(idx_ESP_t,2:end-1,2:end-1)),1.5);
-    q.Color = "k";
-    q.LineWidth = 2;
-    hold on
+    switch vector_type
+        case 'VExB'
+            %ExBドリフトベクトル
+            q = quiver(ESPdata2D.zq,ESPdata2D.rq,ExBdata2D.VExB_z(:,:,i),ExBdata2D.VExB_r(:,:,i),1.5/FIG.tate+0.5);
+            q.Color = "k";
+            q.LineWidth = 2;
+            hold on
+        case 'Ep'
+            %電場ベクトル
+            q = quiver(ESPdata2D.zq(2:end-1,2:end-1),ESPdata2D.rq(2:end-1,2:end-1),squeeze(ESPdata2D.Ez(idx_ESP_t,2:end-1,2:end-1)),squeeze(ESPdata2D.Er(idx_ESP_t,2:end-1,2:end-1)),1.5);
+            q.Color = "k";
+            q.LineWidth = 2;
+            hold on
+    end
     %ESP計測点
     for i_r = 1: size(ESPdata2D.rprobe,1)
         for i_z = 1: size(ESPdata2D.zprobe,2)
-            if not(ismember(i_z,[4 6 16]))
-                p = plot(ESPdata2D.zprobe(1,i_z),ESPdata2D.rprobe(i_r,1),"g+");%測定位置
-                p.LineWidth = 2;
-                p.MarkerSize = 8;
-            end
+            p = plot(ESPdata2D.zprobe(1,i_z),ESPdata2D.rprobe(i_r,1),"g+");%測定位置
+            p.LineWidth = 2;
+            p.MarkerSize = 8;
         end
     end
     hold on
@@ -144,7 +146,7 @@ for i = 1:FIG.tate*FIG.yoko
     % plot(IDSP.z,IDSP.r3,'r+',"MarkerSize",8/FIG.tate+2,"LineWidth",2/FIG.tate)
     title([num2str(ESPdata2D.trange(idx_ESP_t)) 'us'])
     % xlim([-0.05 0.1])
-    % xlim([-0.15 0.15])
+    % xlim([-0.2 0.2])
     xlim([-0.1275 0.1275])
     % ylim([0.08 0.27])
     % xlabel('Z [m]')
@@ -154,7 +156,7 @@ for i = 1:FIG.tate*FIG.yoko
     view([90 -90])%RZ反転
 end
 % if not(multi_analysis)
-%     sgtitle(colorplot)
+%     sgtitle(color_type)
 %     fontsize(18/FIG.tate+5,"points")
 % end
 

@@ -1,6 +1,6 @@
 function [Curvedata2D] = cal_curve_drift(CURVE,PCB,FIG,pathname,savename,range)
-
-savename_curve = [pathname.mat,'/curve/',num2str(PCB.date),'_a039_',num2str(PCB.shot),'_',num2str(FIG.start),'_',num2str(FIG.dt),'_',num2str(FIG.tate*FIG.yoko),'.mat'];
+movlen = 5;%移動平均長さ
+savename_curve = [pathname.mat,'/curve/',num2str(PCB.date),'_a039_',num2str(PCB.shot),'_',num2str(FIG.start),'_',num2str(FIG.dt),'_',num2str(FIG.tate*FIG.yoko),'_movmean',num2str(movlen),'.mat'];
 if exist(savename_curve,"file")
     load(savename_curve,'Curvedata2D')
 else
@@ -47,6 +47,23 @@ else
         psi = psi(idx_r_min:idx_r_max,idx_z_min:idx_z_max);
         low_psi = downsample(psi',CURVE.ds_rate);
         low_psi = downsample(low_psi',CURVE.ds_rate);
+        Bt_ext = zeros(size(Curvedata2D.zq,1),size(Curvedata2D.zq,2));
+        Bt = zeros(size(Curvedata2D.zq,1),size(Curvedata2D.zq,2));
+        Br = zeros(size(Curvedata2D.zq,1),size(Curvedata2D.zq,2));
+        Bz = zeros(size(Curvedata2D.zq,1),size(Curvedata2D.zq,2));
+        for i_r = 1:size(low_r,1)
+            for i_z = 1:size(low_z,1)
+                idx_pcb_r = knnsearch(PCBgrid2D.rq(:,1),low_r(i_r));
+                idx_pcb_z = knnsearch(PCBgrid2D.zq(1,:)',low_z(i_z));
+                Bt_ext(i_r,i_z) = PCBdata2D.Bt_ext(idx_pcb_r,idx_pcb_z,idx_pcb_t);
+                Bt(i_r,i_z) = PCBdata2D.Bt(idx_pcb_r,idx_pcb_z,idx_pcb_t);
+                Br(i_r,i_z) = PCBdata2D.Br(idx_pcb_r,idx_pcb_z,idx_pcb_t);
+                Bz(i_r,i_z) = PCBdata2D.Bz(idx_pcb_r,idx_pcb_z,idx_pcb_t);
+            end
+        end
+        Bp = sqrt(Br.^2+Bz.^2);
+        absB = sqrt(Bt_ext.^2+Bp.^2);
+        % absB = sqrt(Bt^2+Bp^2);
         for i_r = 1:size(low_r,1)
             for i_z = 1:size(low_z,1)
                 idx_pcb_r = knnsearch(PCBgrid2D.rq(:,1),low_r(i_r));
@@ -76,30 +93,27 @@ else
                             [~,~,K2] = curvature(X);
                             sum_Etdt = sum(PCBdata2D.Et(idx_pcb_r,idx_pcb_z,idx_pcb_t-10:idx_pcb_t),3)*1E-6;
                             Curvedata2D.Vgc_t(i_r,i_z,i_t) = q_i/m_i*sum_Etdt;%Toroidal component of Gyrocenter velocity[m/s]
-                            Bt_ext = PCBdata2D.Bt_ext(idx_pcb_r,idx_pcb_z,idx_pcb_t);
-                            Bt = PCBdata2D.Bt(idx_pcb_r,idx_pcb_z,idx_pcb_t);
-                            Br = PCBdata2D.Br(idx_pcb_r,idx_pcb_z,idx_pcb_t);
-                            Bz = PCBdata2D.Bz(idx_pcb_r,idx_pcb_z,idx_pcb_t);
-                            Bp = sqrt(Br^2+Bz^2);
-                            absB = sqrt(Bt_ext^2+Bp^2);
-                            % absB = sqrt(Bt^2+Bp^2);
-                            Curvedata2D.Vgc_p(i_r,i_z,i_t) = Curvedata2D.Vgc_t(i_r,i_z,i_t)*Bp/Bt_ext;%Poloidal component of Gyrocenter velocity[m/s]
-                            % Curvedata2D.Vgc_p(i_r,i_z,i_t) = Curvedata2D.Vgc_t(i_r,i_z,i_t)*Bp/Bt;%Poloidal component of Gyrocenter velocity[m/s]
+                            Curvedata2D.Vgc_p(i_r,i_z,i_t) = Curvedata2D.Vgc_t(i_r,i_z,i_t)*Bp(i_r,i_z)/Bt_ext(i_r,i_z);%Poloidal component of Gyrocenter velocity[m/s]
+                            % Curvedata2D.Vgc_p(i_r,i_z,i_t) = Curvedata2D.Vgc_t(i_r,i_z,i_t)*Bp(i_r,i_z)/Bt(i_r,i_z);%Poloidal component of Gyrocenter velocity[m/s]
                             Fcurve_z = -K2(:,1)*m_i*Curvedata2D.Vgc_p(i_r,i_z,i_t)^2;
                             Fcurve_z = filloutliers(Fcurve_z,"linear");
                             Fcurve_r = -K2(:,2)*m_i*Curvedata2D.Vgc_p(i_r,i_z,i_t)^2;
                             Fcurve_r = filloutliers(Fcurve_r,"linear");
                             Curvedata2D.Fcurve_z(i_r,i_z,i_t) = Fcurve_z(CURVE.c_width+1);%遠心力のz成分[N]
                             Curvedata2D.Fcurve_r(i_r,i_z,i_t) = Fcurve_r(CURVE.c_width+1)+m_i/low_r(i_r)*Curvedata2D.Vgc_t(i_r,i_z,i_t)^2;%遠心力のr成分[N]
-                            Curvedata2D.Vcurve_z(i_r,i_z,i_t) = Curvedata2D.Fcurve_r(i_r,i_z,i_t)*Bt_ext/(q_i*absB^2)*1E-3;
-                            Curvedata2D.Vcurve_r(i_r,i_z,i_t) = -Curvedata2D.Fcurve_z(i_r,i_z,i_t)*Bt_ext/(q_i*absB^2)*1E-3;
-                            % Curvedata2D.Vcurve_z(i_r,i_z,i_t) = Curvedata2D.Fcurve_r(i_r,i_z,i_t)*Bt/(q_i*absB^2)*1E-3;
-                            % Curvedata2D.Vcurve_r(i_r,i_z,i_t) = -Curvedata2D.Fcurve_z(i_r,i_z,i_t)*Bt/(q_i*absB^2)*1E-3;
                         end
                     end
                 end
             end
         end
+        Curvedata2D.Fcurve_z(:,:,i_t) = movmean(Curvedata2D.Fcurve_z(:,:,i_t),movlen,1);%移動平均
+        Curvedata2D.Fcurve_z(:,:,i_t) = movmean(Curvedata2D.Fcurve_z(:,:,i_t),movlen,2);%移動平均
+        Curvedata2D.Fcurve_r(:,:,i_t) = movmean(Curvedata2D.Fcurve_r(:,:,i_t),movlen,1);%移動平均
+        Curvedata2D.Fcurve_r(:,:,i_t) = movmean(Curvedata2D.Fcurve_r(:,:,i_t),movlen,2);%移動平均
+        Curvedata2D.Vcurve_z(:,:,i_t) = Curvedata2D.Fcurve_r(:,:,i_t).*Bt_ext./(q_i.*absB.^2)*1E-3;
+        Curvedata2D.Vcurve_r(:,:,i_t) = -Curvedata2D.Fcurve_z(:,:,i_t).*Bt_ext./(q_i.*absB.^2)*1E-3;
+        % Curvedata2D.Vcurve_z(:,:,i_t) = Curvedata2D.Fcurve_r(:,:,i_t)*Bt/(q_i*absB^2)*1E-3;
+        % Curvedata2D.Vcurve_r(:,:,i_t) = -Curvedata2D.Fcurve_z(:,:,i_t)*Bt/(q_i*absB^2)*1E-3;
     end
     Curvedata2D.zq([1 end],:,:) = [];
     Curvedata2D.zq(:,[1 end],:) = [];

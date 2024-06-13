@@ -26,8 +26,8 @@ run define_path.m
 
 % %SEP合体、X点R=0.26m、ExBアウトフロー大。IDSP->230830,230831(delay=468, 472, 476us)
 ESP.date = 230830;%【input】静電プローブ計測日
-ESP.shotlist = [11 13 14 16 17 20 22:26 28 29 32 34 37 41:45 47 49 51 54 55 57 59 60];%【input】静電プローブ解析shotlist(同一オペレーション)
-FIG.start = 466;%【input】プロット開始時刻[us]
+ESP.shotlist = [11 13 14 16 17 20 22:26 28 29 32 34 37 41:45 47 49 51 54 55 57 59 60];%32 34【input】静電プローブ解析shotlist(同一オペレーション)
+FIG.start = 474;%【input】プロット開始時刻[us]
 FIG.dt = 1;%【input】プロット時間間隔[us]
 PCB.date = 230830;%【input】重ねる磁気面計測日
 PCB.IDX = 22;%【input】重ねる磁気面shot番号
@@ -40,9 +40,11 @@ ESP.mesh = 21;%【input】静電プローブ補間メッシュ数(21)
 ESP.trange = 460:0.1:500;%【input】計算時間範囲(0.1刻み)
 ESP.vector = true;%【input】電場ベクトルをプロット
 
-colorplot = 'phi';%【input】カラープロット種類('phi','psi','Ez','Er','Et',...
+color_type = 'phi';%【input】カラープロット種類('phi','psi','Ez','Er','Et',...
 % 'Bz','Br','Bt_ext','Bt_plasma','absB','absB2','Jt','VExBr','VExBz','|VExB|')
-profileplot = 'VExBz';%【input】一次元プロット種類('VExBr','VExBz','|VExB|')
+vector_type = 'Ep';%【input】ベクトルプロット種類('Ep','VExB')
+
+% profileplot = 'VExBz';%【input】一次元プロット種類('VExBr','VExBz','|VExB|')
 
 PCB.mesh = 40; %【input】psiのrz方向メッシュ数
 PCB.trange = 400:800;%【input】psi計算時間範囲
@@ -73,7 +75,7 @@ ESPdata2D = cal_ESP(pathname,ESP);
 [ExBdata2D,newPCBdata2D] = cal_ExB(pathname,PCBgrid2D,PCBdata2D,ESPdata2D,ESP,PCB,FIG);
 
 %磁気面、ExBドリフト2次元プロット
-plot_ExB(PCBgrid2D,PCBdata2D,ESPdata2D,ExBdata2D,newPCBdata2D,IDSP,FIG,colorplot,false)
+plot_ExB(PCBgrid2D,PCBdata2D,ESPdata2D,ExBdata2D,newPCBdata2D,IDSP,FIG,color_type,vector_type,false)
 
 %磁気面、ExBドリフト2次元プロット
 % movie_ExB(PCBgrid2D,PCBdata2D,ESPdata2D,ExBdata2D,newPCBdata2D,IDSP,FIG,colorplot)

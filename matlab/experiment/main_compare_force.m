@@ -25,11 +25,11 @@ range.z_max = 0.17;
 range.r_min = 0.06;
 range.r_max = 0.33;
 
-FIG.tate = 2;%【input】プロット枚数(縦)
-FIG.yoko = 2.5;%【input】プロット枚数(横)
+FIG.tate = 1;%【input】プロット枚数(縦)
+FIG.yoko = 1;%【input】プロット枚数(横)
 FIG.dt = 1;%【input】プロット時間間隔[us]
-cal_type = 'contop';%'contop','magline','curve','ExB','nablaB'
-plot_type = 'V_r';%'V_zr','V_z','V_r','V','F_zr','F_z','F_r','F','scatter'
+cal_type = 'nablaB';%'contop','magline','curve','ExB','nablaB'
+plot_type = 'F_z';%'V_zr','V_z','V_r','V','F_zr','F_z','F_r','F_r/F_z','F','scatter'
 
 switch PCB.date
     case 230828
@@ -40,10 +40,10 @@ switch PCB.date
         savename.ESP = [pathname.mat,'/ESP/','mesh21_230828_shot5-63.mat'];
     case 230830
         PCB.shot = 2437;
-        FIG.start = 468;
+        FIG.start = 470;
         savename.highmesh_psi = [pathname.mat,'/pcb_processed/','mesh500_a039_2437.mat'];
         savename.pcb = [pathname.mat,'/pcb_processed/','a039_2437.mat'];
-        savename.ESP = [pathname.mat,'/ESP/','mesh21_230830_shot11-60.mat'];
+        savename.ESP = [pathname.mat,'/ESP/','230830_shot11_13-14_16-17_20_22-26_28-29_32_34_37_41-45_47_49_51_54-55_57_59-60_mesh21.mat'];
     case 230914
         PCB.shot = 2862;
         FIG.start = 500;
@@ -98,29 +98,36 @@ switch cal_type
         E_z = squeeze(ESPdata2D.Ez(idx_time,idx_range.r_min:idx_range.r_max,idx_range.z_min:idx_range.z_max));
         E_r = squeeze(ESPdata2D.Er(idx_time,idx_range.r_min:idx_range.r_max,idx_range.z_min:idx_range.z_max));
         absE = sqrt(E_z.^2+E_r.^2);
-        Fcurve_z = q_i*E_z;
-        Fcurve_r = q_i*E_r;
-        Fcurve = q_i*absE;
+        Fe_z = q_i*E_z;
+        Fe_r = q_i*E_r;
+        Fe = q_i*absE;
         % figure('Position',[0 0 1000*(range.z_max-range.z_min)/(range.r_max-range.r_min)+100 1500],'visible','on')
         figure('Position',[0 0 1500 1500],'visible','on')
         switch plot_type
             case 'F_r'
-                contourf(mesh_z,mesh_r,Fcurve_r,100,'edgecolor','none')
-                % c = colorbar;
+                contourf(mesh_z,mesh_r,Fe_r,100,'edgecolor','none')
+                c = colorbar;
                 colormap(jet)
+                clim([-5E-16 5E-16])
                 % c.Label.String = 'R component of Electrical Force [N]';
             case 'F_z'
-                contourf(mesh_z,mesh_r,Fcurve_z,100,'edgecolor','none')
+                contourf(mesh_z,mesh_r,Fe_z,100,'edgecolor','none')
                 % c = colorbar;
                 colormap(jet)
-                clim([-2E-16 2E-16])
+                clim([0 8E-16])
                 % c.Label.String = 'Z component of Electrical Force [N]';
             case 'F'
-                contourf(mesh_z,mesh_r,Fcurve,100,'edgecolor','none')
+                contourf(mesh_z,mesh_r,Fe,100,'edgecolor','none')
                 c = colorbar;
                 colormap(jet)
                 clim([0 3E-16])
                 c.Label.String = 'Strength of Electrical Force [N]';
+            case 'F_z/F_r'
+                contourf(mesh_z,mesh_r,abs(Fe_z)./abs(Fe_r),[0:0.1:30],'edgecolor','none')
+                c = colorbar;
+                colormap(jet)
+                % clim([0 10])
+                % c.Label.String = 'Z component of Electrical Force [N]';
         end
         if exist(savename.pcb,"file")
             load(savename.pcb,'PCBgrid2D','PCBdata2D')
@@ -135,7 +142,6 @@ switch cal_type
         daspect([1 1 1])
         view([90 -90])%RZ反転
         % clim([0 1.2E-17])
-        clim([-3E-16 3E-16])
         xlim([-0.01 0.05])
         ylim([0.1 0.27])
         c.Location = "north";

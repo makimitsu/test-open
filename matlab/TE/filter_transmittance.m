@@ -7,7 +7,7 @@ run define_path.m
 
 date = 20240313;
 % angle = [-20 -15 -10 -5 -2.5 0 2.5 5 10 15 20];
-angle = [-10 -5 -2.5 0 2.5 5 10];
+angle = [-5 -2.5 0 2.5 5];
 % angle = [-2.5, 0, 2.5, 5];
 x_min = 1;
 x_max = 1024;
@@ -69,20 +69,20 @@ ax = gca;
 ax.FontSize = 18;
 hold off
 
-figure
-errorbar(angle,lambda_center,lambda_center-lambda_10_left,lambda_10_right-lambda_center,'bo-','LineWidth',2)
-hold on
-errorbar(angle,lambda_center,lambda_center-lambda_50_left,lambda_50_right-lambda_center,'go-','LineWidth',2)
-hold on
-errorbar(angle,lambda_center,lambda_center-lambda_90_left,lambda_90_right-lambda_center,'ro-','LineWidth',2)
-yline(529.05,'LineWidth',3)%C VI 529.05nm
-xlabel('Filter Tilt Angle [°]')
-ylabel('Filter Center Wavelength [nm]')
-% ylim([528.9 529.3])
-% ylim([527.5 530.5])
-ax = gca;
-ax.FontSize = 18;
-hold off
+% figure
+% errorbar(angle,lambda_center,lambda_center-lambda_10_left,lambda_10_right-lambda_center,'bo-','LineWidth',2)
+% hold on
+% errorbar(angle,lambda_center,lambda_center-lambda_50_left,lambda_50_right-lambda_center,'go-','LineWidth',2)
+% hold on
+% errorbar(angle,lambda_center,lambda_center-lambda_90_left,lambda_90_right-lambda_center,'ro-','LineWidth',2)
+% yline(529.05,'LineWidth',3)%C VI 529.05nm
+% xlabel('Filter Tilt Angle [°]')
+% ylabel('Filter Center Wavelength [nm]')
+% % ylim([528.9 529.3])
+% % ylim([527.5 530.5])
+% ax = gca;
+% ax.FontSize = 18;
+% hold off
 
 % figure
 % contourf(angle',lambda_transmit',spectra,10)
