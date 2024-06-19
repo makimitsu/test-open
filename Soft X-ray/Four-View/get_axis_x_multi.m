@@ -4,7 +4,7 @@ trange = data2D.trange;
 % timeIndex = trange==time;
 psi = data2D.psi;
 % psi = psi(:,:,timeIndex);
-% Bt = data2D.Bt;
+Bt = data2D.Bt;
 % Bt = Bt(:,:,timeIndex);
 rq = grid2D.rq;
 zq = grid2D.zq;
@@ -34,6 +34,7 @@ magAxisList.psi = NaN(2,numel(trange));
 xPointList.r = NaN(1,numel(trange));
 xPointList.z = NaN(1,numel(trange));
 xPointList.psi = NaN(1,numel(trange));
+xPointList.Bt = NaN(1,numel(trange));
 
 % magAxisList.r = rqList(I(TF));
 % magAxisList.z = zqList(I(TF));
@@ -70,6 +71,7 @@ for i=1:numel(trange)
         xPointList.r(i) = rqList(psiRidgeIdx_t(xpointIdx));
         xPointList.z(i) = zqList(psiRidgeIdx_t(xpointIdx));
         xPointList.psi(i) = psi(psiRidgeIdx_t(xpointIdx));
+        xPointList.Bt(i) = Bt(psiRidgeIdx_t(xpointIdx));
     end
     if any(ismember(magAxisList.r(:,i),rLim))
         magAxisList.r(:,i) = NaN;
@@ -80,6 +82,7 @@ for i=1:numel(trange)
         xPointList.r(i) = NaN;
         xPointList.z(i) = NaN;
         xPointList.psi(i) = NaN;
+        xPointList.Bt(i) = NaN;
     end
     % if trange(i) == 467
     %     flag = true;

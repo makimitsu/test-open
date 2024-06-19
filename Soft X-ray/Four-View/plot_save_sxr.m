@@ -28,10 +28,19 @@ r_space_SXR = linspace(rmin,rmax,size(EE,1));
 z_space_SXR1 = linspace(zmin1,zmax1,size(EE,2));
 z_space_SXR2 = linspace(zmin2,zmax2,size(EE,2));
 
-r_range = find(0.060<=r_space_SXR & r_space_SXR<=0.330);
+rmin_psi = min(grid2D.rq,[],'all');
+rmax_psi = max(grid2D.rq,[],'all');
+zmin_psi = min(grid2D.zq,[],'all');
+zmax_psi = max(grid2D.zq,[],'all');
+
+% r_range = find(0.060<=r_space_SXR & r_space_SXR<=0.330);
+% r_space_SXR_plot = r_space_SXR(r_range);
+% z_range1 = find(-0.12<=z_space_SXR1 & z_space_SXR1<=0.12);
+% z_range2 = find(-0.12<=z_space_SXR2 & z_space_SXR2<=0.12);
+r_range = find(rmin_psi<=r_space_SXR & r_space_SXR<=rmax_psi);
 r_space_SXR_plot = r_space_SXR(r_range);
-z_range1 = find(-0.12<=z_space_SXR1 & z_space_SXR1<=0.12);
-z_range2 = find(-0.12<=z_space_SXR2 & z_space_SXR2<=0.12);
+z_range1 = find(zmin_psi<=z_space_SXR1 & z_space_SXR1<=zmax_psi);
+z_range2 = find(zmin_psi<=z_space_SXR2 & z_space_SXR2<=zmax_psi);
 
 z_space_SXR1_plot = z_space_SXR1(z_range1);
 z_space_SXR2_plot = z_space_SXR2(z_range2);
@@ -45,10 +54,13 @@ psi_mesh_z = grid2D.zq;
 psi_mesh_r = grid2D.rq;
 t_idx = find(data2D.trange==t);
 psi = data2D.psi(:,:,t_idx);
+Bz = data2D.Bz(:,:,t_idx);
+Br = data2D.Br(:,:,t_idx);
+Bp = sqrt(Bz.^2+Br.^2);
 
 psi_min = min(min(psi));
 psi_max = max(max(psi));
-contour_layer = linspace(psi_min,psi_max,20);
+contour_layer = linspace(psi_min,psi_max,50);
 
 [SXR_mesh_z1,SXR_mesh_r] = meshgrid(z_space_SXR1_plot,r_space_SXR_plot);
 [SXR_mesh_z2,~] = meshgrid(z_space_SXR2_plot,r_space_SXR_plot);
@@ -60,9 +72,9 @@ contour_layer = linspace(psi_min,psi_max,20);
 EE_q = zeros(50,50,4);
 for i = 1:4
     if i <=2
-        EE_q(:,:,i) = griddata(z_space_SXR1,r_space_SXR,EE(:,:,i),psi_mesh_z,psi_mesh_r);
-    else
         EE_q(:,:,i) = griddata(z_space_SXR2,r_space_SXR,EE(:,:,i),psi_mesh_z,psi_mesh_r);
+    else
+        EE_q(:,:,i) = griddata(z_space_SXR1,r_space_SXR,EE(:,:,i),psi_mesh_z,psi_mesh_r);
     end
 end
 
@@ -80,11 +92,12 @@ nameList = {'1um Al', '2.5um Al', '2um Mylar', '1um Mylar'};
 % cLimList = {[0 1],[0 1.8],[0 0.8],[0 0.2]};
 % cLimList = {[0 0.4],[0 1],[0 0.4],[0 0.2]};
 % cLimList = {[0 0.4],[0 6],[0 0.4],[0 0.2]};
-% cLimList = {[0 1],[0 2],[0 0.3],[0 0.15]};
-cLimList = {[0 1],[0 0.5],[0 0.3],[0 0.15]};
+cLimList = {[0 1],[0 2],[0 0.3],[0 0.15]};
+% cLimList = {[0 1],[0 0.5],[0 0.3],[0 0.15]};
 % cLimList = {[0 1.5],[0 0.5],[0 1],[0 1.5]};
 % cLimList = {[0 0.3],[0 0.3],[0 0.3],[0 0.15]};
 % cLimList = {[0 2],[0 2],[0 2],[0 2]};
+% cLimList = {[0 1],[0 1],[0 1],[0 0.6]};
 
 % 負の要素を0で置換
 negativeEE = find(EE<0);
@@ -108,8 +121,8 @@ for i = 1:4
     % [~,h] = contourf(SXR_mesh_z,SXR_mesh_r,EE_plot,linspace(cRange(1),cRange(2),20));clim(cRange);
     % [~,h] = contourf(SXR_mesh_z,SXR_mesh_r,EE_plot,20);
 
-    % [~,h] = contourf(psi_mesh_z,psi_mesh_r,EE_q(:,:,i),linspace(cRange(1),cRange(2),20));clim(cRange);
-    [~,h] = contourf(psi_mesh_z,psi_mesh_r,EE_q(:,:,i),20);
+    [~,h] = contourf(psi_mesh_z,psi_mesh_r,EE_q(:,:,i),linspace(cRange(1),cRange(2),20));clim(cRange);
+    % [~,h] = contourf(psi_mesh_z,psi_mesh_r,EE_q(:,:,i),20);
 
     colormap('turbo');
     h.LineStyle = 'none';
@@ -129,7 +142,8 @@ for i = 1:4
     % plot(magAxisList.z(:,t_idx),magAxisList.r(:,t_idx),'wo','LineWidth',3);
     % plot(xPointList.z(t_idx),xPointList.r(t_idx),'wx','LineWidth',3);
     hold off;
-    xlim([-0.05,0.05]);ylim([0.18,0.32]);
+    % xlim([-0.05,0.05]);ylim([0.18,0.32]);
+    xlim([-0.02,0.02]);ylim([0.23,0.29]);
     % % xlim([-0.03,0.03]);ylim([0.21,0.3]);
     title(string(nameList(i)));
 end

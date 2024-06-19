@@ -12,9 +12,10 @@ idx = PCB.idx;
 
 % filename = strcat(pathname.pre_processed_directory,'/a039_',num2str(shot(1)),'.mat');
 filename = strcat(pathname.pre_processed_directory,'/',num2str(PCB.date),sprintf('%03d',idx),'.mat');
-if exist(filename,'file') == 0
+if exist(filename,'file') == 0 || PCB.doOverwrite
     doCalculation = true;
-    disp('no processed data -- start calculation');
+    % disp('no processed data -- start calculation');
+    disp('processing data');
 else
     doCalculation = false;
     disp('loading processed data');
@@ -48,8 +49,9 @@ if doCalculation
             % disp(['File:',filename1,' does not exit']);
             % return
         end
-        load(filename1,"rawdata_woTF");
+        load(filename1,"rawdata_wTF","rawdata_woTF");
         a039_raw = rawdata_woTF;
+        a039_raw_wTF = rawdata_wTF;
         % a039_raw = importdata(filename1);
     end
     if ismember(40,dtacq_num_list)
@@ -64,21 +66,28 @@ if doCalculation
             % return
         end
         % a040_raw = importdata(filename2);
-        load(filename2,"rawdata_woTF");
+        load(filename2,"rawdata_wTF","rawdata_woTF");
         a040_raw = rawdata_woTF;
+        a040_raw_wTF = rawdata_wTF;
     end
     
     raw = zeros(1000,length(dtaq_ch));
+    raw_TF = zeros(1000,length(dtaq_ch));
     for i = 1:length(dtaq_ch)
         if dtacq_num_list(i) == 39
             raw(:,i) = a039_raw(:,dtaq_ch(i));
+            raw_TF(:,i) = a039_raw_wTF(:,dtaq_ch(i));
         elseif dtacq_num_list(i) == 40
             raw(:,i) = a040_raw(:,dtaq_ch(i));
+            raw_TF(:,i) = a040_raw_wTF(:,dtaq_ch(i));
         end
     end
     
     b=raw.*coeff';%較正係数RC/NS
     b=b.*polarity';%極性揃え
+
+    b_TF=raw_TF.*coeff';%較正係数RC/NS
+    b_TF=b_TF.*polarity';%極性揃え
     
     %デジタイザchからプローブ通し番号順への変換
     bz=zeros(1000,100);
@@ -98,13 +107,16 @@ if doCalculation
     for i=1:length(ch)
         b(:,i) = filter(bb,aa,b(:,i));
         b(:,i) = b(:,i) - mean(b(1:40,i));
+        b_TF(:,i) = filter(bb,aa,b_TF(:,i));
+        b_TF(:,i) = b_TF(:,i) - mean(b_TF(1:40,i));
         if rem(ch(i),2)==1
             bz(:,ceil(ch(i)/2))=b(:,i);
             ok_bz(ceil(ch(i)/2))=ok(i);
             zpos_bz(ceil(ch(i)/2))=zpos(i);
             rpos_bz(ceil(ch(i)/2))=rpos(i);
         elseif rem(ch(i),2)==0
-            bt(:,ch(i)/2)=b(:,i);
+            % bt(:,ch(i)/2)=b(:,i);
+            bt(:,ch(i)/2)=b_TF(:,i);
             ok_bt(ceil(ch(i)/2))=ok(i);
             zpos_bt(ceil(ch(i)/2))=zpos(i);
             rpos_bt(ceil(ch(i)/2))=rpos(i);
