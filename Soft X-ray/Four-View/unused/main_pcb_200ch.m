@@ -16,29 +16,28 @@ pathname.woTFdata=getenv('woTFdata_path');%rawdata（TFoffset引いた）の保�
 pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所
 pathname.pre_processed_directory_path=getenv('pre_processed_directory_path');
 
+dataType = 1;%エラー回避
 
 %%%%実験オペレーションの取得
-% prompt = {'Date:','Shot number:','doCheck:'};
-% dlgtitle = 'Input';
-% dims = [1 35];
-% definput = {'','',''};
-% answer = inputdlg(prompt,dlgtitle,dims,definput);
-% date = str2double(cell2mat(answer(1)));
-% IDXlist = str2num(cell2mat(answer(2)));
-% doCheck = num2str(cell2mat(answer(3)));
-prompt = {'Date:','Shot number:','dataType(1:Bz, 2:psi, 3:Bt, 4:Jt, 5:Et):','doCheck:'};
-definput = {'','','',''};
+prompt = {'Date:','Shot number:','a039(not necessary)','doCheck:','Restart:','PCB(1:200ch, 2:280ch):'};
+definput = {'','','','','',''};
 if exist('date','var')
-    definput{1} = num2str(PCB.date);
+    definput{1} = num2str(date);
 end
 if exist('IDXlist','var')
     definput{2} = num2str(IDXlist);
 end
-if exist('dataType','var')
-    definput{3} = num2str(dataType);
+if exist('a039','var')
+    definput{3} = num2str(a039);
 end
 if exist('doCheck','var')
     definput{4} = num2str(doCheck);
+end
+if exist('PCB.restart', 'var')
+    definput{5} = num2str(doCheck);
+end
+if exist('PCB.chtype', 'var')
+    definput{6} = num2str(doCheck);
 end
 dlgtitle = 'Input';
 dims = [1 35];
@@ -47,23 +46,46 @@ answer = inputdlg(prompt,dlgtitle,dims,definput);
 if isempty(answer)
     return
 end
-PCB.date = str2double(cell2mat(answer(1)));
+date = str2double(cell2mat(answer(1)));
 IDXlist = str2num(cell2mat(answer(2)));
-dataType = str2num(cell2mat(answer(3)));
+a039 = str2num(cell2mat(answer(3)));
 doCheck = logical(str2num(cell2mat(answer(4))));
+PCB.restart = logical(str2num(cell2mat(answer(5))));
+PCB.chtype = str2num(cell2mat(answer(6)));
+
+if ~doCheck
+    % Data type options for pulldown menu
+    dataTypeOptions = {'Bz', 'psi', 'Bt', 'Jt', 'Et'};
+    dataType = listdlg('PromptString', 'Select data type:', 'SelectionMode', 'single', 'ListString', dataTypeOptions);
+end
 
 DOCID='1wG5fBaiQ7-jOzOI-2pkPAeV6SDiHc_LrOdcbWlvhHBw';%スプレッドシートのID
 T=getTS6log(DOCID);
-node='date';
-T=searchlog(T,node,PCB.date);
-n_data=numel(IDXlist);%計測データ数
-% shotlist=T.a039(IDXlist);
-shotlist = [T.a039(IDXlist), T.a040(IDXlist)];
-% tfshotlist=T.a039_TF(IDXlist);
-tfshotlist = [T.a039_TF(IDXlist), T.a040_TF(IDXlist)];
-EFlist=T.EF_A_(IDXlist);
-TFlist=T.TF_kV_(IDXlist);
-dtacqlist=39.*ones(n_data,1);
+
+if ~isempty(date) && ~isempty(IDXlist)
+    T=searchlog(T,'date',date);
+    if isnan(T.shot(1))
+        T(1, :) = [];
+    end
+    n_data=numel(IDXlist);%計測データ数
+    % shotlist=T.a039(IDXlist);
+    shotlist = [T.a039(IDXlist), T.a040(IDXlist)];
+    % tfshotlist=T.a039_TF(IDXlist);
+    tfshotlist = [T.a039_TF(IDXlist), T.a040_TF(IDXlist)];
+    EFlist=T.EF_A_(IDXlist);
+    TFlist=T.TF_kV_(IDXlist);
+    dtacqlist=39.*ones(n_data,1);
+elseif ~isempty(a039)
+    T=searchlog(T,'a039',a039);
+    n_data = numel(a039);
+    shotlist = [T.a039,T.a040];
+    tfshotlist = [T.a039,T.a040];
+    EFlist = T.EF_A_;
+    TFlist = T.TF_kV_;
+    dtacqlist=39.*ones(n_data,1);
+    date = T.date;
+    IDXlist = T.shot;
+end
 
 % trange=400:600;%【input】計算時間範囲
 % n=50; %【input】rz方向のメッシュ数
@@ -71,11 +93,10 @@ PCB.trange=400:800;%【input】計算時間範囲
 PCB.n=40; %【input】rz方向のメッシュ数
 PCB.start = 40; %plot開始時間-400
 
-% doCheck = false;
-% doCheck = true;
 
 for i=1:n_data
     % dtacq_num=dtacqlist;
+    PCB.date = date;
     PCB.idx = IDXlist(i);
     PCB.shot=shotlist(i,:);
     PCB.tfshot=tfshotlist(i,:);
@@ -88,7 +109,7 @@ for i=1:n_data
     if doCheck
         check_signal(PCB, pathname);
     else
-        plot_psi200ch(PCB, pathname);
+        plot_psi(PCB, pathname);
     end
 end
 

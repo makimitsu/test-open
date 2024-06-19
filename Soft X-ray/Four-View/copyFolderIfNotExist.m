@@ -1,3 +1,5 @@
+%NIFSのデータをドライブにコピーする
+
 function copyFolderIfNotExist(destFolder, sourceFolder)
     if ~isfolder(destFolder)
         try

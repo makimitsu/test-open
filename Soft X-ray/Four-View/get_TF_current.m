@@ -17,7 +17,8 @@ end
 t_start = 1; % us
 t_end = 1000; % us
 
-t_start=t_start-offset;t_end=t_end-offset; % set offset
+t_start=t_start-offset;
+t_end=t_end-offset; % set offset
 time_step = 1;%0.2; % us; time step of plot; must be an integer times of time step of raw data; larger time step gives faster plotting.
 %calibration = [1, -1516.4, 1, 1, 1533.2, 80, 140, 480, 1, 1,]; % calibration for each channel. I'm not sure about the exact calibration coefficient.
 % calibration = [1, -1, 1, 1, 1, 1, 1, 1, 1, 1,]; % calibration for each channel. I'm not sure about the exact calibration coefficient.

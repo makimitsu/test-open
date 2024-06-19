@@ -3,7 +3,11 @@ shot = PCB.shot;
 trange = PCB.trange;
 start = PCB.start;
 
-[grid2D,data2D] = process_PCBdata_200ch(PCB,pathname);
+if PCB.chtype == 2
+    [grid2D,data2D] = process_PCBdata_200ch(PCB,pathname);
+else
+    [grid2D,data2D] = process_PCBdata_280ch(PCB,pathname);
+end
 
 if isstruct(grid2D)==0 %もしdtacqデータがない場合次のloopへ(データがない場合NaNを返しているため)
     return
@@ -20,22 +24,31 @@ for m=1:16 %図示する時間
     i=start+m.*dt; %end
     t=trange(i);
     subplot(4,4,m)
-    if PCB.dataType == 1
+    if PCB.dataType == 2
         contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bz(:,:,i),30,'LineStyle','none');
         clim([-0.1,0.1]);
         dataTypeName = 'Bz';
-    elseif PCB.dataType == 2
-        contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.psi(:,:,i),40,'LineStyle','none')
+    elseif PCB.dataType == 1
+        contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.psi(:,:,i),40,'LineStyle','none');
+        clim([-8e-3,8e-3]);
         dataTypeName = 'psi';
     elseif PCB.dataType == 3
-        contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bt(:,:,i),-100e-3:0.5e-3:100e-3,'LineStyle','none')
+        contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bt(:,:,i),-100e-3:0.5e-3:100e-3,'LineStyle','none');
+        %clim([0.05,0.4]);%ST
+        clim([-0.05,0.05]);%Spheromak
         dataTypeName = 'Bt';
     elseif PCB.dataType == 4
-        contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Jt(:,:,i),30,'LineStyle','none')
+        contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Jt(:,:,i),30,'LineStyle','none');
+        clim([-1e6,1e6]);
         dataTypeName = 'Jt';
     elseif PCB.dataType == 5
-        contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Et(:,:,i),20,'LineStyle','none')
+        contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Et(:,:,i),20,'LineStyle','none');
+        clim([-500,400]);
         dataTypeName = 'Et';
+    elseif PCB.dataType == 6
+        contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Br(:,:,i),30,'LineStyle','none');
+        clim([-0.07,0.07]);
+        dataTypeName = 'Br';
     end
     colormap(jet)
     axis image
@@ -51,6 +64,7 @@ end
 sgtitle(strcat(dataTypeName, ' diagram of shot',num2str(shot)));
 
 end
+
 %{
 filename=strcat(pathname.rawdata,'/rawdata_dtacq',num2str(dtacq_num),'_shot',num2str(shot),'_tfshot',num2str(tfshot),'.mat');
 if exist(filename,"file")==0

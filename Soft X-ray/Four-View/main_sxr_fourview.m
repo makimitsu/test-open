@@ -53,6 +53,7 @@ SXR.doSave = doSave;
 SXR.doFilter = doFilter;
 SXR.doNLR = doNLR;
 
+%-----------スプレッドシートからデータ抜き取り--------------------%
 DOCID='1wG5fBaiQ7-jOzOI-2pkPAeV6SDiHc_LrOdcbWlvhHBw';%スプレッドシートのID
 T=getTS6log(DOCID);
 
@@ -73,12 +74,13 @@ elseif ~isempty(a039)% a039入力の場合
     tfshotlist = [T.a039_TF,T.a040_TF];
     EFlist = T.EF_A_;
     TFlist = T.TF_kV_;
-    dtacqlist=39;
+    dtacqlist=39.*ones(n_data,1);
     startlist = T.SXRStart;
     intervallist = T.SXRInterval;
     date = T.date;
     IDXlist = T.shot;
 end
+%-------------------------------------------------%
 
 PCB.trange=400:800;%【input】計算時間範囲
 PCB.n=50; %【input】rz方向のメッシュ数
@@ -90,6 +92,7 @@ SXR.show_localmax = false;
 % doFilter = true;
 % doNLR = false; %do non-linear reconstruction
 
+% NIFSの軟X線データをドライブにコピーする
 copyFolderIfNotExist(strcat(getenv('SXR_IMAGE_DIR'),'/',num2str(date)), strcat(getenv('NIFS_path'),'/',num2str(date)));
 
 for i=1:n_data
@@ -108,14 +111,9 @@ for i=1:n_data
     SXR.interval = intervallist(i);
     % [PCBdata.grid2D,PCBdata.data2D] = process_PCBdata_280ch(date, shot, tfshot, pathname, n,i_EF,trange);
     % [PCBdata.grid2D,PCBdata.data2D] = process_PCBdata_280ch(PCB,pathname);
-    [PCBdata.grid2D,PCBdata.data2D] = process_PCBdata_200ch(PCB,pathname);
-    % grid2D = NaN;
-    % data2D = NaN;
+    [PCBdata.grid2D,PCBdata.data2D] = process_PCBdata_200ch(PCB,pathname); %process_PCBdata_200ch.mに行く
     SXR.date = date;
     SXR.shot = IDXlist(i);
-    % SXR.SXRfilename = strcat(getenv('SXR_IMAGE_DIR'),'/',num2str(date),'/shot',num2str(shot_SXR,'%03i'),'.tif');
     SXR.SXRfilename = strcat(getenv('SXR_IMAGE_DIR'),'/',num2str(date),'/shot',num2str(SXR.shot,'%03i'),'.tif');
-    % plot_sxr_multi(grid2D,data2D,date,shot_SXR,show_xpoint,show_localmax,start,interval,doSave,SXRfilename,doFilter,doNLR);
     plot_sxr_multi(PCBdata,SXR);
-    % plot_sxr_at_t(grid2D,data2D,date,shot,t,show_xpoint,show_localmax,start,interval,doSave,SXRfilename,doFilter,NL)
 end

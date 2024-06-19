@@ -189,8 +189,8 @@ start = PCB.start;
 %     load(filename,'data2D','grid2D');
 % end
 
-% [grid2D,data2D] = process_PCBdata_280ch(PCB,pathname);
-[grid2D,data2D] = process_PCBdata_200ch(PCB,pathname);
+[grid2D,data2D] = process_PCBdata_280ch(PCB,pathname);
+% [grid2D,data2D] = process_PCBdata_200ch(PCB,pathname);
 
 % ***********************************************
 
@@ -211,6 +211,23 @@ dt = 4;
      i=start+m.*dt; %end
      t=trange(i);
      subplot(4,4,m)
+     if PCB.dataType == 1
+        contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bz(:,:,i),30,'LineStyle','none');
+        clim([-0.1,0.1]);
+        dataTypeName = 'Bz';
+    elseif PCB.dataType == 2
+        contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.psi(:,:,i),40,'LineStyle','none')
+        dataTypeName = 'psi';
+    elseif PCB.dataType == 3
+        contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bt(:,:,i),-100e-3:0.5e-3:100e-3,'LineStyle','none')
+        dataTypeName = 'Bt';
+    elseif PCB.dataType == 4
+        contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Jt(:,:,i),30,'LineStyle','none')
+        dataTypeName = 'Jt';
+    elseif PCB.dataType == 5
+        contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Et(:,:,i),20,'LineStyle','none')
+        dataTypeName = 'Et';
+    end
      % ポロイダル磁場ベースでのプロット
      % Bp = sqrt((data2D.Br(:,:,i)).^2+(data2D.Bz(:,:,i)).^2);
      % contourf(grid2D.zq(1,:),grid2D.rq(:,1),Bp,30,'LineStyle','none');clim([0,0.02]);
@@ -219,7 +236,7 @@ dt = 4;
      % x_psi = xPointList.psi(i);
      % sepa(((data2D.psi(:,:,i)<=x_psi+5e-4&data2D.psi(:,:,i)>=x_psi-5e-5)|(data2D.psi(:,:,i)<=x_psi*1.1&data2D.psi(:,:,i)>=x_psi*0.9)))=1;
      % contourf(grid2D.zq(1,:),grid2D.rq(:,1),sepa,'LineStyle','none');
-    contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bz(:,:,i),30,'LineStyle','none');clim([-0.1,0.1])%Bz
+    % contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bz(:,:,i),30,'LineStyle','none');clim([-0.1,0.1])%Bz
     % contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Br(:,:,i),30,'LineStyle','none')
     % contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.psi(:,:,i),40,'LineStyle','none');clim([-5e-3,5e-3])%psi
     % contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bt(:,:,i),40,'LineStyle','none');clim([0,0.3])%Bt
@@ -261,7 +278,7 @@ dt = 4;
 %     ylabel('r [m]')
  end
 
- sgtitle(strcat('shot',num2str(shot)));
+ sgtitle(strcat(dataTypeName, 'diagram of shot',num2str(shot)));
 
  % drawnow
 

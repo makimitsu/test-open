@@ -11,7 +11,7 @@ idx = PCB.idx;
 
 % filename = strcat(pathname.pre_processed_directory,'/a039_',num2str(shot(1)),'.mat');
 filename = strcat(pathname.pre_processed_directory_path,'/',num2str(PCB.date),sprintf('%03d',idx),'_200ch.mat');
-if exist(filename,'file') == 0
+if exist(filename, 'file') == 0 || any(PCB.restart == 1)
     doCalculation = true;
     disp('no processed data -- start calculation');
 else
@@ -22,8 +22,6 @@ end
 
 if doCalculation
     %較正係数のバージョンを日付で判別
-    % sheets = sheetnames('coeff200ch.xlsx');
-    % sheets = str2double(sheets);
     sheets = str2double(sheetnames('coeff200ch.xlsx'));
     sheet_date=max(sheets(sheets<=date));
 
@@ -126,10 +124,12 @@ if doCalculation
     ok_bz_matrix = false(length(rprobepcb),length(zprobepcb));
     for i = 1:length(ok_bt)
         if rpos_bt(i) > (r_shift)
-            index_r = (abs(rpos_bt(i)-rprobepcb_t)<0.001);index_z = (zpos_bt(i)==zprobepcb);
+            index_r = (abs(rpos_bt(i)-rprobepcb_t)<0.001);
+            index_z = (zpos_bt(i)==zprobepcb);
             ok_bt_matrix = ok_bt_matrix + rot90(index_r,-1)*index_z*ok_bt(i);
         end
-        index_r = (abs(rpos_bz(i)-rprobepcb)<0.001);index_z = (zpos_bz(i)==zprobepcb);
+        index_r = (abs(rpos_bz(i)-rprobepcb)<0.001);
+        index_z = (zpos_bz(i)==zprobepcb);
         ok_bz_matrix = ok_bz_matrix + rot90(index_r,-1)*index_z*ok_bz(i);
     end
     
