@@ -6,8 +6,8 @@ load(filename,'data2D','grid2D');
 % X点周辺の切り出し
 % [~,xpoint] = get_axis_x(grid2D,data2D,467);
 [~,xpointList] = get_axis_x_multi(grid2D,data2D);
-x_r = xpointList.r(data2D.trange==467);
-x_z = xpointList.z(data2D.trange==467);
+x_r = xpointList.r(data2D.trange==475);
+x_z = xpointList.z(data2D.trange==475);
 rq = grid2D.rq;
 zq = grid2D.zq;
 x_r_idx = knnsearch(rq(:,1),x_r);
@@ -62,18 +62,18 @@ Bp = sqrt(Br_new.^2+Bz_new.^2);
 x_e(1,1) = r_ind;
 x_e(2,1) = z_ind;
 
-% % X点近傍の磁場が0になるように微修正
-% Br_new = Br_new - Br_new(r_ind,z_ind);
-% Bz_new = Bz_new - Bz_new(r_ind,z_ind);
-% Bp = sqrt(Br_new.^2+Bz_new.^2);
-% disp(min(Bp,[],'all'));
+% X点近傍の磁場が0になるように微修正
+Br_new = Br_new - Br_new(r_ind,z_ind);
+Bz_new = Bz_new - Bz_new(r_ind,z_ind);
+Bp = sqrt(Br_new.^2+Bz_new.^2);
+disp(min(Bp,[],'all'));
 
 % 1nsごとにステップ
 for i = 2:1000
     r_idx = x_e(1,i-1);
     z_idx = x_e(2,i-1);
     % 電場によって加速（磁力線に沿って？）
-    v_e(:,i) = v_e(:,i-1) + [0;0;1].*e*Et_new(r_idx,z_idx)/me*1e-9;
+    v_e(:,i) = v_e(:,i-1) + [0;0;1].*e*Et_new(r_idx,z_idx)/me*1e-21;
     % 速度は電場、位置は磁場で変更？
     % 磁場と速度の内積で移動距離を計算、ポロイダル平面に投影して位置を更新
     B = [Br_new(r_idx,z_idx),Bz_new(r_idx,z_idx),Bt_new(r_idx,z_idx)];
