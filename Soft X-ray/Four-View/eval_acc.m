@@ -62,11 +62,11 @@ Bp = sqrt(Br_new.^2+Bz_new.^2);
 x_e(1,1) = r_ind;
 x_e(2,1) = z_ind;
 
-% X点近傍の磁場が0になるように微修正
-Br_new = Br_new - Br_new(r_ind,z_ind);
-Bz_new = Bz_new - Bz_new(r_ind,z_ind);
-Bp = sqrt(Br_new.^2+Bz_new.^2);
-disp(min(Bp,[],'all'));
+% % X点近傍の磁場が0になるように微修正
+% Br_new = Br_new - Br_new(r_ind,z_ind);
+% Bz_new = Bz_new - Bz_new(r_ind,z_ind);
+% Bp = sqrt(Br_new.^2+Bz_new.^2);
+% disp(min(Bp,[],'all'));
 
 % 1nsごとにステップ
 for i = 2:1000
