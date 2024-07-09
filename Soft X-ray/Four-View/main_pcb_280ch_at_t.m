@@ -66,6 +66,8 @@ dtacqlist=39.*ones(n_data,1);
 PCB.trange=400:800;%【input】計算時間範囲
 PCB.n=40; %【input】rz方向のメッシュ数
 PCB.start = 40; %plot開始時間-400
+PCB.doOverwrite=false;
+PCB.type = 1;
 
 % doCheck = false;
 % doCheck = true;

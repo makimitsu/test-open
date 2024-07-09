@@ -79,7 +79,7 @@ dtacqlist=39.*ones(n_data,1);
 
 PCB.trange=400:800;%【input】計算時間範囲
 PCB.n=40; %【input】rz方向のメッシュ数
-PCB.start = 40; %plot開始時間-400
+PCB.start = 60; %plot開始時間-400
 
 % doCheck = false;
 % doCheck = true;
@@ -105,7 +105,8 @@ for i=1:n_data
     else
         plot_psi280ch(PCB,pathname);
         % [B_r,B_t,b] = get_guide_field_ratio(PCB,pathname)
-        [B_r,B_t,b] = get_guide_field_ratio2(PCB,pathname)
+        [B_r,B_t,b] = get_guide_field_ratio2(PCB,pathname);
+        disp(['B_r=',num2str(B_r),', B_t=',num2str(B_t),', b=',num2str(b)]);
         % get_B_reconnection(PCB,pathname);
         % [grid2D,data2D] = process_PCBdata_200ch(PCB,pathname);
         % [magAxisList,xPointList] = get_axis_x_multi(grid2D,data2D);

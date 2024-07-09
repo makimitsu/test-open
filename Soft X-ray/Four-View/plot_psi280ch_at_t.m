@@ -4,8 +4,8 @@ trange = PCB.trange;
 % start = PCB.start;
 time = PCB.time;
 
-% [grid2D,data2D] = process_PCBdata_280ch(PCB,pathname);
-[grid2D,data2D] = process_PCBdata_200ch(PCB,pathname);
+[grid2D,data2D] = process_PCBdata_280ch(PCB,pathname);
+% [grid2D,data2D] = process_PCBdata_200ch(PCB,pathname);
 
 % ***********************************************
 
@@ -20,15 +20,17 @@ end
 
 figure;
 i = find(trange==time);
-contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Br(:,:,i),40,'LineStyle','none')
+% contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Br(:,:,i),40,'LineStyle','none')
+contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.psi(:,:,i),40,'LineStyle','none');
+colorbar;
 colormap(jet)
 axis image
 axis tight manual
 hold on
-contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),20,'black')
+contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),10,'black','LineWidth',3)
 % contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.Br(:,:,i)),20,'black')
-plot(magAxisList.z(:,i),magAxisList.r(:,i),'ko');
-plot(xPointList.z(i),xPointList.r(i),'kx');
+% plot(magAxisList.z(:,i),magAxisList.r(:,i),'ko');
+% plot(xPointList.z(i),xPointList.r(i),'kx');
 hold off
 colorbar
 xlabel('z [m]');

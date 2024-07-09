@@ -205,7 +205,7 @@ figure('Position', [0 0 1500 1500],'visible','on');
 
 % figure('Position', [0 0 1500 1500],'visible','on');
 % start=30;
-dt = 4;
+dt = 2;
 %  t_start=470+start;
  for m=1:16 %図示する時間
      i=start+m.*dt; %end

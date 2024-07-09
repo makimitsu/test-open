@@ -53,7 +53,7 @@ for i = 1:numel(trange)
         % 値の取り方は考えた方がいい、Btは理論値でもよさそう
         Br_tmp = Br(:,:,i);
         % B_reconnection(1,i) = max(abs(Br_t(range)),[],'all');
-        B_reconnection(1,i) = mean([max(Br_tmp(range),[],'all'),abs(min(Br_tmp(range),[],"all"))]);
+        B_reconnection(1,i) = min([max(Br_tmp(range),[],'all'),abs(min(Br_tmp(range),[],"all"))]);
         % diffusionRegion = (abs(rq-xpoint.r)+abs(zq-xpoint.z))<=0.02;
         % Bt_t = Bt_ref(:,:,i);
         % B_guide(1,i) = mean(Bt_t(diffusionRegion));
@@ -98,9 +98,16 @@ mergingRatio(nanMask) = NaN;
 
 % timing = knnsearch(mergingRatio(plotRange).',0.5);
 % timing = find(mergingRatio==0,1,'last');
-timing = find(trange>=460&trange<=500&mergingRatio>=0.5,1);
-B_r = B_reconnection(1,timing);
-B_t = B_guide(1,timing);
+
+% timing = find(trange>=460&trange<=500&mergingRatio>=0.5,1);
+% timing = find(trange>=460&trange<=500&mergingRatio>=0,1);
+% B_r = B_reconnection(1,timing);
+% B_t = B_guide(1,timing);
+
+B_r_max = maxk(B_reconnection(trange>=460&trange<=500),4);
+B_r = mean(B_r_max(2:4));
+B_t = mean(B_guide(trange>=460&trange<=500),'omitnan');
+
 b = B_t/B_r;
 
 % % ガイド磁場比の計算に使用した磁気面を表示

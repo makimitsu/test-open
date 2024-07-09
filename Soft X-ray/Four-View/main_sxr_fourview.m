@@ -4,7 +4,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%
 % clear
 % close all
-clearvars -except date IDXlist doSave doFilter doNLR
+clearvars -except date IDXlist doSave doFilter doNLR shotIDX
 addpath([getenv('GITHUB_DIR'),'test-open',filesep,'pcb_experiment']); %getMDSdata.mとcoeff200ch.xlsxのあるフォルダへのパス
 
 %%%%%ここが各PCのパス
@@ -20,8 +20,8 @@ definput = {'','','','',''};
 if exist('date','var')
     definput{1} = num2str(date);
 end
-if exist('IDXlist','var')
-    definput{2} = num2str(IDXlist);
+if exist('shotIDX','var')
+    definput{2} = num2str(shotIDX);
 end
 if exist('doSave','var')
     definput{3} = num2str(doSave);
@@ -44,7 +44,7 @@ if isempty(answer)
     return
 end
 date = str2double(cell2mat(answer(1)));
-IDXlist = str2num(cell2mat(answer(2)));
+shotIDX = str2num(cell2mat(answer(2)));
 doSave = logical(str2num(cell2mat(answer(3))));
 doFilter = logical(str2num(cell2mat(answer(4))));
 doNLR = logical(str2num(cell2mat(answer(5))));
@@ -57,6 +57,7 @@ DOCID='1wG5fBaiQ7-jOzOI-2pkPAeV6SDiHc_LrOdcbWlvhHBw';%スプレッドシート�
 T=getTS6log(DOCID);
 node='date';
 T=searchlog(T,node,date);
+IDXlist = find(ismember(T.shot,shotIDX));
 n_data=numel(IDXlist);%計測データ数
 shotlist_a039 = T.a039(IDXlist);
 shotlist_a040 = T.a040(IDXlist);
@@ -91,7 +92,8 @@ SXR.show_localmax = false;
 for i=1:n_data
     disp(strcat('(',num2str(i),'/',num2str(n_data),')'));
     % dtacq_num=dtacqlist;
-    PCB.idx = IDXlist(i);
+    % PCB.idx = IDXlist(i);
+    PCB.idx = shotIDX(i);
     PCB.shot=shotlist(i,:);
     PCB.tfshot=tfshotlist(i,:);
     if PCB.shot == PCB.tfshot
@@ -108,7 +110,7 @@ for i=1:n_data
     % grid2D = NaN;
     % data2D = NaN;
     SXR.date = date;
-    SXR.shot = IDXlist(i);
+    SXR.shot = shotIDX(i);
     % SXR.SXRfilename = strcat(getenv('SXR_IMAGE_DIR'),'/',num2str(date),'/shot',num2str(shot_SXR,'%03i'),'.tif');
     SXR.SXRfilename = strcat(getenv('SXR_IMAGE_DIR'),'/',num2str(date),'/shot',num2str(SXR.shot,'%03i'),'.tif');
     % plot_sxr_multi(grid2D,data2D,date,shot_SXR,show_xpoint,show_localmax,start,interval,doSave,SXRfilename,doFilter,doNLR);
