@@ -1,13 +1,17 @@
-filename = '/Users/shinjirotakeda/Library/CloudStorage/OneDrive-TheUniversityofTokyo/Documents/probedata/processed/240111020_200ch.mat';
+% filename = '/Users/shinjirotakeda/Library/CloudStorage/OneDrive-TheUniversityofTokyo/Documents/probedata/processed/240111020_200ch.mat';
+filename = '/Users/shinjirotakeda/Library/CloudStorage/OneDrive-TheUniversityofTokyo/Documents/probedata/processed/240621055_200ch.mat';
 load(filename,'data2D','grid2D');
 % data2D(:,:,68);
 
 % X点周辺の切り出し
-[~,xpoint] = get_axis_x(grid2D,data2D,467);
+% [~,xpoint] = get_axis_x(grid2D,data2D,467);
+[~,xpointList] = get_axis_x_multi(grid2D,data2D);
+x_r = xpointList.r(data2D.trange==467);
+x_z = xpointList.z(data2D.trange==467);
 rq = grid2D.rq;
 zq = grid2D.zq;
-x_r_idx = knnsearch(rq(:,1),xpoint.r);
-x_z_idx = knnsearch(zq(1,:).',xpoint.z);
+x_r_idx = knnsearch(rq(:,1),x_r);
+x_z_idx = knnsearch(zq(1,:).',x_z);
 
 newRangeR = x_r_idx-2:x_r_idx+2;
 newRangeZ = x_z_idx-2:x_z_idx+2;
@@ -110,4 +114,4 @@ xlabel('z');ylabel('r');
 Ee = 0.5*me*v_e.^2./e;
 figure;
 plot(step,vecnorm(Ee(:,1:maxStep)));
-xlabel('step');ylabel('electron energy [eV]');
+xlabel('step');ylabel('electron energy [eV]');0

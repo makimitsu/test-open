@@ -52,7 +52,7 @@ if numel(I(TF)) == 2
         xpoint.psi = NaN;
         xpoint.Bt = NaN;
     end
-elseif numel(I(TF)) == 1
+elseif isscalar(I(TF))
     % 軸位置のrz座標を取得
     magaxis.r = rq(I(TF));
     magaxis.z = zq(I(TF));
