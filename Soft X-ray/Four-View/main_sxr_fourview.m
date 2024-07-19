@@ -15,6 +15,8 @@ pathname.fourier=getenv('fourier_path');%fourierのmd0（データックのシ�
 pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所;
 pathname.pre_processed_directory_path = getenv('pre_processed_directory_path');%計算結果の保存先（どこでもいい）
 
+PCB.restart = 0; % 今だけ
+
 %%%%実験オペレーションの取得
 prompt = {'Date:','Shot number:','a039(not necessary):','doSave:','doFilter:','doNLR:'};
 definput = {'','','','','',''};
@@ -59,6 +61,9 @@ T=getTS6log(DOCID);
 
 if ~isempty(date) && ~isempty(IDXlist)% 日付とショット入力の場合
     T=searchlog(T,'date',date);
+    if isnan(T.shot(1))
+        T(1, :) = [];
+    end
     n_data=numel(IDXlist);%計測データ
     shotlist = [T.a039(IDXlist), T.a040(IDXlist)];
     tfshotlist = [T.a039_TF(IDXlist), T.a040_TF(IDXlist)];
@@ -69,6 +74,9 @@ if ~isempty(date) && ~isempty(IDXlist)% 日付とショット入力の場合
     intervallist = T.SXRInterval(IDXlist);
 elseif ~isempty(a039)% a039入力の場合
     T=searchlog(T,'a039',a039);
+    if isnan(T.shot(1))
+        T(1, :) = [];
+    end
     n_data = numel(a039);
     shotlist = [T.a039, T.a040];
     tfshotlist = [T.a039_TF,T.a040_TF];

@@ -1,4 +1,4 @@
-addpath '/Users/shohgookazaki/Documents/GitHub/test-open/pcb_experiment';
+ addpath '/Users/shohgookazaki/Documents/GitHub/test-open/pcb_experiment';
 
 %%%%%%%%%%%%%%%%%%%%%%%%
 %200ch用新規pcbプローブのみでの磁気面（Bz）
@@ -20,7 +20,7 @@ pathname.pre_processed_directory_path=getenv('pre_processed_directory_path');
 doCheck = 0;
 
 dataType = 1;
-PCB.chtype = 2;
+PCB.chtype = 1;
 
 %%%%実験オペレーションの取得
 prompt = {'Date:','Shot number:','a039(not necessary)','doCheck:','Restart:'};
@@ -56,7 +56,7 @@ PCB.restart = logical(str2num(cell2mat(answer(5))));
 
 if ~doCheck
     % Data type options for pulldown menu
-    dataTypeOptions = {'psi', 'Bz', 'Bt', 'Jt', 'Et','Br'};
+    dataTypeOptions = {'psi', 'Bz', 'Bt', 'Jt', 'Et','Br', 'Ep'};
     dataType = listdlg('PromptString', 'Select data type:', 'SelectionMode', 'single', 'ListString', dataTypeOptions);
 
     % chTypeOptions = {'280ch', '200ch'};

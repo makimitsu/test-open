@@ -1,5 +1,7 @@
-function plot_psi200ch(PCB, pathname)
+function plot_psi(PCB, pathname)
 shot = PCB.shot;
+date = PCB.date;
+IDXlist = PCB.idx;
 trange = PCB.trange;
 start = PCB.start;
 
@@ -24,31 +26,43 @@ for m=1:16 %図示する時間
     i=start+m.*dt; %end
     t=trange(i);
     subplot(4,4,m)
-    if PCB.dataType == 2
-        contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bz(:,:,i),30,'LineStyle','none');
-        clim([-0.1,0.1]);
-        dataTypeName = 'Bz';
-    elseif PCB.dataType == 1
-        contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.psi(:,:,i),40,'LineStyle','none');
-        clim([-8e-3,8e-3]);
-        dataTypeName = 'psi';
-    elseif PCB.dataType == 3
-        contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bt(:,:,i),-100e-3:0.5e-3:100e-3,'LineStyle','none');
-        %clim([0.05,0.4]);%ST
-        clim([-0.05,0.05]);%Spheromak
-        dataTypeName = 'Bt';
-    elseif PCB.dataType == 4
-        contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Jt(:,:,i),30,'LineStyle','none');
-        clim([-1e6,1e6]);
-        dataTypeName = 'Jt';
-    elseif PCB.dataType == 5
-        contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Et(:,:,i),20,'LineStyle','none');
-        clim([-500,400]);
-        dataTypeName = 'Et';
-    elseif PCB.dataType == 6
-        contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Br(:,:,i),30,'LineStyle','none');
-        clim([-0.07,0.07]);
-        dataTypeName = 'Br';
+    switch PCB.dataType
+        case 1
+            contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.psi(:,:,i),40,'LineStyle','none');
+            clim([-5e-3,5e-3]);
+            dataTypeName = 'psi';
+            colorLabel = '\psi (Wb)';
+        case 2
+            contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bz(:,:,i),30,'LineStyle','none');
+            clim([-0.1,0.1]);
+            dataTypeName = 'Bz';
+            colorLabel = 'B_z (T)';
+        case 3
+            contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bt(:,:,i),-100e-3:0.5e-3:100e-3,'LineStyle','none');
+            %clim([0.05,0.4]);%ST
+            clim([-0.05,0.05]);%Spheromak
+            dataTypeName = 'Bt';
+            colorLabel = 'B_t (T)';
+        case 4
+            contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Jt(:,:,i),30,'LineStyle','none');
+            clim([-1e6,1e6]);
+            dataTypeName = 'Jt';
+            colorLabel = 'J_t (A/m^2)';
+        case 5
+            contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Et(:,:,i),20,'LineStyle','none');
+            clim([-0.75e-3,0.75e-3]);
+            dataTypeName = 'Et';
+            colorLabel = 'E_t (V/m)';
+        case  6
+            contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Br(:,:,i),30,'LineStyle','none');
+            clim([-0.07,0.07]);
+            dataTypeName = 'Br';
+            colorLabel = 'B_r (T)';
+        case  7
+            contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Et(:,:,i),20,'LineStyle','none'); %計算が合ってるかはわからない
+            clim([-0.75e-3,0.75e-3]);
+            dataTypeName = 'Ep';
+            colorLabel = 'E_p (V/m)';
     end
     colormap(jet)
     axis image
@@ -59,9 +73,12 @@ for m=1:16 %図示する時間
     plot(xPointList.z(i),xPointList.r(i),'kx');
     hold off
     title(string(t)+' us')
+
+    c = colorbar;
+    ylabel(c, colorLabel);
 end
 
-sgtitle(strcat(dataTypeName, ' diagram of shot',num2str(shot)));
+sgtitle(strcat(dataTypeName, ' diagram of shot', num2str(shot), ', on', num2str(date), ':', num2str(IDXlist(1))));
 
 end
 

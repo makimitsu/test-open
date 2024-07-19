@@ -53,10 +53,6 @@ if ismember(39,dtacq_num_list)
     a039_raw = rawdata_woTF;
 end
 if ismember(40,dtacq_num_list)
-    dtaq40file = strcat(pathname.rawdata, '/mag_probe/dtacq',num2str(40));
-    if exist(dtaq40file, 'dir') ~=7 % フォルダがなかったら作る
-        mkdir(dtaq40file);
-    end
     filename2 = strcat(pathname.rawdata,'/mag_probe/dtacq',num2str(40),'/shot',num2str(shot(2)),'_tfshot',num2str(tfshot(2)),'.mat');
     if exist(filename2,"file")==0
         disp('No rawdata file of a040 -- Start generating!')
@@ -140,10 +136,10 @@ r = 7;%プローブ本数＝グラフ出力時の縦に並べる個数
 col = 10;%グラフ出力時の横に並べる個数
 y_upper_lim = 0.05;%縦軸プロット領域（b_z上限）
 y_lower_lim = -0.05;%縦軸プロット領域（b_z下限）
+% t_start=1;%横軸プロット領域（開始時間）
+% t_end=1000;%横軸プロット領域（終了時間）
 t_start=400;%横軸プロット領域（開始時間）
 t_end=600;%横軸プロット領域（終了時間）
-% t_start=400;%横軸プロット領域（開始時間）
-% t_end=600;%横軸プロット領域（終了時間）
 t = 470;
 % z_probe_pcb = [-0.17 -0.1275 -0.0850 -0.0315 -0.0105 0.0105 0.0315 0.0850 0.1275 0.17];
 z_probe_pcb = [-0.2975 -0.255 -0.17 -0.1275 -0.0850 -0.0315 -0.0105 0.0105 0.0315 0.0850 0.1275 0.17 0.255 0.2975];

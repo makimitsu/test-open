@@ -10,8 +10,9 @@ trange = PCB.trange;
 % newTimeRange = find(trange>=440&trange<=500);
 newTimeRange = 1:numel(trange);
 % [grid2D,data2D] = process_PCBdata_280ch(PCB,pathname);
-[grid2D,data2D] = process_PCBdata_200ch(PCB,pathname);
+[grid2D,data2D] = process_PCBdata_280ch(PCB,pathname);
 Br = data2D.Br;
+% Bt = data2D.Bt;
 rq = grid2D.rq;
 zq = grid2D.zq;
 
@@ -23,15 +24,16 @@ zq = grid2D.zq;
 
 trange = trange(newTimeRange);
 Br = Br(:,:,newTimeRange);
+% Bt = Bt(:,:,newTimeRange);
 
 B_reconnection = zeros(1,numel(trange));
 B_guide = zeros(1,numel(trange));
 mergingRatio = zeros(1,numel(trange));
 
 [magAxisList,xPointList] = get_axis_x_multi(grid2D,data2D);
-[I_TF,x,aquisition_rate] = get_TF_current(PCB,pathname);
+% [I_TF,x,aquisition_rate] = get_TF_current(PCB,pathname);
 % timing = x/aquisition_rate==time;
-m0 = 4*pi*10^(-7);
+% m0 = 4*pi*10^(-7);
 % r = xpoint.r;
 % Bt = m0*I_TF(timing)*1e3*12/(2*pi()*r);
 
@@ -39,7 +41,7 @@ m0 = 4*pi*10^(-7);
 % 240117
 % SPコイルの内側のプローブ（からのデータ）のみを使用するように修正が必要
 for i = 1:numel(trange)
-    time = trange(i);
+    % time = trange(i);
     % [magaxis,xpoint] = get_axis_x(grid2D,data2D,time);
     magaxis.r = magAxisList.r(:,i);
     magaxis.z = magAxisList.z(:,i);
@@ -49,22 +51,24 @@ for i = 1:numel(trange)
     if magaxis.z(1)~=magaxis.z(2) && ~isnan(magaxis.r(1))
         range = rq>=min(magaxis.r)&rq<=max(magaxis.r)&zq>=min(magaxis.z)&zq<=max(magaxis.z);
         % 値の取り方は考えた方がいい、Btは理論値でもよさそう
-        Br_t = Br(:,:,i);
+        Br_tmp = Br(:,:,i);
         % B_reconnection(1,i) = max(abs(Br_t(range)),[],'all');
-        B_reconnection(1,i) = mean([max(Br_t(range),[],'all'),abs(min(Br_t(range),[],"all"))]);
+        B_reconnection(1,i) = mean([max(Br_tmp(range),[],'all'),abs(min(Br_tmp(range),[],"all"))]);
         % diffusionRegion = (abs(rq-xpoint.r)+abs(zq-xpoint.z))<=0.02;
         % Bt_t = Bt_ref(:,:,i);
         % B_guide(1,i) = mean(Bt_t(diffusionRegion));
         % B_guide(1,i) = get_B_troidal(PCB,grid2D,data2D,pathname,time);
-        timing = x/aquisition_rate==time;
-        B_guide(1,i) = m0*I_TF(timing)*1e3*12/(2*pi()*xPointList.r(1,i));
+        % timing = x/aquisition_rate==time;
+        % B_guide(1,i) = m0*I_TF(timing)*1e3*12/(2*pi()*xPointList.r(1,i));
+        B_guide(1,i) = xPointList.Bt(i);
         mergingRatio(1,i) = xPointList.psi(i)/mean(magAxisList.psi(:,i));
     elseif ~isnan(magaxis.r(1))
         range = rq>=min(magaxis.r(1),xpoint.r)&rq<=max(magaxis.r(1),xpoint.r)&zq>=min(magaxis.z(1),xpoint.z)&zq<=max(magaxis.z(1),xpoint.z);
-        Br_t = Br(:,:,i);
-        B_reconnection(1,i) = mean([max(Br_t(range),[],'all'),abs(min(Br_t(range),[],"all"))]);
-        timing = x/aquisition_rate==time;
-        B_guide(1,i) = m0*I_TF(timing)*1e3*12/(2*pi()*xPointList.r(1,i));
+        Br_tmp = Br(:,:,i);
+        B_reconnection(1,i) = mean([max(Br_tmp(range),[],'all'),abs(min(Br_tmp(range),[],"all"))]);
+        % timing = x/aquisition_rate==time;
+        % B_guide(1,i) = m0*I_TF(timing)*1e3*12/(2*pi()*xPointList.r(1,i));
+        B_guide(1,i) = xPointList.Bt(i);
         mergingRatio(1,i) = xPointList.psi(i)/mean(magAxisList.psi(:,i));
     else
         B_reconnection(1,i) = NaN;

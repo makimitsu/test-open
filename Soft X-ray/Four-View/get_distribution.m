@@ -42,7 +42,24 @@ E = zeros(1,K);
 % end
 % EE = reshape(E,sqrt(K),sqrt(K)); %ここで縦がr、横がzで左下が最小になる
 
-if NL
+if MEM
+    f = zeros(1, K);
+    df = ones(1, K);
+    eps = 0.1; % Newton法やめる時ようのε
+    while df.'*df > eps*(f.'*f)
+        Phif = M*gamma/2*(f+1)+ L.'*L*expm(f)-L.'*S;
+        Dx = M*gamma/2*diag(f.^(-1));
+        invDx = Dx^(-1);
+        A = eye(M)+L/Dx*L.';
+        b = L*invDx*Phif;
+        xi = cholesky(A,b);
+        df = -invDx*(Phif-L.'*xi)*diag(f.^(-1));
+        f = f+ df;
+    end
+    EE = exp(f);
+    
+
+elseif NL
     gamma = 10^(lg_gamma(gamma_index));
     C = Laplacian(sqrt(K)-1);
     H = gm2d;
