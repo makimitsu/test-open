@@ -94,7 +94,7 @@ mergingRatio(nanMask) = NaN;
 % subplot(1,3,2);plot(trange(plotRange),B_reconnection(plotRange));xlabel('time');ylabel('B_r');
 % subplot(1,3,3);plot(trange(plotRange),B_guide(plotRange));xlabel('time');ylabel('B_g');
 
-% figure;plot(trange,mergingRatio);xlim([465 485]);
+figure;plot(trange,mergingRatio);xlim([465 485]);
 
 % timing = knnsearch(mergingRatio(plotRange).',0.5);
 % timing = find(mergingRatio==0,1,'last');

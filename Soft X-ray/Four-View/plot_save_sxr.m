@@ -60,8 +60,8 @@ Bp = sqrt(Bz.^2+Br.^2);
 
 psi_min = min(min(psi));
 psi_max = max(max(psi));
-% contour_layer = linspace(psi_min,psi_max,50);
-contour_layer = linspace(psi_min,psi_max,20);
+contour_layer = linspace(psi_min,psi_max,50);
+% contour_layer = linspace(psi_min,psi_max,20);
 
 [SXR_mesh_z1,SXR_mesh_r] = meshgrid(z_space_SXR1_plot,r_space_SXR_plot);
 [SXR_mesh_z2,~] = meshgrid(z_space_SXR2_plot,r_space_SXR_plot);
@@ -70,7 +70,7 @@ contour_layer = linspace(psi_min,psi_max,20);
 % f.Units = 'normalized';
 % f.Position = [0.1,0.2,0.8,0.8];
 
-EE_q = zeros(50,50,4);
+EE_q = zeros(size(psi,1),size(psi,1),4);
 for i = 1:4
     if i <=2
         EE_q(:,:,i) = griddata(z_space_SXR2,r_space_SXR,EE(:,:,i),psi_mesh_z,psi_mesh_r);
@@ -93,13 +93,13 @@ nameList = {'1um Al', '2.5um Al', '2um Mylar', '1um Mylar'};
 % cLimList = {[0 1],[0 1.8],[0 0.8],[0 0.2]};
 % cLimList = {[0 0.4],[0 1],[0 0.4],[0 0.2]};
 % cLimList = {[0 0.4],[0 6],[0 0.4],[0 0.2]};
-% cLimList = {[0 1],[0 2],[0 0.3],[0 0.15]};
+cLimList = {[0 1],[0 2],[0 0.3],[0 0.15]};
 % cLimList = {[0 1],[0 0.5],[0 0.3],[0 0.15]}; %240111
 % cLimList = {[0 1.5],[0 0.5],[0 1],[0 1.5]};
 % cLimList = {[0 0.3],[0 0.3],[0 0.3],[0 0.15]};
 % cLimList = {[0 2],[0 2],[0 2],[0 2]};
 % cLimList = {[0 1],[0 1],[0 1],[0 0.6]};
-cLimList = {[0 2],[0 0.2],[0 0.2],[0 1.5]};%240621
+% cLimList = {[0 2],[0 0.2],[0 0.2],[0 1.5]};%240621
 % cLimList = {[0 1],[0 1],[0 1],[0 0.5]};
 
 % 負の要素を0で置換
@@ -125,8 +125,6 @@ for i = 1:4
     % [~,h] = contourf(SXR_mesh_z,SXR_mesh_r,EE_plot,20);
 
     [~,h] = contourf(psi_mesh_z,psi_mesh_r,EE_q(:,:,i),linspace(cRange(1),cRange(2),20));clim(cRange);
-    % [~,h] = contourf(psi_mesh_z,psi_mesh_r,smoothdata(smoothdata(EE_q(:,:,i)./Bp.^0.3),2),20);
-    % [~,h] = contourf(psi_mesh_z,psi_mesh_r,smoothdata(smoothdata(EE_q(:,:,i)./Bp.^0.3),2),linspace(cRange(1),cRange(2),20));clim(cRange);
 
     colormap('turbo');
     h.LineStyle = 'none';
@@ -140,16 +138,17 @@ for i = 1:4
         localmax_pos_z = SXR_mesh_z(localmax_idx);
         plot(localmax_pos_z,localmax_pos_r,'r*');
     end
-    [~,hp]=contourf(psi_mesh_z,psi_mesh_r,psi,contour_layer,'white','Fill','off');axis([-0.12 0.12 0.06 0.33]);
+    % [~,hp]=contourf(psi_mesh_z,psi_mesh_r,psi,contour_layer,'white','Fill','off');axis([-0.12 0.12 0.06 0.33]);
+    [~,hp]=contourf(interp_matrix(psi_mesh_z,3),interp_matrix(psi_mesh_r,3),interp_matrix(psi,3),contour_layer,'white','Fill','off');
     % [~,hp]=contourf(psi_mesh_z,psi_mesh_r,psi,contour_layer,'-k','Fill','off');
     hp.LineWidth = 1.5;
     % plot(magAxisList.z(:,t_idx),magAxisList.r(:,t_idx),'wo','LineWidth',3);
     % plot(xPointList.z(t_idx),xPointList.r(t_idx),'wx','LineWidth',3);
     hold off;
     % xlim([-0.05,0.05]);ylim([0.18,0.32]);
-    % xlim([-0.02,0.02]);ylim([0.23,0.29]);
+    xlim([-0.02,0.02]);ylim([0.23,0.29]);
     % xlim([-0.07,0.07]);ylim([0.2,0.32]);
-    % % xlim([-0.03,0.03]);ylim([0.21,0.3]);
+    % xlim([-0.03,0.03]);ylim([0.21,0.3]);
     title(string(nameList(i)));
 end
 
