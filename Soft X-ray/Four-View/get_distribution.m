@@ -42,24 +42,37 @@ E = zeros(1,K);
 % end
 % EE = reshape(E,sqrt(K),sqrt(K)); %ここで縦がr、横がzで左下が最小になる
 
-if MEM
-    f = zeros(1, K);
-    df = ones(1, K);
+if NL %最大エントロピー
+    gamma = 10^(lg_gamma(gamma_index));
+    L = gm2d;
+    f = zeros(K, 1);
+    df = zeros(K, 1);
     eps = 0.1; % Newton法やめる時ようのε
-    while df.'*df > eps*(f.'*f)
-        Phif = M*gamma/2*(f+1)+ L.'*L*expm(f)-L.'*S;
-        Dx = M*gamma/2*diag(f.^(-1));
-        invDx = Dx^(-1);
-        A = eye(M)+L/Dx*L.';
+    iter = 0;
+    while (df.'*df > eps*(f.'*f) || iter == 0) && (iter < 15) % iter15以下で大丈夫なのかな
+        disp(iter);
+        Ex = diag(exp(f)); 
+        invEx = Ex^(-1);%逆行列計算を楽にする
+        Dx = M*gamma/2*Ex;
+        invDx = Dx^(-1);%逆行列計算を楽にする
+        Phif = M*gamma/2*(f+1)+ L.'*L*exp(f)-L.'*s.';
+        A = eye(M)+L*invDx*L.'; %正定値対称行列になっているはずなんだよね
         b = L*invDx*Phif;
         xi = cholesky(A,b);
-        df = -invDx*(Phif-L.'*xi)*diag(f.^(-1));
+        
+        df = -invEx*invDx*(Phif-L.'*xi);
+        m = 0.5;
+        df(df > m) = 1+m - m ./ df(df > m); % dfが大きくなりすぎるのを阻止。エラーの原因になる。
+        df(df < -m) = -(1+m) - m ./df(df<-m); % dfが小さくなりすぎるのを阻止。エラーの原因になる。
         f = f+ df;
+        iter = iter+1;
     end
-    EE = exp(f);
-    
+    E = exp(f);
 
-elseif NL
+    EE = reshape(E.',sqrt(K),sqrt(K));
+    
+%{
+if NL % 最小フィッシャー
     gamma = 10^(lg_gamma(gamma_index));
     C = Laplacian(sqrt(K)-1);
     H = gm2d;
@@ -88,6 +101,7 @@ elseif NL
     EE = (H' * H + (M * gamma) .* (C'* W * C))^(-1) * H' * G'; 
 
     EE = reshape(EE, sqrt(K), sqrt(K));
+%}
 else
     for i=1:K
         if M>K
@@ -98,6 +112,7 @@ else
         E1 = (s./(s.^2+M*10^(lg_gamma(gamma_index)))).*v_1.*(Z.');
         E(i)=sum(E1);
     end
+    disp(max(E));
     EE = reshape(E,sqrt(K),sqrt(K)); %ここで縦がr、横がzで左下が最小になる
 end
 

@@ -23,16 +23,11 @@ else
 end
 
 dirPath = getenv('SXR_MATRIX_DIR');
-checkFolder = strcat(dirPath, '/',options,'/',num2str(date));
-if exist(checkFolder, 'dir') ~=7 % フォルダがなかったら作る
-    mkdir(checkFolder);
-end
-
 matrixFolder = strcat(dirPath,'/',options,'/',num2str(date),'/shot',num2str(shot));
 if exist(matrixFolder,'dir') == 0
     doCalculation = true;
     mkdir(matrixFolder);
-elseif length(dir(matrixFolder))-2 ~= 8 %フォルダが存在しても全結果がない場合は計算する % なぜ-2で-1じゃないの
+elseif length(dir(matrixFolder))-2 ~= 8 %フォルダが存在しても全結果がない場合は計算する
     doCalculation = true;
 else
     doCalculation = false; 

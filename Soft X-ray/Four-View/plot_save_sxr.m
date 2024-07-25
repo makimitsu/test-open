@@ -95,7 +95,7 @@ nameList = {'1um Al', '2.5um Al', '2um Mylar', '1um Mylar'};
 
 % cLimList = {[0 1],[0 2],[0 0.3],[0 0.15]};
 
-cLimList = {[0 2],[0 0.5],[0 0.5], [0 2]};
+cLimList = {[0 10],[0 10],[0 5], [0 20]};
 
 % cLimList = {[0 1],[0 0.5],[0 0.3],[0 0.15]};
 % cLimList = {[0 1.5],[0 0.5],[0 1],[0 1.5]};
@@ -104,6 +104,13 @@ cLimList = {[0 2],[0 0.5],[0 0.5], [0 2]};
 % cLimList = {[0 1],[0 1],[0 1],[0 0.6]};
 
 % 負の要素を0で置換
+if any(~isfinite(EE(:)))
+    error('EE contains non-finite values.');
+end
+if any(~isfinite(EE_q(:)))
+    error('EE_q contains non-finite values.');
+end
+
 negativeEE = find(EE<0);
 EE(negativeEE) = zeros(size(negativeEE));
 negativeEEq = find(EE_q<0);

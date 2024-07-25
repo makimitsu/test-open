@@ -1,8 +1,8 @@
-addpath('/Users/shinjirotakeda/Documents/GitHub/test-open/Soft X-ray/Four-View');
-SXRfilename = '/Users/shinjirotakeda/Library/CloudStorage/OneDrive-TheUniversityofTokyo/Documents/SXR_Images/230920/shot056.tif';
-date = 230920;
-number = 6;
-doPlot = false;
+addpath('/Users/shohgookazaki/Documents/GitHub/test-open/Soft X-ray/Four-View');
+SXRfilename = '/Users/shohgookazaki/Library/CloudStorage/GoogleDrive-shohgo-okazaki@g.ecc.u-tokyo.ac.jp/My Drive/OnoLab/data/SXR_Images/240622/shot039.tif';
+date = 240622;
+number = 3;
+doPlot = true;
 doNLR = true;
 
 parameterFile = 'parameters.mat';

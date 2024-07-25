@@ -16,6 +16,7 @@ gm2d3 = LineProjection(l3,N_grid,zmin1,zmax1,rmin,rmax,false,true);
 l4 = MCPLine_down(N_projection,zhole1,false);
 gm2d4 = LineProjection(l4,N_grid,zmin1,zmax1,rmin,rmax,false,false);
 
+
 % ラプラシアン行列の計算と特異値分解
 C = Laplacian(N_grid);
 [U1,S1,V1]=svd(gm2d1*(C^(-1)),'econ');
