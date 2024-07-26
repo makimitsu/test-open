@@ -2,8 +2,8 @@
 % close all
 % clearvars -except date shotIDXList doCheck
 clearvars -except default
-addpath 'C:\Users\User\Dropbox\PC (4)\Documents\GitHub\test-open\pcb_experiment'; %getMDSdata.mとcoeff200ch.xlsxのあるフォルダへのパス
-addpath 'C:\Users\User\Dropbox\PC (4)\Documents\GitHub\test-open\Soft X-ray\Four-View_Simulation';
+addpath 'C:\Users\User\Dropbox\PC (4)\Documents\GitHub\test-open'\pcb_experiment\; %getMDSdata.mとcoeff200ch.xlsxのあるフォルダへのパス
+%addpath 'C:\Users\User\Dropbox\PC (4)\Documents\GitHub\test-open\Soft X-ray\Four-View_Simulation';
 
 %%%%%%%%%%%%%%%%%%%%%%%%
 %280ch用新規pcbプローブのみでの磁気面（Bz）
@@ -12,15 +12,15 @@ addpath 'C:\Users\User\Dropbox\PC (4)\Documents\GitHub\test-open\Soft X-ray\Four
 
 %%%%%ここが各PCのパスx
 %【※コードを使用する前に】環境変数を設定しておくか、matlab内のコマンドからsetenv('パス名','アドレス')で指定してから動かす
-pathname.ts3u=getenv('ts3u_path');%old-koalaのts-3uまでのパス（mrdなど）
-pathname.fourier=getenv('fourier_path');%fourierのmd0（データックのショットが入ってる）までのpath
-pathname.NIFS=getenv('NIFS_path');%resultsまでのpath（ドップラー、SXR）
-pathname.save=getenv('savedata_path');%outputデータ保存先
-pathname.rawdata38=getenv('rawdata038_path');%dtacq a038のrawdataの保管場所
-pathname.woTFdata=getenv('woTFdata_path');%rawdata（TFoffset引いた）の保管場所
+% pathname.ts3u=getenv('ts3u_path');%old-koalaのts-3uまでのパス（mrdなど）
+% pathname.fourier=getenv('fourier_path');%fourierのmd0（データックのショットが入ってる）までのpath
+% pathname.NIFS=getenv('NIFS_path');%resultsまでのpath（ドップラー、SXR）
+% pathname.save=getenv('savedata_path');%outputデータ保存先
+% pathname.rawdata38=getenv('rawdata038_path');%dtacq a038のrawdataの保管場所
+% pathname.woTFdata=getenv('woTFdata_path');%rawdata（TFoffset引いた）の保管場所
 pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所
 pathname.pre_processed_directory = getenv('pre_processed_directory_path');%計算結果の保存先（どこでもいい）
-pathname.MAGDATA = getenv('MAGDATA_DIR');
+%pathname.MAGDATA = getenv('MAGDATA_DIR');
 
 % %%%%実験オペレーションの取得
 % prompt = {'Date:','Shot number:','doCheck:'};
@@ -105,8 +105,8 @@ for i=1:n_data
     else
         plot_psi280ch(PCB,pathname);
         % [B_r,B_t,b] = get_guide_field_ratio(PCB,pathname)
-        [B_r,B_t,b] = get_guide_field_ratio2(PCB,pathname);
-        disp(['B_r=',num2str(B_r),', B_t=',num2str(B_t),', b=',num2str(b)]);
+        %[B_r,B_t,b] = get_guide_field_ratio2(PCB,pathname);
+        %disp(['B_r=',num2str(B_r),', B_t=',num2str(B_t),', b=',num2str(b)]);
         % get_B_reconnection(PCB,pathname);
         % [grid2D,data2D] = process_PCBdata_200ch(PCB,pathname);
         % [magAxisList,xPointList] = get_axis_x_multi(grid2D,data2D);
