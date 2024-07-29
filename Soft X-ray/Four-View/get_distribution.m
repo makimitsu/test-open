@@ -1,5 +1,7 @@
 function EE = get_distribution(M,K,gm2d,U,s,v,VectorImage,plot_flag,NL)
 
+
+
 Z=U'*VectorImage.';
 
 gmin=-15;gmax=15;
@@ -42,37 +44,52 @@ E = zeros(1,K);
 % end
 % EE = reshape(E,sqrt(K),sqrt(K)); %ここで縦がr、横がzで左下が最小になる
 
+
 if NL %最大エントロピー
     gamma = 10^(lg_gamma(gamma_index));
     L = gm2d;
-    f = zeros(K, 1);
+    Lt = L.';
+    g = VectorImage.';
+    f = -1*ones(K, 1);
     df = zeros(K, 1);
     eps = 0.1; % Newton法やめる時ようのε
     iter = 0;
-    while (df.'*df > eps*(f.'*f) || iter == 0) && (iter < 15) % iter15以下で大丈夫なのかな
+    while df.'*df > eps*(f.'*f) || iter == 0  || iter<5
         disp(iter);
-        Ex = diag(exp(f)); 
-        invEx = Ex^(-1);%逆行列計算を楽にする
-        Dx = M*gamma/2*Ex;
-        invDx = Dx^(-1);%逆行列計算を楽にする
-        Phif = M*gamma/2*(f+1)+ L.'*L*exp(f)-L.'*s.';
-        A = eye(M)+L*invDx*L.'; %正定値対称行列になっているはずなんだよね
-        b = L*invDx*Phif;
+        tic
+        diagEx = exp(f); %対角成分のままでいることで計算時間が減る
+        diaginvEx = diagEx.^(-1);%逆行列計算を楽にする
+        diagDx = M*gamma/2*diagEx;
+        diaginvDx = diagDx.^(-1);%逆行列計算を楽にする
+
+        Phif = M*gamma/2*(f+1)+ Lt*(L*exp(f)-g);
+        A = eye(M) + L*(Lt.*diaginvDx); %A = eye(M)+L*invDx*Lt; %正定値対称行列になっているはずなんだよね
+        b = L*(Phif.*diaginvDx); %b = L*invDx*Phif;
         xi = cholesky(A,b);
         
-        df = -invEx*invDx*(Phif-L.'*xi);
+        diagproduct = diaginvEx.*diaginvDx;
+        df = -(Phif-Lt*xi).*diagproduct; %df = -invEx*invDx*(Phif-L.'*xi); 
+
+        % dfが大きく/小さくなりすぎるのを阻止。エラーの原因になる。
         m = 0.5;
-        df(df > m) = 1+m - m ./ df(df > m); % dfが大きくなりすぎるのを阻止。エラーの原因になる。
-        df(df < -m) = -(1+m) - m ./df(df<-m); % dfが小さくなりすぎるのを阻止。エラーの原因になる。
-        f = f+ df;
+        df(df > m) = 1+m - m ./ df(df > m); 
+        df(df < -m) = -(1+m) - m ./df(df<-m); 
+        
+        f = f+ df; %Newton法
+
         iter = iter+1;
+        disp((df.'*df)/(f.'*f));
+        toc
     end
     E = exp(f);
 
     EE = reshape(E.',sqrt(K),sqrt(K));
-    
+    figure;imagesc(VectorImage);
+    figure;imagesc((L*E).');
+
 %{
 if NL % 最小フィッシャー
+    tic
     gamma = 10^(lg_gamma(gamma_index));
     C = Laplacian(sqrt(K)-1);
     H = gm2d;
@@ -101,6 +118,7 @@ if NL % 最小フィッシャー
     EE = (H' * H + (M * gamma) .* (C'* W * C))^(-1) * H' * G'; 
 
     EE = reshape(EE, sqrt(K), sqrt(K));
+    toc
 %}
 else
     for i=1:K
@@ -112,8 +130,9 @@ else
         E1 = (s./(s.^2+M*10^(lg_gamma(gamma_index)))).*v_1.*(Z.');
         E(i)=sum(E1);
     end
-    disp(max(E));
     EE = reshape(E,sqrt(K),sqrt(K)); %ここで縦がr、横がzで左下が最小になる
+    figure;imagesc(VectorImage);
+    figure;imagesc(gm2d*E.');
 end
 
 % contourfで単調増加する軸から生成されたmeshgridを使ってプロットすると上下が反転する
