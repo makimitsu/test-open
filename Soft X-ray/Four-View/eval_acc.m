@@ -1,5 +1,7 @@
-filename = '/Users/shinjirotakeda/Library/CloudStorage/OneDrive-TheUniversityofTokyo/Documents/probedata/processed/240111020_200ch.mat';
+clear
+% filename = '/Users/shinjirotakeda/Library/CloudStorage/OneDrive-TheUniversityofTokyo/Documents/probedata/processed/240111020_200ch.mat';
 % filename = '/Users/shinjirotakeda/Library/CloudStorage/OneDrive-TheUniversityofTokyo/Documents/probedata/processed/240621055_200ch.mat';
+filename = '/Users/shinjirotakeda/Library/CloudStorage/GoogleDrive-takeda-shinjiro234@g.ecc.u-tokyo.ac.jp/マイドライブ/probedata/processed/240111020_200ch.mat';
 load(filename,'data2D','grid2D');
 % data2D(:,:,68);
 
@@ -35,7 +37,7 @@ v_e = zeros(3,1000);
 x_e = zeros(2,1000); %インデックスの配列
 
 Et = data2D.Et(newRangeR,newRangeZ,68);
-Bt = data2D.Bt_th(newRangeR,newRangeZ,68);
+Bt = data2D.Bt(newRangeR,newRangeZ,68);
 Bz = data2D.Bz(newRangeR,newRangeZ,68);
 Br = data2D.Br(newRangeR,newRangeZ,68);
 
@@ -59,23 +61,30 @@ dz = abs(zq_new(1,1)-zq_new(1,2));
 Bp = sqrt(Br_new.^2+Bz_new.^2);
 [~,I] = min(Bp,[],'all');
 [r_ind, z_ind] = ind2sub(size(Bt_new),I);
-x_e(1,1) = r_ind;
-x_e(2,1) = z_ind;
+% x_e(1,1) = r_ind;
+% x_e(2,1) = z_ind;
+
+x_e(1,1) = r_ind+1;
+x_e(2,1) = z_ind+1;
 
 % X点近傍の磁場が0になるように微修正
 Br_new = Br_new - Br_new(r_ind,z_ind);
 Bz_new = Bz_new - Bz_new(r_ind,z_ind);
+disp(Bp(r_ind,z_ind));
+disp(Bt_new(r_ind,z_ind));
 Bp = sqrt(Br_new.^2+Bz_new.^2);
 disp(min(Bp,[],'all'));
 
 % 衝突時間で計算を終わらせるとちょうど良さそう
 
+v_e(3,1) = -1e6; %熱速度くらい
+
 % 1nsごとにステップ
-for i = 2:1000
+for i = 2:200
     r_idx = x_e(1,i-1);
     z_idx = x_e(2,i-1);
     % 電場によって加速（磁力線に沿って？）
-    v_e(:,i) = v_e(:,i-1) + [0;0;1].*e*Et_new(r_idx,z_idx)/me*1e-9;
+    v_e(:,i) = v_e(:,i-1) + [0;0;1].*e*Et_new(r_idx,z_idx)/me*1e-12;
     % 速度は電場、位置は磁場で変更？
     % 磁場と速度の内積で移動距離を計算、ポロイダル平面に投影して位置を更新
     B = [Br_new(r_idx,z_idx),Bz_new(r_idx,z_idx),Bt_new(r_idx,z_idx)];
@@ -100,8 +109,8 @@ for i = 2:1000
     end
 end
 
-if i == 1000
-    maxStep = 1000;
+if i == 200
+    maxStep = 200;
 end
 
 step = 1:maxStep;
@@ -109,9 +118,9 @@ figure;
 plot(step,vecnorm(v_e(:,1:maxStep)));
 xlabel('step');ylabel('electron velocity [m/s]');
 
-figure;
-plot(z_new(x_e(2,1:maxStep-1)),r_new(x_e(1,1:maxStep-1)));
-xlabel('z');ylabel('r');
+% figure;
+% plot(z_new(x_e(2,1:maxStep-1)),r_new(x_e(1,1:maxStep-1)));
+% xlabel('z');ylabel('r');
 
 Ee = 0.5*me*v_e.^2./e;
 figure;

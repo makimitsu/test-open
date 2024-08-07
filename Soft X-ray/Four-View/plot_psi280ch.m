@@ -205,8 +205,10 @@ figure('Position', [0 0 1500 1500],'visible','on');
 
 % figure('Position', [0 0 1500 1500],'visible','on');
 % start=30;
-dt = 2;
+dt = 1;
 %  t_start=470+start;
+Et_t = zeros(1,16);
+times = start+dt:dt:start+dt*16;
  for m=1:16 %図示する時間
      i=start+m.*dt; %end
      t=trange(i);
@@ -223,6 +225,11 @@ dt = 2;
              contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Br(:,:,i),30,'LineStyle','none');clim([-0.1,0.1])%Br
          case 5
              contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Et(:,:,i),20,'LineStyle','none');clim([-500,400])%Et
+             % 時刻iにおけるx点の[r,z]座標（インデックス）を取得
+             idxR = knnsearch(grid2D.rq(:,1),xPointList.r(i));
+             idxZ = knnsearch(grid2D.zq(1,:).',xPointList.z(i));
+             % ±3程度の範囲でEtの平均を計算
+             Et_t(m) = mean(data2D.Et(max(1,idxR-3):min(idxR+3,numel(grid2D.rq(:,1))),max(1,idxZ-3):min(numel(grid2D.zq(1,:)),idxZ+3),i),'all');
          case 6
              contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Jt(:,:,i),30,'LineStyle','none');clim([-0.8*1e+6,0]);%clim([-0.8*1e+6,0.8*1e+6]) %jt%カラーバーの軸の範囲
      end
@@ -279,6 +286,12 @@ dt = 2;
 
  sgtitle(strcat('shot',num2str(shot)));
 
+ if PCB.type==5
+     figure;plot(times+400,Et_t,'LineWidth',3);
+     ax = gca;
+     ax.FontSize = 18;
+     xlabel('time [us]');ylabel('Electric field [V/m]');
+ end
  % drawnow
 
 end

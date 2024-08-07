@@ -103,9 +103,9 @@ for i=1:n_data
     if doCheck
         check_signal(PCB,pathname);
     else
-        plot_psi280ch(PCB,pathname);
-        % [B_r,B_t,b] = get_guide_field_ratio(PCB,pathname)
-        [B_r,B_t,b] = get_guide_field_ratio2(PCB,pathname);
+        % plot_psi280ch(PCB,pathname);
+        [B_r,B_t,b] = get_guide_field_ratio(PCB,pathname);
+        % [B_r,B_t,b] = get_guide_field_ratio2(PCB,pathname);
         disp(['B_r=',num2str(B_r),', B_t=',num2str(B_t),', b=',num2str(b)]);
         % get_B_reconnection(PCB,pathname);
         % [grid2D,data2D] = process_PCBdata_200ch(PCB,pathname);

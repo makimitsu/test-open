@@ -124,7 +124,8 @@ for i = 1:4
     % [~,h] = contourf(SXR_mesh_z,SXR_mesh_r,EE_plot,linspace(cRange(1),cRange(2),20));clim(cRange);
     % [~,h] = contourf(SXR_mesh_z,SXR_mesh_r,EE_plot,20);
 
-    [~,h] = contourf(psi_mesh_z,psi_mesh_r,EE_q(:,:,i),linspace(cRange(1),cRange(2),20));clim(cRange);
+    % [~,h] = contourf(psi_mesh_z,psi_mesh_r,EE_q(:,:,i),linspace(cRange(1),cRange(2),20));clim(cRange);
+    [~,h] = contourf(psi_mesh_z,psi_mesh_r,EE_q(:,:,i),20);
 
     colormap('turbo');
     h.LineStyle = 'none';
