@@ -66,6 +66,7 @@ if doCalculation
     % 非線形フィルターをかける（必要があれば）
     if doFilter
         % figure;imagesc(rawImage);
+        disp(size(rawImage));
         [rawImage,~] = imnlmfilt(rawImage,'SearchWindowSize',91,'ComparisonWindowSize',15);
         % figure;imagesc(rawImage);
     end

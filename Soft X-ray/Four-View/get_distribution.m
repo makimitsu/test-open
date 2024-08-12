@@ -1,7 +1,5 @@
 function EE = get_distribution(M,K,gm2d,U,s,v,VectorImage,plot_flag,NL)
 
-
-
 Z=U'*VectorImage.';
 
 gmin=-15;gmax=15;
@@ -43,18 +41,34 @@ E = zeros(1,K);
 %     E(i)=sum(E1);
 % end
 % EE = reshape(E,sqrt(K),sqrt(K)); %ここで縦がr、横がzで左下が最小になる
-
-
+%{
 if NL %最大エントロピー
-    gamma = 10^(lg_gamma(gamma_index));
-    L = gm2d;
+    gamma = 10^(lg_gamma(gamma_index));%GCVも考え直さないと→計算時間やばくなりそう
+    L = gm2d; %Lf=g
     Lt = L.';
     g = VectorImage.';
-    f = -1*ones(K, 1);
-    df = zeros(K, 1);
+    df = zeros(K, 1);%Newton法の解の修正
     eps = 0.1; % Newton法やめる時ようのε
     iter = 0;
-    while df.'*df > eps*(f.'*f) || iter == 0  || iter<5
+    iterc = 0;
+    
+    %初期値を決める
+    
+    for i=1:K
+        % v_1 = v(i,:);
+        if M>K
+            v_1 = [v(i,:) zeros(1,M-K)];
+        else
+            v_1 = v(i,:);
+        end
+        E1 = (s./(s.^2+M*10^(lg_gamma(gamma_index)))).*v_1.*(Z.');
+        E(i)=sum(E1);
+    end
+    E(E<1e-5) = 1e-5;
+    f = log(E.');
+
+
+    while df.'*df > eps*(f.'*f) || iter == 0 ||iterc==10
         disp(iter);
         tic
         diagEx = exp(f); %対角成分のままでいることで計算時間が減る
@@ -66,9 +80,19 @@ if NL %最大エントロピー
         A = eye(M) + L*(Lt.*diaginvDx); %A = eye(M)+L*invDx*Lt; %正定値対称行列になっているはずなんだよね
         b = L*(Phif.*diaginvDx); %b = L*invDx*Phif;
         xi = cholesky(A,b);
+        %diagproduct = diaginvEx.*diaginvDx;
+
+        %L2正則化する場合
         
-        diagproduct = diaginvEx.*diaginvDx;
-        df = -(Phif-Lt*xi).*diagproduct; %df = -invEx*invDx*(Phif-L.'*xi); 
+        lambda = 10;%良くわかんないけど適当に決めた
+        L2 = lambda/2*(f.'*f);
+        b2 = L2*(L.'.*diaginvDx).'; % b2 = L*invDx*L2;
+        xi2 = cholesky(A,b2); % 時間かかるね
+        diaginvs = ((L2-L.'*xi2).*diaginvDx+diagEx).^(-1);
+        diagproduct = diaginvs.*diaginvDx;
+        
+
+        df = -(Phif-Lt*xi).*diagproduct; %df = -inv?*invDx*(Phif-L.'*xi); 
 
         % dfが大きく/小さくなりすぎるのを阻止。エラーの原因になる。
         m = 0.5;
@@ -79,15 +103,24 @@ if NL %最大エントロピー
 
         iter = iter+1;
         disp((df.'*df)/(f.'*f));
+        if (df.'*df)/(f.'*f)>0.8 % 収束しないで振動しそうになった時は初期値を変えよう
+            iterc = iterc+1;
+            if iterc >2 && iterc  <10
+                f = -1*ones(K,1);
+                df = zeros(K,1);
+                disp('収束しそうにないから初期値変えた');
+                iterc = 10;
+            elseif iterc >12
+                error('収束しなさそうだよ');
+            end
+        end
         toc
     end
     E = exp(f);
 
     EE = reshape(E.',sqrt(K),sqrt(K));
-    figure;imagesc(VectorImage);
-    figure;imagesc((L*E).');
 
-%{
+%}
 if NL % 最小フィッシャー
     tic
     gamma = 10^(lg_gamma(gamma_index));
@@ -131,8 +164,6 @@ else
         E(i)=sum(E1);
     end
     EE = reshape(E,sqrt(K),sqrt(K)); %ここで縦がr、横がzで左下が最小になる
-    figure;imagesc(VectorImage);
-    figure;imagesc(gm2d*E.');
 end
 
 % contourfで単調増加する軸から生成されたmeshgridを使ってプロットすると上下が反転する
