@@ -32,8 +32,8 @@ end
 % ファントムテスト用の画像を準備（4視点分）
 if Newdata
     data_set(N_projection,gm2d1,'1',1000);
-    data_set(N_projection,gm2d2,'2',1000);
-    data_set(N_projection,gm2d3,'3',1000);
-    data_set(N_projection,gm2d4,'4',1000);
+    %data_set(N_projection,gm2d2,'2',1000);
+    %data_set(N_projection,gm2d3,'3',1000);
+    %data_set(N_projection,gm2d4,'4',1000);
     
 end

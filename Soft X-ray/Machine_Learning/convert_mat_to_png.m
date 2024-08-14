@@ -23,25 +23,15 @@ function convert_mat_to_png(input_dir,output_dir, z_grid, r_grid, name)
             X = data.(name);
             
             fig = figure('Visible','off');
-            axes_handle = axes(fig);
-
-            if strcmp(name,'EE')
-                [~,h] = contourf(axes_handle, mesh_z, mesh_r, X,20);
-                c = colorbar;
-                h.LineStyle = 'none';
-                xlabel('Z');ylabel('R');
-            elseif strcmp(name,'II') || strcmp(name,'IIwgn')
-                figure;imagesc(X);c=colorbar('Ticks',[0,20,40]);
-                c = colorbar('Ticks', [0,20,40]);
-                xlabel('Z [Pixels]');ylabel('R [Pixels]');
-            else 
-                error('Unknown variable')
-            end
+            %ax = axes(fig);
+            imagesc(X);%c=colorbar(ax, 'Ticks',[0,20,40]);
+            axis off;
+            %xlabel(ax, 'Z [Pixels]');ylabel(ax, 'R [Pixels]');
 
             colormap('turbo');
-            c.Label.String = 'Intensity [a.u.]';c.FontSize = 18;
+            %c.Label.String = 'Intensity [a.u.]';c.FontSize = 18;
             output_file = sprintf('image_%04d.png', k);
-            exportgraphics(axes_handle, fullfile(output_dir, output_file)); % Save as PNG
+            exportgraphics(fig, fullfile(output_dir, output_file)); % Save as PNG
             close(gcf);
         else
             warning('Variable %s not found in file: %s', name, mat_files(k).n);

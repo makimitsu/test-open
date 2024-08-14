@@ -110,9 +110,9 @@ for i = 1:num_images
     %[IIwgn,~] = imnlmfilt(IIwgn,'SearchWindowSize',25,'ComparisonWindowSize',15);
 
     %Save the image
-    %save(fullfile(initial_dir, sprintf('/image_%04d.mat', i)), 'EE');
-    %save(fullfile(projected_dir, sprintf('/image_%04d.mat', i)), 'II');
-    %save(fullfile(withnoise_dir, sprintf('/image_%04d.mat', i)), 'IIwgn');
+    save(fullfile(initial_dir, sprintf('/image_%04d.mat', i)), 'EE');
+    save(fullfile(projected_dir, sprintf('/image_%04d.mat', i)), 'II');
+    save(fullfile(withnoise_dir, sprintf('/image_%04d.mat', i)), 'IIwgn');
 
     % Save metadata
     metadata(i).image_id = i;
