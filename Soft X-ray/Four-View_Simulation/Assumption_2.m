@@ -32,7 +32,7 @@ r_grid = linspace(330,70,n);
 % EE = EE./max(max(EE));
 % EE = fliplr(rot90(EE)); %rが縦、zが横、右下最小
 
-loadpath = '/Users/shinjirotakeda/Library/CloudStorage/OneDrive-TheUniversityofTokyo/Documents/result_matrix/LF_LR/210924/shot45/4_high.txt';
+loadpath = '4_high.txt';
 EE = readmatrix(loadpath); %縦がr、横がzで左上が最小になる
 % EE = rot90(EE,2); %rが縦、zが横、右下最小
 EE = flipud(EE);

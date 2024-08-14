@@ -127,7 +127,7 @@ save([output_dir, '/metadata.mat'], 'metadata');
 
 
 %可視化ファイル
-%convert_mat_to_png(initial_dir, [initial_dir, '/converted'], z_grid, r_grid, 'EE');
+convert_mat_to_png(initial_dir, [initial_dir, '/converted'], z_grid, r_grid, 'EE');
 convert_mat_to_png(projected_dir, [projected_dir, '/converted'], z_grid, r_grid, 'II');
 convert_mat_to_png(withnoise_dir, [withnoise_dir, '/converted'], z_grid, r_grid, 'IIwgn');
 

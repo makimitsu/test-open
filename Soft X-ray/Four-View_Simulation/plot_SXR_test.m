@@ -1,11 +1,11 @@
 function plot_SXR_test()
 addpath '/Users/shohgookazaki/Documents/GitHub/test-open/Soft X-ray/Four-view';
 NL = true;
-plot_flag = false;
+plot_flag = true;
 
 % 再構成条件の定義
-newProjectionNumber = 50; %投影数＝視線数の平方根
-newGridNumber = 90; %グリッド数（再構成結果の画素数の平方根）
+newProjectionNumber = 80;%50; %投影数＝視線数の平方根
+newGridNumber = 100;%90; %グリッド数（再構成結果の画素数の平方根）
 
 % 再構成計算に必要なパラメータを計算するなら読み込む、しない場合も範囲に関しては読み込む
 parameterFile = '/Users/shohgookazaki/Documents/GitHub/test-open/Soft X-ray/Four-view/parameters.mat';
@@ -33,12 +33,12 @@ end
 
 % number = (t-start)/interval+1;
 % ファントムテスト用の画像を準備（4視点分）
-[~,Iwgn1] = Assumption(N_projection,gm2d1,plot_flag);
-[~,Iwgn2] = Assumption(N_projection,gm2d2,false);
-[~,Iwgn3] = Assumption(N_projection,gm2d3,false);
-[~,Iwgn4] = Assumption(N_projection,gm2d4,false);
+%[~,Iwgn1] = Assumption(N_projection,gm2d1,plot_flag);
+%[~,Iwgn2] = Assumption(N_projection,gm2d2,false);
+%[~,Iwgn3] = Assumption(N_projection,gm2d3,false);
+%[~,Iwgn4] = Assumption(N_projection,gm2d4,false);
 % % こっちを使う時は N_projection_new = 80, N_grid_new = 100
-% [~,Iwgn1] = Assumption_2(N_projection,gm2d1,true);
+ [~,Iwgn1] = Assumption_2(N_projection,gm2d1,true);
 % [~,Iwgn2] = Assumption_2(N_projection,gm2d2,false);
 % [~,Iwgn3] = Assumption_2(N_projection,gm2d3,false);
 % [~,Iwgn4] = Assumption_2(N_projection,gm2d4,false);

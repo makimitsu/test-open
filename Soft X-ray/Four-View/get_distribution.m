@@ -41,7 +41,7 @@ E = zeros(1,K);
 %     E(i)=sum(E1);
 % end
 % EE = reshape(E,sqrt(K),sqrt(K)); %ここで縦がr、横がzで左下が最小になる
-%{
+
 if NL %最大エントロピー
     gamma = 10^(lg_gamma(gamma_index));%GCVも考え直さないと→計算時間やばくなりそう
     L = gm2d; %Lf=g
@@ -120,7 +120,7 @@ if NL %最大エントロピー
 
     EE = reshape(E.',sqrt(K),sqrt(K));
 
-%}
+%{
 if NL % 最小フィッシャー
     tic
     gamma = 10^(lg_gamma(gamma_index));

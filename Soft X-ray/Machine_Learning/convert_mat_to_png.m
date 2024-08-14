@@ -26,11 +26,12 @@ function convert_mat_to_png(input_dir,output_dir, z_grid, r_grid, name)
             axes_handle = axes(fig);
 
             if strcmp(name,'EE')
-                [~,h] = contourf(axes_handle, mesh_z, mesh_r, X);
+                [~,h] = contourf(axes_handle, mesh_z, mesh_r, X,20);
                 c = colorbar;
                 h.LineStyle = 'none';
                 xlabel('Z');ylabel('R');
             elseif strcmp(name,'II') || strcmp(name,'IIwgn')
+                figure;imagesc(X);c=colorbar('Ticks',[0,20,40]);
                 c = colorbar('Ticks', [0,20,40]);
                 xlabel('Z [Pixels]');ylabel('R [Pixels]');
             else 
