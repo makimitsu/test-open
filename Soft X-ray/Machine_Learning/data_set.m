@@ -83,7 +83,7 @@ for i = 1:num_images
     end
 
     % 背景の光を追加する
-    background_intensity = 0.01;
+    background_intensity = 0.05;
     EE = EE + background_intensity;
     
     %正規化
@@ -127,6 +127,7 @@ save([output_dir, '/metadata.mat'], 'metadata');
 
 
 %可視化ファイル
+disp('converting to png...');
 convert_mat_to_png(initial_dir, [initial_dir, '/converted'], z_grid, r_grid, 'EE');
 convert_mat_to_png(projected_dir, [projected_dir, '/converted'], z_grid, r_grid, 'II');
 convert_mat_to_png(withnoise_dir, [withnoise_dir, '/converted'], z_grid, r_grid, 'IIwgn');

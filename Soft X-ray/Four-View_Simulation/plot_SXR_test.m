@@ -7,29 +7,9 @@ plot_flag = true;
 newProjectionNumber = 80;%50; %投影数＝視線数の平方根
 newGridNumber = 100;%90; %グリッド数（再構成結果の画素数の平方根）
 
-% 再構成計算に必要なパラメータを計算するなら読み込む、しない場合も範囲に関しては読み込む
-parameterFile = '/Users/shohgookazaki/Documents/GitHub/test-open/Soft X-ray/Four-view/parameters.mat';
+[gm2d1, gm2d2, gm2d3, gm2d4, U1, U2, U3, U4, ...
+          s1, s2, s3, s4, v1, v2, v3, v4, M, K, range, N_projection, N_grid] = parametercheck(newProjectionNumber, newGridNumber);
 
-if isfile(parameterFile)
-        disp(strcat('Loading parameter from ',which(parameterFile)))
-        load(parameterFile,'gm2d1','gm2d2','gm2d3','gm2d4', ...
-                'U1','U2','U3','U4','s1','s2','s3','s4', ...
-                'v1','v2','v3','v4','M','K','range','N_projection','N_grid');
-            
-        if newProjectionNumber ~= N_projection || newGridNumber ~= N_grid
-            disp('Different parameters - Start calculation!');
-            get_parameters(newProjectionNumber,newGridNumber,parameterFile);
-            load(parameterFile,'gm2d1','gm2d2','gm2d3','gm2d4', ...
-                    'U1','U2','U3','U4','s1','s2','s3','s4', ...
-                    'v1','v2','v3','v4','M','K','range');
-        end
-else
-    disp('No parameters - Start calculation!');
-    get_parameters(newProjectionNumber,newGridNumber,parameterFile);
-    load(parameterFile,'gm2d1','gm2d2','gm2d3','gm2d4', ...
-            'U1','U2','U3','U4','s1','s2','s3','s4', ...
-            'v1','v2','v3','v4','M','K','range');
-end
 
 % number = (t-start)/interval+1;
 % ファントムテスト用の画像を準備（4視点分）
