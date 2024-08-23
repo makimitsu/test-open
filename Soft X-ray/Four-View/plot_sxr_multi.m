@@ -37,8 +37,10 @@ end
 parameterFile = 'parameters.mat';
 if doCalculation
     disp('No matrix data -- Start calculation');
-    newProjectionNumber = 50;
-    newGridNumber = 90;
+    % newProjectionNumber = 50;
+    % newGridNumber = 90;
+    newProjectionNumber = SXR.projection;
+    newGridNumber = SXR.grid;
     if isfile(parameterFile)
         disp(strcat('Loading parameter from ',which(parameterFile)))
         load(parameterFile,'gm2d1','gm2d2','gm2d3','gm2d4', ...
@@ -46,14 +48,43 @@ if doCalculation
                 'v1','v2','v3','v4','M','K','range','N_projection','N_grid');
             
         if newProjectionNumber ~= N_projection || newGridNumber ~= N_grid
-            disp('Different parameters - Start calculation!');
+            % disp('Different parameters - Start calculation!');
+            disp('Different parameters!');
+            disp(['current projection number: ',num2str(N_projection)]);
+            disp(['current grid number: ',num2str(N_grid)]);
+            flag = true;
+            while flag
+                userInput = input('continue? (y/n): ','s');
+                if strcmpi(userInput, 'y')
+                    flag = false;
+                elseif strcmpi(userInput, 'n')
+                    disp('stop calculation');
+                    return;
+                else
+                    disp('Invalid input. Please enter y/n');
+                end
+            end
+            disp('Start calculation!');
             get_parameters(newProjectionNumber,newGridNumber,parameterFile);
             load(parameterFile,'gm2d1','gm2d2','gm2d3','gm2d4', ...
                     'U1','U2','U3','U4','s1','s2','s3','s4', ...
                     'v1','v2','v3','v4','M','K','range');
         end
     else
-        disp('No parameters - Start calculation!');
+        disp('No parameter!');
+        flag = true;
+        while flag
+            userInput = input('continue? (y/n): ','s');
+            if strcmpi(userInput, 'y')
+                flag = false;
+            elseif strcmpi(userInput, 'n')
+                disp('stop calculation');
+                return;
+            else
+                disp('Invalid input. Please enter y/n');
+            end
+        end
+        disp('Start calculation!');
         get_parameters(newProjectionNumber,newGridNumber,parameterFile);
         load(parameterFile,'gm2d1','gm2d2','gm2d3','gm2d4', ...
                 'U1','U2','U3','U4','s1','s2','s3','s4', ...

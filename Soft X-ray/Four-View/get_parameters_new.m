@@ -7,8 +7,6 @@ plotFlagLines = false;
 
 % 視線の分布、重み行列の作成
 zhole1=40;zhole2=-40;                                  
-% zmin1=-240;zmax1=320;zmin2=-320;zmax2=240;             
-% rmin=55;rmax=375;
 zmin1=-100;zmax1=180;zmin2=-180;zmax2=100;             
 rmin=70;rmax=330;
 range = [zmin1,zmax1,zmin2,zmax2,rmin,rmax];            
@@ -27,10 +25,6 @@ C = Laplacian(N_grid);
 [U2,S2,V2]=svd(gm2d2*(C^(-1)),'econ');
 [U3,S3,V3]=svd(gm2d3*(C^(-1)),'econ');
 [U4,S4,V4]=svd(gm2d4*(C^(-1)),'econ');
-% [U1,S1,V1]=svd(gm2d1*(C^(-1)));
-% [U2,S2,V2]=svd(gm2d2*(C^(-1)));
-% [U3,S3,V3]=svd(gm2d3*(C^(-1)));
-% [U4,S4,V4]=svd(gm2d4*(C^(-1)));
 v1=(C^(-1)*V1);
 v2=(C^(-1)*V2);
 v3=(C^(-1)*V3);
@@ -125,12 +119,6 @@ end
 L = N_projection/2;
 k = find_circle(L); %左上から下方向にカウントする線型インデックス→X最小、Z最大からZをまず減らし、その後Xを増やしている
 [row,col] = ind2sub([N_projection N_projection],k);
-% % rowとcolはベクトル（N行）
-% % このままだとN*N*?になる
-% % N*?にしたい
-% l.x = ll_x(row,col,:);
-% l.y = ll_y(row,col,:);
-% l.z = ll_z(row,col,:);
 
 Np = numel(k);
 l.x = zeros(Np,nLine);
@@ -209,65 +197,10 @@ if plot_flag
     figure;imagesc(FOV);clim([0 1]);
 end
 
-% k=find(l_r>=rmin&l_r<=rmax&l_z>=zmin&l_z<=zmax);
-% pl_r=l_r(k);
-% pl_z=l_z(k);
-% if plot_flag
-%     figure(f2);plot(pl_z,pl_r,'.');
-%     hold on;grid on;
-%     xlabel('Z [mm]');ylabel('R [mm]');
-% end
-% 
-% r_grid = ceil((pl_r-rmin)./DR);%グリッド座標
-% z_grid = ceil((pl_z-zmin)./DZ);
-% 
-% A = [r_grid z_grid];
-% [uniqueRows, ~, rowIndices] = unique(A, 'rows', 'stable');
-% counts = histcounts(rowIndices, 'BinMethod', 'integers', 'BinLimits', [1, size(uniqueRows, 1)]);
-% % B = [uniqueRows,counts.'];
-% 
-% num_p = numel(r_grid);
-% gm_temp = zeros(N_g);
-% 
-% gm_temp(sub2ind(size(gm_temp),uniqueRows(:,1),uniqueRows(:,2))) = counts.';
-
-
-% for i = 1:N_p
-%     %各視線の座標からrz座標を計算、プロット
-%     x=l(i).x;
-%     y=l(i).y;
-%     l_z=l(i).z;
-%     l_r=sqrt(x.^2+y.^2);
-%     if plot_flag
-%         figure(f1);plot(l_z,l_r);
-%         hold on;grid on;
-%         xlabel('Z [mm]');ylabel('R [mm]');
-%     end
-% 
-%     %再構成対象の領域内の視線を抽出
-%     k=find(l_r>=rmin&l_r<=rmax&l_z>=zmin&l_z<=zmax);
-%     pl_r=l_r(k);
-%     pl_z=l_z(k);
-%     if plot_flag
-%         figure(f2);plot(pl_z,pl_r,'.');
-%         hold on;grid on;
-%         xlabel('Z [mm]');ylabel('R [mm]');
-%     end
-% 
-%     %各点のグリッド座標を求め、各グリッド毎に含まれる点の数を数え上げる
-%     r_grid = fix((pl_r-rmin)./DR)+1;%グリッド座標
-%     z_grid = fix((pl_z-zmin)./DZ)+1;
-%     num_p = numel(r_grid);
-%     gm_temp = zeros(N_g);
-%     for ct = 1:num_p
-%         gm_temp(r_grid(ct),z_grid(ct)) = gm_temp(r_grid(ct),z_grid(ct))+1;
-%     end
-%     gm2d(i,:) = reshape(flipud(gm_temp),1,[]);
-% end
 end
 
 function C = Laplacian(N_grid)
-k=N_grid+1;
+k=N_grid;
 K=k*k;
 C=zeros(K);
 for i=1:1:k

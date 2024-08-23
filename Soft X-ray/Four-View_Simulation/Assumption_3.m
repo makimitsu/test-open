@@ -20,7 +20,12 @@ r1_space = sqrt((z_space+z_0).^2+(r_space+r_0).^2);
 % r1_space = abs(0.5*(z_space-z_0)+(r_space-r_0))/sqrt(1.25);
 % EE = exp(-0.5*r0_space.^2).*exp(-5*r1_space)+1.5*exp(-r0_space.^2);
 
+
+% 数値的にファントムを生成
 EE = exp(-5*r0_space.^2) + exp(-5*r1_space.^2);
+
+% % 広めに定義したグリッドデータを元にファントムを生成し、そのうちから再構成領域のみを抉り取りたい
+% [r_space1,z_space1] = meshgrid(r_grid,z_grid); %rが横、zが縦の座標系（右上最小?）
 
 % EE = zeros(m,n);
 % for i=1:m
@@ -33,6 +38,15 @@ EE = exp(-5*r0_space.^2) + exp(-5*r1_space.^2);
 % size(E)
 EE = EE./max(max(EE))*0.2;
 EE = fliplr(rot90(EE)); %rが縦、zが横、右下最小
+
+% 2視点システム時のデータからファントム生成
+loadpath = '/Users/shinjirotakeda/Library/CloudStorage/GoogleDrive-takeda-shinjiro234@g.ecc.u-tokyo.ac.jp/マイドライブ/SXR_DATA/result_matrix/LF_LR/210924/shot45/4_high.txt';
+EE = readmatrix(loadpath);
+% 4視点システム時のデータからファントム生成
+load('/Users/shinjirotakeda/Library/CloudStorage/GoogleDrive-takeda-shinjiro234@g.ecc.u-tokyo.ac.jp/マイドライブ/SXR_DATA/result_matrix/LF_LR/240111/shot29/4.mat','EE1');
+EE = EE1;
+EE = flipud(EE);
+EE = imresize(EE,sqrt(size(gm2d,2))/size(EE,1),'nearest');
 
 %2D matrix is transformed to 1D transversal vector
 E = reshape(EE,1,[]);

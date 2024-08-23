@@ -18,8 +18,11 @@ doCheck = SXR.doCheck;
 
 % save = false;
 
-newProjectionNumber = 50;
-newGridNumber = 90;
+% newProjectionNumber = 50;
+% newGridNumber = 90;
+
+newProjectionNumber = SXR.projection;
+newGridNumber = SXR.grid;
 
 if doFilter & doNLR
     options = 'NLF_NLR';

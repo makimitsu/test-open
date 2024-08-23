@@ -4,7 +4,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%
 % clear
 % close all
-clearvars -except date IDXlist doSave doFilter doNLR shotIDX
+clearvars -except date IDXlist doSave doFilter doNLR shotIDX projection grid
 addpath([getenv('GITHUB_DIR'),'test-open',filesep,'pcb_experiment']); %getMDSdata.mとcoeff200ch.xlsxのあるフォルダへのパス
 
 %%%%%ここが各PCのパス
@@ -15,8 +15,8 @@ pathname.rawdata=getenv('rawdata_path');%dtacqのrawdataの保管場所;
 pathname.pre_processed_directory = getenv('pre_processed_directory_path');%計算結果の保存先（どこでもいい）
 
 %%%%実験オペレーションの取得
-prompt = {'Date:','Shot number:','doSave:','doFilter:','doNLR:'};
-definput = {'','','','',''};
+prompt = {'Date:','Shot number:','doSave:','doFilter:','doNLR:', 'Projection:', 'Grid:'};
+definput = {'','','','','','',''};
 if exist('date','var')
     definput{1} = num2str(date);
 end
@@ -31,6 +31,12 @@ if exist('doFilter','var')
 end
 if exist('doNLR','var')
     definput{5} = num2str(doNLR);
+end
+if exist('projection','var')
+    definput{6} = num2str(projection);
+end
+if exist('grid','var')
+    definput{7} = num2str(grid);
 end
 dlgtitle = 'Input';
 dims = [1 35];
@@ -48,10 +54,14 @@ shotIDX = str2num(cell2mat(answer(2)));
 doSave = logical(str2num(cell2mat(answer(3))));
 doFilter = logical(str2num(cell2mat(answer(4))));
 doNLR = logical(str2num(cell2mat(answer(5))));
+projection = str2double(cell2mat(answer(6)));
+grid = str2double(cell2mat(answer(7)));
 
 SXR.doSave = doSave;
 SXR.doFilter = doFilter;
 SXR.doNLR = doNLR;
+SXR.projection = projection;
+SXR.grid = grid;
 
 DOCID='1wG5fBaiQ7-jOzOI-2pkPAeV6SDiHc_LrOdcbWlvhHBw';%スプレッドシートのID
 T=getTS6log(DOCID);

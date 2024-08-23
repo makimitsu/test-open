@@ -35,7 +35,7 @@ zmin = range(3);
 zmax = range(4);
 rmin = range(5);
 rmax = range(6);
-[~,Iwgn_phantom1] = Assumption_3(N_projection,gm2d1,zmin,zmax,rmin,rmax,true);
+[EE_original,Iwgn_phantom1] = Assumption_3(N_projection,gm2d1,zmin,zmax,rmin,rmax,true);
 
 % reconstruct original images from noisy signal
 EE1 = clc_distribution(M,K,gm2d1,U1,s1,v1,Iwgn_phantom1,plot_flag,NL);
@@ -93,5 +93,8 @@ axis image
 
 error1 = sum((EE_new1-EE1).^2/max(EE1,[],'all'),'all')/numel(EE1);
 % error1 = sum((EE_new1-EE1).^2./EE1,'all')/numel(EE1);
+EE_original = EE_original(r_range,z_range);
+error_original = sum((EE_original-EE1).^2/max(EE_original,[],'all'),'all')/numel(EE_original);
 
 disp(error1);
+disp(error_original);
