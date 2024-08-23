@@ -2,19 +2,22 @@ function [] = get_parameters(N_projection,N_grid,filepath)
 
 % filepath = '/Users/shinjirotakeda/Documents/GitHub/test-open/Soft X-ray/Four-View_Simulation/parameters.mat';
 
+plotFlagProjection = false;
+plotFlagLines = false;
+
 % 視線の分布、重み行列の作成
 zhole1=40;zhole2=-40;                                  
 zmin1=-240;zmax1=320;zmin2=-320;zmax2=240;             
 rmin=55;rmax=375;
 range = [zmin1,zmax1,zmin2,zmax2,rmin,rmax];            
-l1 = MCPLine_up(N_projection,zhole2,false);
-gm2d1 = LineProjection(l1,N_grid,zmin2,zmax2,rmin,rmax,false,true); 
-l2 = MCPLine_down(N_projection,zhole2,false);
-gm2d2 = LineProjection(l2,N_grid,zmin2,zmax2,rmin,rmax,false,false);
-l3 = MCPLine_up(N_projection,zhole1,false);
-gm2d3 = LineProjection(l3,N_grid,zmin1,zmax1,rmin,rmax,false,true);
-l4 = MCPLine_down(N_projection,zhole1,false);
-gm2d4 = LineProjection(l4,N_grid,zmin1,zmax1,rmin,rmax,false,false);
+l1 = MCPLine_up(N_projection,zhole2,plotFlagLines);
+gm2d1 = LineProjection(l1,N_grid,zmin2,zmax2,rmin,rmax,plotFlagProjection,true); 
+l2 = MCPLine_down(N_projection,zhole2,plotFlagLines);
+gm2d2 = LineProjection(l2,N_grid,zmin2,zmax2,rmin,rmax,plotFlagProjection,false);
+l3 = MCPLine_up(N_projection,zhole1,plotFlagLines);
+gm2d3 = LineProjection(l3,N_grid,zmin1,zmax1,rmin,rmax,plotFlagProjection,true);
+l4 = MCPLine_down(N_projection,zhole1,plotFlagLines);
+gm2d4 = LineProjection(l4,N_grid,zmin1,zmax1,rmin,rmax,plotFlagProjection,false);
 
 % ラプラシアン行列の計算と特異値分解
 C = Laplacian(N_grid);

@@ -1,7 +1,8 @@
 clear
 % filename = '/Users/shinjirotakeda/Library/CloudStorage/OneDrive-TheUniversityofTokyo/Documents/probedata/processed/240111020_200ch.mat';
 % filename = '/Users/shinjirotakeda/Library/CloudStorage/OneDrive-TheUniversityofTokyo/Documents/probedata/processed/240621055_200ch.mat';
-filename = '/Users/shinjirotakeda/Library/CloudStorage/GoogleDrive-takeda-shinjiro234@g.ecc.u-tokyo.ac.jp/マイドライブ/probedata/processed/240111020_200ch.mat';
+% filename = '/Users/shinjirotakeda/Library/CloudStorage/GoogleDrive-takeda-shinjiro234@g.ecc.u-tokyo.ac.jp/マイドライブ/probedata/processed/240111020_200ch.mat';
+filename = '/Users/shinjirotakeda/Library/CloudStorage/GoogleDrive-takeda-shinjiro234@g.ecc.u-tokyo.ac.jp/マイドライブ/probedata/processed/240111020.mat';
 load(filename,'data2D','grid2D');
 % data2D(:,:,68);
 
@@ -65,7 +66,7 @@ Bp = sqrt(Br_new.^2+Bz_new.^2);
 % x_e(2,1) = z_ind;
 
 x_e(1,1) = r_ind+1;
-x_e(2,1) = z_ind+1;
+x_e(2,1) = z_ind;
 
 % X点近傍の磁場が0になるように微修正
 Br_new = Br_new - Br_new(r_ind,z_ind);

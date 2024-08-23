@@ -15,12 +15,14 @@ if isfile(filepath)
         's1', 's2', 's3', 's4', 'v1', 'v2', 'v3', 'v4', 'M', 'K', 'range','N_projection', 'N_grid');
     if N_projection_new ~= N_projection || N_grid_new ~= N_grid
         disp('Different parameters - Start calculation!');
+        % clc_parameters_new(N_projection_new,N_grid_new,filepath);
         clc_parameters(N_projection_new,N_grid_new,filepath);
         load(filepath, 'gm2d1', 'gm2d2', 'gm2d3', 'gm2d4', 'U1', 'U2', 'U3', 'U4', ...
             's1', 's2', 's3', 's4', 'v1', 'v2', 'v3', 'v4', 'M', 'K', 'range','N_projection', 'N_grid');
     end
 else
     disp('No parameter - Start calculation!');
+    % clc_parameters_new(N_projection_new,N_grid_new,filepath);
     clc_parameters(N_projection_new,N_grid_new,filepath);
     load(filepath, 'gm2d1', 'gm2d2', 'gm2d3', 'gm2d4', 'U1', 'U2', 'U3', 'U4', ...
         's1', 's2', 's3', 's4', 'v1', 'v2', 'v3', 'v4', 'M', 'K', 'range','N_projection', 'N_grid');   
