@@ -106,11 +106,18 @@ centers = [
 ];
 %}
 %a8 全体を多き隠す大きな光源
-
+%{
 centers = [
     0, 0, 1, 1, 1;  % [z_center, r_center, semi_major_axis, semi_minor_axis, intensity]
 ];
-%
+%}
+%a9 左上に一つだけ
+
+centers = [
+    1, 1, 0.2, 0.2, 1;  % [z_center, r_center, semi_major_axis, semi_minor_axis, intensity]
+];
+
+
 
 
 
@@ -130,8 +137,8 @@ for i = 1:size(centers, 1)
 end
 
 % 背景の光を低くする
-background_intensity = 0.01;
-EE = EE + background_intensity;
+%background_intensity = 0.01;
+%EE = EE + background_intensity;
 %}
 
 
@@ -158,12 +165,11 @@ IIwgn(k) = Iwgn;
 Iwgn = Iwgn.';
 
 %非線形フィルター
-[IIwgn,~] = imnlmfilt(IIwgn,'SearchWindowSize',25,'ComparisonWindowSize',15);
+%[IIwgn,~] = imnlmfilt(IIwgn,'SearchWindowSize',25,'ComparisonWindowSize',15);
 
 % I_check = II(75,:);
 % j = 1:numel(I_check);
 % figure;plot(j,I_check);
-
 
 if plot_flag
     [mesh_z,mesh_r] = meshgrid(z_grid,r_grid);
