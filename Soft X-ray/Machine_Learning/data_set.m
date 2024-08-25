@@ -125,7 +125,7 @@ for i = 1:num_images
 
     EEt = flipud(EEt);
     
-    %Save the image
+    %Save
     save(fullfile(initial_dir, sprintf('/image_%04d.mat', i)), 'EE');
     save(fullfile(projected_dir, sprintf('/image_%04d.mat', i)), 'II');
     save(fullfile(withnoise_dir, sprintf('/image_%04d.mat', i)), 'IIwgn');

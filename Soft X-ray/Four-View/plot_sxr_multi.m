@@ -91,6 +91,23 @@ for t = times
     if ~exist(matrixPath,'file')%doCalculation
 %         ベクトル形式の画像データの読み込み
         [VectorImage1,VectorImage2, VectorImage3, VectorImage4] = get_sxr_image(date,number,newProjectionNumber,rawImage);
+        
+        n_p = 50;
+        VV1 = zeros(n_p);
+        VV2 = zeros(n_p);
+        VV3 = zeros(n_p);
+        VV4 = zeros(n_p);
+        k=FindCircle(n_p/2);
+        VV1(k) = VectorImage1;
+        VV2(k) = VectorImage2;
+        VV3(k) = VectorImage3;
+        VV4(k) = VectorImage4;   
+        dataPath = getenv('SXR_DATA_DIR');
+        %save(fullfile(dataPath, '/', num2str(date),'/', sprintf(num2str(number),'.mat')), 'VV1');
+        %save(fullfile(dataPath, '/', num2str(date),'/', sprintf(num2str(number),'.mat')), 'VV2');
+        %save(fullfile(dataPath, '/', num2str(date),'/', sprintf(num2str(number),'.mat')), 'VV3');
+        save(fullfile(dataPath, '/', num2str(date),'/', sprintf(num2str(number),'.mat')), 'VV4');
+        
 
 %         再構成計算
 
@@ -112,6 +129,8 @@ for t = times
     
     EE = cat(3,EE1,EE2,EE3,EE4);
 
+
+
     if ~doSave
         f = figure;
         f.Units = 'normalized';
@@ -131,4 +150,16 @@ if doSave
     close(f);
 end
 
+end
+
+
+function k = FindCircle(L)
+    R = zeros(2*L);
+    for i = 1:2*L
+        for j = 1:2*L
+            R(i,j) = sqrt((L-i+0.5)^2+(j-L-0.5)^2);
+        end
+    end
+    % figure;imagesc(R)
+    k = find(R<L);
 end
