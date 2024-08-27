@@ -5,9 +5,9 @@ import pathlib
 import sys
 import numpy as np
 
-date = 240621 #sys.argv[1]
-shot = 4 #sys.argv[2]
-N_projection = 50 #int(sys.argv[3])
+date = '240621' #sys.argv[1]
+shot = '41' #sys.argv[2]
+N_projection = 50 # int(sys.argv[3])
 N_grid = 91 #int(sys.argv[4])
 
 PATH = pathlib.Path('/Users/shohgookazaki/Library/CloudStorage/GoogleDrive-shohgo-okazaki@g.ecc.u-tokyo.ac.jp/My Drive/OnoLab/data/SXR_data/' + date + '/shot' + shot)
@@ -34,6 +34,11 @@ def load_data(input_data):
     sxr2 = tf.cast(sxr2, tf.float32)
     sxr3 = tf.cast(sxr3, tf.float32)
     sxr4 = tf.cast(sxr4, tf.float32)
+    
+    sxr1 = tf.image.flip_up_down(sxr1)
+    sxr2 = tf.image.flip_up_down(sxr2)
+    sxr3 = tf.image.flip_up_down(sxr3)
+    sxr4 = tf.image.flip_up_down(sxr4)
 
     return sxr1, sxr2, sxr3, sxr4
 
@@ -194,7 +199,7 @@ BATCH_SIZE = 1
 input_files = get_sorted_file_list(PATH, '*.mat')
 
 input_dataset = tf.data.Dataset.from_tensor_slices([str(f) for f in input_files])
-input_dataset = input_dataset.map(load_data, num_parallel_calls=tf.data.AUTOTUNE)
+input_dataset = input_dataset.map(tf_load_data, num_parallel_calls=tf.data.AUTOTUNE)
 input_dataset = input_dataset.batch(BATCH_SIZE)
 
 OUTPUT_CHANNELS = 1

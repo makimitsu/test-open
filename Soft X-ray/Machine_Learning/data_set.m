@@ -1,7 +1,7 @@
 addpath '/Users/shohgookazaki/Documents/GitHub/test-open/Soft X-ray/Four-view';
 Newdata = true;
 
-num_images = 5000; % 決める
+num_images = 5; % 決める
 
 % 再構成条件の定義
 newProjectionNumber = 50; %投影数＝視線数の平方根
@@ -37,7 +37,7 @@ z_grid = linspace(-200, 200, m);
 r_grid = linspace(330, 70, n);
 
 % Create directories for saving images if not exist
-output_dir = 'output_images';
+output_dir = 'test_output_images';
 if ~exist(output_dir, 'dir')
     mkdir(output_dir);
 end
@@ -183,8 +183,6 @@ for i = 1:num_images
     sxr2 = IIwgn2;
     sxr3 = IIwgn3;
     sxr4 = IIwgn4;
-    
-
 
     save(fullfile(initial_dir, sprintf('/image_%04d.mat', i)), 'EE1','EE2','EE3','EE4');
     save(fullfile(projected_dir, sprintf('/image_%04d.mat', i)), 'II1','II2','II3','II4');
@@ -205,10 +203,10 @@ save([output_dir, '/metadata.mat'], 'metadata');
 
 %可視化ファイル
 %disp('converting to png...');
-%convert_mat_to_png(initial_dir, [initial_dir, '/converted'], z_grid, r_grid, 'EE');
+convert_mat_to_png(initial_dir, [initial_dir, '/converted'], z_grid, r_grid, 'EE');
 %convert_mat_to_png(projected_dir, [projected_dir, '/converted'], z_grid, r_grid, 'II');
-%convert_mat_to_png(withnoise_dir, [withnoise_dir, '/converted'], z_grid, r_grid, 'IIwgn');
-%convert_mat_to_png(EETikhonov_dir, [EETikhonov_dir, '/converted'], z_grid, r_grid, 'EEt');
+%convert_mat_to_png(withnoise_dir, [withnoise_dir, '/converted'], z_grid, r_grid, 'sxr1');
+convert_mat_to_png(EETikhonov_dir, [EETikhonov_dir, '/converted'], z_grid, r_grid, 'EEt1');
 
 disp('Image generation and metadata creation completed.');
 

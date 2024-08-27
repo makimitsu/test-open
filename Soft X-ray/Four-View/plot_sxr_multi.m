@@ -96,7 +96,6 @@ for t = times
         sxr2(k) = VectorImage2;
         sxr3(k) = VectorImage3;
         sxr4(k) = VectorImage4;
-        
         save(dataPath, 'sxr1', 'sxr2','sxr3','sxr4')
         
 

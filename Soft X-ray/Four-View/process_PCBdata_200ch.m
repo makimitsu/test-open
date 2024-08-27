@@ -220,6 +220,7 @@ if doCalculation
         end
     end
 else
+
     load(filename,'data2D','grid2D');
 end
 
