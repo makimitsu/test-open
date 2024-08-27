@@ -11,6 +11,7 @@ show_localmax = SXR.show_localmax;
 doSave = SXR.doSave;
 doFilter = SXR.doFilter;
 doNLR = SXR.doNLR;
+docGAN = SXR.docGAN;
 % SXRfilename = SXR.SXRfilename;
 
 EE = SXRdata.EE;
@@ -292,6 +293,8 @@ if doSave
         directory = '/LF_NLR/';
     elseif doFilter & ~doNLR
         directory = '/NLF_LR/';
+    elseif docGAN
+        directory = '/cGAN/';
     else
         directory = '/LF_LR/';
     end

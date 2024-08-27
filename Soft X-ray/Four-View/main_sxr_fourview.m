@@ -18,8 +18,8 @@ pathname.pre_processed_directory_path = getenv('pre_processed_directory_path');%
 PCB.restart = 0; % 今だけ
 
 %%%%実験オペレーションの取得
-prompt = {'Date:','Shot number:','a039(not necessary):','doSave:','doFilter:','doNLR:'};
-definput = {'','','','','',''};
+prompt = {'Date:','Shot number:','a039(not necessary):','doSave:','doFilter:','doNLR:', 'docGAN:'};
+definput = {'','','','','','',''};
 if exist('date','var')
     definput{1} = num2str(date);
 end
@@ -38,6 +38,9 @@ end
 if exist('doNLR','var')
     definput{6} = num2str(doNLR);
 end
+if exist('docGAN', 'var')
+    definput{7} = num2str(docGAN);
+end
 dlgtitle = 'Input';
 dims = [1 35];
 answer = inputdlg(prompt,dlgtitle,dims,definput);
@@ -50,10 +53,12 @@ a039 = str2num(cell2mat(answer(3)));
 doSave = logical(str2num(cell2mat(answer(4))));
 doFilter = logical(str2num(cell2mat(answer(5))));
 doNLR = logical(str2num(cell2mat(answer(6))));
+docGAN = logical(str2num(cell2mat(answer(7))));
 
 SXR.doSave = doSave;
 SXR.doFilter = doFilter;
 SXR.doNLR = doNLR;
+SXR.docGAN = docGAN;
 
 %-----------スプレッドシートからデータ抜き取り--------------------%
 DOCID='1wG5fBaiQ7-jOzOI-2pkPAeV6SDiHc_LrOdcbWlvhHBw';%スプレッドシートのID

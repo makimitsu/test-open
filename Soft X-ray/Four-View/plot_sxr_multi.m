@@ -10,7 +10,11 @@ interval = SXR.interval;
 doSave = SXR.doSave;
 doFilter = SXR.doFilter;
 doNLR = SXR.doNLR;
+docGAN = SXR.docGAN;
 SXRfilename = SXR.SXRfilename;
+
+addpath '/Users/shohgookazaki/Documents/GitHub/test-open/Soft X-ray/Machine_Learning/code'; %getMDSdata.mとcoeff200ch.xlsxのあるフォルダへのパス
+
 
 if doFilter & doNLR
     options = 'NLF_NLR';
@@ -39,26 +43,9 @@ if doCalculation
     disp('No matrix data -- Start calculation');
     newProjectionNumber = 50;
     newGridNumber = 90;
-    if isfile(parameterFile)
-        disp(strcat('Loading parameter from ',which(parameterFile)))
-        load(parameterFile,'gm2d1','gm2d2','gm2d3','gm2d4', ...
-                'U1','U2','U3','U4','s1','s2','s3','s4', ...
-                'v1','v2','v3','v4','M','K','range','N_projection','N_grid');
-            
-        if newProjectionNumber ~= N_projection || newGridNumber ~= N_grid
-            disp('Different parameters - Start calculation!');
-            get_parameters(newProjectionNumber,newGridNumber,parameterFile);
-            load(parameterFile,'gm2d1','gm2d2','gm2d3','gm2d4', ...
-                    'U1','U2','U3','U4','s1','s2','s3','s4', ...
-                    'v1','v2','v3','v4','M','K','range');
-        end
-    else
-        disp('No parameters - Start calculation!');
-        get_parameters(newProjectionNumber,newGridNumber,parameterFile);
-        load(parameterFile,'gm2d1','gm2d2','gm2d3','gm2d4', ...
-                'U1','U2','U3','U4','s1','s2','s3','s4', ...
-                'v1','v2','v3','v4','M','K','range');
-    end
+    
+    [gm2d1, gm2d2, gm2d3, gm2d4, U1, U2, U3, U4, ...
+          s1, s2, s3, s4, v1, v2, v3, v4, M, K, range, N_projection, N_grid] = parametercheck(newProjectionNumber, newGridNumber);
 
     % 生画像の取得
     rawImage = imread(SXRfilename);
@@ -92,22 +79,32 @@ for t = times
 %         ベクトル形式の画像データの読み込み
         [VectorImage1,VectorImage2, VectorImage3, VectorImage4] = get_sxr_image(date,number,newProjectionNumber,rawImage);
         
-        n_p = 50;
-        VV1 = zeros(n_p);
-        VV2 = zeros(n_p);
-        VV3 = zeros(n_p);
-        VV4 = zeros(n_p);
+        datadirPath = getenv('SXR_DATA_DIR');
+        dataFolder = strcat(datadirPath,'/',num2str(date),'/shot',num2str(shot));
+        if ~exist(dataFolder, 'dir')
+            mkdir(dataFolder);
+        end
+
+        dataPath = strcat(dataFolder,'/',num2str(number),'.mat');
+        n_p = N_projection;
+        sxr1 = zeros(n_p);
+        sxr2 = zeros(n_p);
+        sxr3 = zeros(n_p);
+        sxr4 = zeros(n_p);
         k=FindCircle(n_p/2);
-        VV1(k) = VectorImage1;
-        VV2(k) = VectorImage2;
-        VV3(k) = VectorImage3;
-        VV4(k) = VectorImage4;   
-        dataPath = getenv('SXR_DATA_DIR');
-        %save(fullfile(dataPath, '/', num2str(date),'/', sprintf(num2str(number),'.mat')), 'VV1');
-        %save(fullfile(dataPath, '/', num2str(date),'/', sprintf(num2str(number),'.mat')), 'VV2');
-        %save(fullfile(dataPath, '/', num2str(date),'/', sprintf(num2str(number),'.mat')), 'VV3');
-        save(fullfile(dataPath, '/', num2str(date),'/', sprintf(num2str(number),'.mat')), 'VV4');
+        sxr1(k) = VectorImage1;
+        sxr2(k) = VectorImage2;
+        sxr3(k) = VectorImage3;
+        sxr4(k) = VectorImage4;
         
+        save(dataPath, 'sxr1', 'sxr2','sxr3','sxr4')
+        
+
+        
+        %if docGAN
+        %    pyrunfile("get_distribution.py date shot N_Projection N_grid+1");
+        %end
+
 
 %         再構成計算
 
@@ -142,13 +139,23 @@ for t = times
     SXRdata.range = range;
 
     % plot_save_sxr(grid2D,data2D,range,date,shot,t,EE,show_localmax,show_xpoint,doSave,doFilter,doNLR);
-    plot_save_sxr(PCBdata,SXR,SXRdata);
+    % plot_save_sxr(PCBdata,SXR,SXRdata);
+
+    if docGAN
+        cGANPath = strcat(dirPath,'/cGAN/',num2str(date),'/shot',num2str(shot),'/',num2str(number),'.mat');
+        load(cGANPath,'EE1','EE2','EE3','EE4');
+        EE = cat(3,EE1,EE2,EE3,EE4);
+        SXRdata.EE = EE;
+        plot_save_sxr(PCBdata,SXR,SXRdata);
+    end
+
 
 end
 
 if doSave
     close(f);
 end
+
 
 end
 
