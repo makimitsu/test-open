@@ -134,7 +134,7 @@ end
 load(filename,'rawdata');%1000×192
 
 %正しくデータ取得できていない場合はreturn
-if numel(rawdata)< 500
+if numel(rawdata)< 5004
     return
 end
 

@@ -7,9 +7,16 @@ plot_flag = true;
 newProjectionNumber = 50;%80; %投影数＝視線数の平方根
 newGridNumber = 90;%100; %グリッド数（再構成結果の画素数の平方根）
 
-[gm2d1, gm2d2, gm2d3, gm2d4, U1, U2, U3, U4, ...
-          s1, s2, s3, s4, v1, v2, v3, v4, M, K, range, N_projection, N_grid] = parametercheck(newProjectionNumber, newGridNumber);
-
+if evalin('base', 'exist(''N_projection'', ''var'')')
+    NP = evalin('base', 'N_projection');
+    if NP ~= newProjectionNumber
+        [gm2d1, gm2d2, gm2d3, gm2d4, U1, U2, U3, U4, ...
+                  s1, s2, s3, s4, v1, v2, v3, v4, M, K, range, N_projection, N_grid] = parametercheck(newProjectionNumber, newGridNumber);
+    end
+else
+    [gm2d1, gm2d2, gm2d3, gm2d4, U1, U2, U3, U4, ...
+              s1, s2, s3, s4, v1, v2, v3, v4, M, K, range, N_projection, N_grid] = parametercheck(newProjectionNumber, newGridNumber);
+end
 
 % number = (t-start)/interval+1;
 % ファントムテスト用の画像を準備（4視点分）

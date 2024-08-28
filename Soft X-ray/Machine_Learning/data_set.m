@@ -7,8 +7,16 @@ num_images = 5; % 決める
 newProjectionNumber = 50; %投影数＝視線数の平方根
 newGridNumber = 90; %グリッド数（再構成結果の画素数の平方根）
 
-[gm2d1, gm2d2, gm2d3, gm2d4, U1, U2, U3, U4, ...
-          s1, s2, s3, s4, v1, v2, v3, v4, M, K, range, N_projection, N_grid] = parametercheck(newProjectionNumber, newGridNumber);
+if evalin('base', 'exist(''N_projection'', ''var'')')
+    NP = evalin('base', 'N_projection');
+    if NP ~= newProjectionNumber
+        [gm2d1, gm2d2, gm2d3, gm2d4, U1, U2, U3, U4, ...
+                  s1, s2, s3, s4, v1, v2, v3, v4, M, K, range, N_projection, N_grid] = parametercheck(newProjectionNumber, newGridNumber);
+    end
+else
+    [gm2d1, gm2d2, gm2d3, gm2d4, U1, U2, U3, U4, ...
+              s1, s2, s3, s4, v1, v2, v3, v4, M, K, range, N_projection, N_grid] = parametercheck(newProjectionNumber, newGridNumber);
+end
 
 %ここからファントム生成
 
@@ -89,8 +97,14 @@ for i = 1:num_images
             z_0 = 1 - 2 * rand();        % Random z-position
             r_0 = 1 - 2 * rand();        % Random r-position
         end
-        intensity = rand()*0.1; % Random intensity multiplier
-        sigma = rand() * 0.1;     % Random size of the source
+        
+        if mod(num_images, 2) == 0
+            intensity = rand()*10;
+            sigma = rand();
+        else
+            intensity = rand()*0.1; % Random intensity multiplier
+            sigma = rand() * 0.1;     % Random size of the source
+        end
 
         % Store properties for metadata
         source_positions(j, :) = [z_0, r_0];
@@ -203,8 +217,8 @@ save([output_dir, '/metadata.mat'], 'metadata');
 
 %可視化ファイル
 %disp('converting to png...');
-convert_mat_to_png(initial_dir, [initial_dir, '/converted'], z_grid, r_grid, 'EE');
-%convert_mat_to_png(projected_dir, [projected_dir, '/converted'], z_grid, r_grid, 'II');
+convert_mat_to_png(initial_dir, [initial_dir, '/converted'], z_grid, r_grid, 'EE1');
+%convert_mat_to_png(projected_dir, [projected_dir, '/converted'], z_grid, r_grid, 'II1');
 %convert_mat_to_png(withnoise_dir, [withnoise_dir, '/converted'], z_grid, r_grid, 'sxr1');
 convert_mat_to_png(EETikhonov_dir, [EETikhonov_dir, '/converted'], z_grid, r_grid, 'EEt1');
 

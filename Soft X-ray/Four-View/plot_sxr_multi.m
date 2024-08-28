@@ -44,8 +44,16 @@ if doCalculation
     newProjectionNumber = 50;
     newGridNumber = 90;
     
-    [gm2d1, gm2d2, gm2d3, gm2d4, U1, U2, U3, U4, ...
-          s1, s2, s3, s4, v1, v2, v3, v4, M, K, range, N_projection, N_grid] = parametercheck(newProjectionNumber, newGridNumber);
+    if evalin('base', 'exist(''N_projection'', ''var'')')
+        NP = evalin('base', 'N_projection');
+        if NP ~= newProjectionNumber
+            [gm2d1, gm2d2, gm2d3, gm2d4, U1, U2, U3, U4, ...
+                      s1, s2, s3, s4, v1, v2, v3, v4, M, K, range, N_projection, N_grid] = parametercheck(newProjectionNumber, newGridNumber);
+        end
+    else
+        [gm2d1, gm2d2, gm2d3, gm2d4, U1, U2, U3, U4, ...
+                  s1, s2, s3, s4, v1, v2, v3, v4, M, K, range, N_projection, N_grid] = parametercheck(newProjectionNumber, newGridNumber);
+    end
 
     % 生画像の取得
     rawImage = imread(SXRfilename);
@@ -125,22 +133,20 @@ for t = times
     
     EE = cat(3,EE1,EE2,EE3,EE4);
 
-
-
     if ~doSave
         f = figure;
         f.Units = 'normalized';
         f.Position = [0.1,0.2,0.8,0.8];
     end
 
-    SXRdata.EE = EE;
     SXRdata.t = t;
     SXRdata.range = range;
 
     % plot_save_sxr(grid2D,data2D,range,date,shot,t,EE,show_localmax,show_xpoint,doSave,doFilter,doNLR);
-    % plot_save_sxr(PCBdata,SXR,SXRdata);
-
-    if docGAN
+    if ~dcGAN
+        SXRdata.EE = EE;
+        plot_save_sxr(PCBdata,SXR,SXRdata);
+    elseif docGAN
         cGANPath = strcat(dirPath,'/cGAN/',num2str(date),'/shot',num2str(shot),'/',num2str(number),'.mat');
         load(cGANPath,'EE1','EE2','EE3','EE4');
         EE = cat(3,EE1,EE2,EE3,EE4);

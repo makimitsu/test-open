@@ -5,13 +5,16 @@ import pathlib
 import sys
 import numpy as np
 
-date = '240621' #sys.argv[1]
-shot = '41' #sys.argv[2]
-N_projection = 50 # int(sys.argv[3])
-N_grid = 91 #int(sys.argv[4])
+date = '240622'
+first_shot = 1 #計算したい最初のショットの番号
+last_shot = 48 #計算したい最後のショットの番号
 
-PATH = pathlib.Path('/Users/shohgookazaki/Library/CloudStorage/GoogleDrive-shohgo-okazaki@g.ecc.u-tokyo.ac.jp/My Drive/OnoLab/data/SXR_data/' + date + '/shot' + shot)
-savePATH = '/Users/shohgookazaki/Library/CloudStorage/GoogleDrive-shohgo-okazaki@g.ecc.u-tokyo.ac.jp/My Drive/OnoLab/data/result_matrix'
+shot_list = list(map(str, list(range(first_shot, last_shot+1))))
+N_projection = 50
+N_grid = 91
+
+base_path = '/Users/shohgookazaki/Library/CloudStorage/GoogleDrive-shohgo-okazaki@g.ecc.u-tokyo.ac.jp/My Drive/OnoLab/data/SXR_data/'
+save_base_path = '/Users/shohgookazaki/Library/CloudStorage/GoogleDrive-shohgo-okazaki@g.ecc.u-tokyo.ac.jp/My Drive/OnoLab/data/result_matrix'
 
 def get_sorted_file_list(dataset_path, pattern):
     file_list = list(dataset_path.glob(pattern))
@@ -41,7 +44,6 @@ def load_data(input_data):
     sxr4 = tf.image.flip_up_down(sxr4)
 
     return sxr1, sxr2, sxr3, sxr4
-
 
 def tf_load_data(input_data):
     return tf.py_function(func=load_data, inp=[input_data], Tout=[tf.float32, tf.float32, tf.float32, tf.float32])
@@ -161,7 +163,7 @@ def Discriminator():
 
   return tf.keras.Model(inputs=[inp, tar], outputs=last)
 
-def save_images(model, index, sxr1, sxr2, sxr3, sxr4):
+def save_images(model, index, sxr1, sxr2, sxr3, sxr4, savePATH):
   
   EE1 = np.squeeze(model(sxr1, training=True))
   EE2 = np.squeeze(model(sxr2, training=True))
@@ -190,23 +192,14 @@ def save_images(model, index, sxr1, sxr2, sxr3, sxr4):
   savefile = savedir + '/' + f'{index}.mat'
   scipy.io.savemat(savefile, data_dict)
 
-
 # The facade training set consist of 400 images
 BUFFER_SIZE = 800
 # The batch size of 1 produced better results for the U-Net in the original pix2pix experiment
 BATCH_SIZE = 1
 
-input_files = get_sorted_file_list(PATH, '*.mat')
-
-input_dataset = tf.data.Dataset.from_tensor_slices([str(f) for f in input_files])
-input_dataset = input_dataset.map(tf_load_data, num_parallel_calls=tf.data.AUTOTUNE)
-input_dataset = input_dataset.batch(BATCH_SIZE)
-
 OUTPUT_CHANNELS = 1
 
 generator = Generator()
-
-
 discriminator = Discriminator()
 
 generator_optimizer = tf.keras.optimizers.Adam(2e-5, beta_1=0.5)
@@ -223,6 +216,15 @@ checkpoint = tf.train.Checkpoint(generator_optimizer=generator_optimizer,
 # Restoring the latest checkpoint in checkpoint_dir
 checkpoint.restore(tf.train.latest_checkpoint(checkpoint_dir))
 
-# Run the trained model on a few examples from the test set
-for index, (sxr1, sxr2, sxr3, sxr4) in enumerate(input_dataset):
-  save_images(generator,index+1, sxr1, sxr2, sxr3, sxr4)
+for shot in shot_list:
+  PATH = pathlib.Path(base_path + date + '/shot' + shot)
+  savePATH = save_base_path + '/cGAN/' + date + '/' + 'shot' + shot
+  
+  input_files = get_sorted_file_list(PATH, '*.mat')
+  input_dataset = tf.data.Dataset.from_tensor_slices([str(f) for f in input_files])
+  input_dataset = input_dataset.map(tf_load_data, num_parallel_calls=tf.data.AUTOTUNE)
+  input_dataset = input_dataset.batch(BATCH_SIZE)
+
+  # Run the trained model on a few examples from the test set
+  for index, (sxr1, sxr2, sxr3, sxr4) in enumerate(input_dataset):
+    save_images(generator,index+1, sxr1, sxr2, sxr3, sxr4, savePATH)

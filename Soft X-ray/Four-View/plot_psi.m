@@ -29,7 +29,7 @@ for m=1:16 %図示する時間
     switch PCB.dataType
         case 1
             contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.psi(:,:,i),40,'LineStyle','none');
-            clim([-2e-2,2e-2]);
+            clim([-0.5e-2,0.5e-2]);
             dataTypeName = 'psi';
             colorLabel = '\psi (Wb)';
         case 2
