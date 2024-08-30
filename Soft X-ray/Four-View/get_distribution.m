@@ -79,7 +79,11 @@ if NL %最大エントロピー
         Phif = M*gamma/2*(f+1)+ Lt*(L*exp(f)-g);
         A = eye(M) + L*(Lt.*diaginvDx); %A = eye(M)+L*invDx*Lt; %正定値対称行列になっているはずなんだよね
         b = L*(Phif.*diaginvDx); %b = L*invDx*Phif;
-        xi = cholesky(A,b);
+        %xi = cholesky(A,b);
+        
+        R = chol(A);
+        xi = R\(R'\b);
+        
         %diagproduct = diaginvEx.*diaginvDx;
 
         %L2正則化する場合

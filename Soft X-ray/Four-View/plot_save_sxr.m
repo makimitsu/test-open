@@ -70,6 +70,8 @@ contour_layer = linspace(psi_min,psi_max,50);
 % f.Units = 'normalized';
 % f.Position = [0.1,0.2,0.8,0.8];
 
+set(gcf, 'Visible', 'off');  % Suppress plot display
+
 EE_q = zeros(50,50,4);
 for i = 1:4
     if i <=2
@@ -96,7 +98,7 @@ nameList = {'1um Al', '2.5um Al', '2um Mylar', '1um Mylar'};
 
 % cLimList = {[0 1],[0 2],[0 0.3],[0 0.15]};
 
-cLimList = {[0 2],[0 0.5],[0 0.5], [0 2]};
+cLimList = {[0 1],[0 1],[0 1], [0 1]};
 
 % cLimList = {[0 1],[0 0.5],[0 0.3],[0 0.15]};
 % cLimList = {[0 1.5],[0 0.5],[0 1],[0 1.5]};
@@ -294,7 +296,7 @@ if doSave
     elseif doFilter & ~doNLR
         directory = '/NLF_LR/';
     elseif docGAN
-        directory = '/cGAN/';
+        directory = '/cGAN_large/';
     else
         directory = '/LF_LR/';
     end

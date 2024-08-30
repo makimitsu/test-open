@@ -143,11 +143,11 @@ for t = times
     SXRdata.range = range;
 
     % plot_save_sxr(grid2D,data2D,range,date,shot,t,EE,show_localmax,show_xpoint,doSave,doFilter,doNLR);
-    if ~dcGAN
+    if ~docGAN
         SXRdata.EE = EE;
         plot_save_sxr(PCBdata,SXR,SXRdata);
     elseif docGAN
-        cGANPath = strcat(dirPath,'/cGAN/',num2str(date),'/shot',num2str(shot),'/',num2str(number),'.mat');
+        cGANPath = strcat(dirPath,'/cGAN_large/',num2str(date),'/shot',num2str(shot),'/',num2str(number),'.mat');
         load(cGANPath,'EE1','EE2','EE3','EE4');
         EE = cat(3,EE1,EE2,EE3,EE4);
         SXRdata.EE = EE;

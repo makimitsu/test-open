@@ -1,9 +1,7 @@
 %Lf=gの類似度計算
 
-
 date = '240621';
-shot = '4';
-mat = '8';
+results = [];
 
 newProjectionNumber = 50; %投影数＝視線数の平方根
 newGridNumber = 90; %グリッド数（再構成結果の画素数の平方根）
@@ -21,21 +19,57 @@ end
 matpath = getenv('SXR_MATRIX_DIR');
 sxrpath = getenv('SXR_DATA_DIR');
 
-matrixPath = strcat(matpath, '/cGAN/', date, '/shot', shot, '/', mat, '.mat');
-sxrPath = strcat(sxrpath,'/', date, '/shot', shot, '/', mat, '.mat');
 
-load(matrixPath,'EE1','EE2','EE3','EE4');
-load(sxrPath, 'sxr1', 'sxr2','sxr3','sxr4');
-sim = simi(gm2d1,N_projection,EE1,sxr1);
+for shotnum = [6:6]
+    for matnum = 7:7
+        shot = num2str(shotnum);
+        mat = num2str(matnum);
 
-matrixPath = strcat(matpath, '/LF_NLR/', date, '/shot', shot, '/', mat, '.mat');
-load(matrixPath,'EE1','EE2','EE3','EE4');
-sim2 = simi(gm2d1,N_projection,EE1,sxr1);
+        matrixPath_cGAN = strcat(matpath, '/cGAN/', date, '/shot', shot, '/', mat, '.mat');
+        matrixPath_cGAN_large = strcat(matpath, '/cGAN_large/', date, '/shot', shot, '/', mat, '.mat');
+        matrixPath_LF_LR = strcat(matpath, '/LF_LR/', date, '/shot', shot, '/', mat, '.mat');
 
-fprintf('cGANsim = %d\n', sim);
-fprintf('LF_NLRsim = %d\n', sim2);
+        sxrPath = strcat(sxrpath,'/', date, '/shot', shot, '/', mat, '.mat');
+        load(sxrPath, 'sxr1');
 
+        load(matrixPath_cGAN,'EE1');
+        cGANsim = simi(gm2d1,N_projection,EE1,sxr1);
+
+        load(matrixPath_cGAN_large,'EE1');
+        cGAN_largesim = simi(gm2d1,N_projection,EE1,sxr1);
+        
+        cGAN_sxr = gm2d1*EE1(:);
+
+        n_p = N_projection;
+        cGAN_sxr_cal = zeros(n_p);
+        k=FindCircle(n_p/2);
+        cGAN_sxr_cal(k) = cGAN_sxr;
+        cGAN_sxr_cal = cGAN_sxr_cal(:);
+
+        load(matrixPath_LF_LR,'EE1');
+        LF_LRsim = simi(gm2d1,N_projection,EE1,sxr1);
+        
+        
+        LF_LR_sxr = gm2d1*EE1(:);
+        LF_LR_sxr_cal = zeros(n_p);
+        LF_LR_sxr_cal(k) = LF_LR_sxr;
+        LF_LR_sxr_cal = LF_LR_sxr_cal(:);
+        
+        x = 1:2500;
+
+        plot(x, cGAN_sxr_cal,'g', x, LF_LR_sxr_cal, 'b--o');
+        
+        
+        %results = [results; {shot, mat, cGANsim, cGAN_largesim, LF_LRsim}];
+    end
+end
+% Convert results cell array to table
+%resultsTable = cell2table(results, 'VariableNames', {'Shot', 'Mat', 'cGANsim', 'cGAN_largesim', 'LF_LRsim'});
+
+% Write table to CSV file
+%writetable(resultsTable, 'SSIM_results.csv');
 function sim = simi(gm2d,N_projection,EE, sxr)
+
     EE = EE(:);
     
     sxr_cal = gm2d*EE;
@@ -45,7 +79,10 @@ function sim = simi(gm2d,N_projection,EE, sxr)
     k=FindCircle(n_p/2);
     sxr_calcal(k) = sxr_cal;
     
-    [ssimval, ssimmap] = ssim(sxr, sxr_calcal);
+    sxr = double(sxr);
+    sxr_calcal = double(sxr_calcal);
+
+    [ssimval, ssimimage] = ssim(sxr, sxr_calcal);
         
     sim = ssimval;
 end

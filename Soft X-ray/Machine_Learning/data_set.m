@@ -1,11 +1,13 @@
 addpath '/Users/shohgookazaki/Documents/GitHub/test-open/Soft X-ray/Four-view';
 Newdata = true;
 
-num_images = 5; % 決める
+num_images = 5000; % 決める
 
 % 再構成条件の定義
 newProjectionNumber = 50; %投影数＝視線数の平方根
 newGridNumber = 90; %グリッド数（再構成結果の画素数の平方根）
+
+output_dir = 'output_images';
 
 if evalin('base', 'exist(''N_projection'', ''var'')')
     NP = evalin('base', 'N_projection');
@@ -45,7 +47,7 @@ z_grid = linspace(-200, 200, m);
 r_grid = linspace(330, 70, n);
 
 % Create directories for saving images if not exist
-output_dir = 'test_output_images';
+
 if ~exist(output_dir, 'dir')
     mkdir(output_dir);
 end
@@ -98,13 +100,14 @@ for i = 1:num_images
             r_0 = 1 - 2 * rand();        % Random r-position
         end
         
-        if mod(num_images, 2) == 0
+        if mod(num_images, 50) == 0
             intensity = rand()*10;
-            sigma = rand();
         else
             intensity = rand()*0.1; % Random intensity multiplier
-            sigma = rand() * 0.1;     % Random size of the source
         end
+
+        sigma = rand() * 0.1;     % Random size of the source
+        
 
         % Store properties for metadata
         source_positions(j, :) = [z_0, r_0];
@@ -123,8 +126,10 @@ for i = 1:num_images
     %EE = EE + background_intensity;
     
     %正規化
-    EE = EE./max(max(EE));
+    % EE = EE./max(max(EE));
     %EE = fliplr(rot90(EE)); %rが縦、zが横、右下最小
+
+    
     
     %2D matrix is transformed to 1D transversal vector
     E = reshape(EE,1,[]);
@@ -217,10 +222,10 @@ save([output_dir, '/metadata.mat'], 'metadata');
 
 %可視化ファイル
 %disp('converting to png...');
-convert_mat_to_png(initial_dir, [initial_dir, '/converted'], z_grid, r_grid, 'EE1');
+%convert_mat_to_png(initial_dir, [initial_dir, '/converted'], z_grid, r_grid, 'EE1');
 %convert_mat_to_png(projected_dir, [projected_dir, '/converted'], z_grid, r_grid, 'II1');
 %convert_mat_to_png(withnoise_dir, [withnoise_dir, '/converted'], z_grid, r_grid, 'sxr1');
-convert_mat_to_png(EETikhonov_dir, [EETikhonov_dir, '/converted'], z_grid, r_grid, 'EEt1');
+%convert_mat_to_png(EETikhonov_dir, [EETikhonov_dir, '/converted'], z_grid, r_grid, 'EEt1');
 
 disp('Image generation and metadata creation completed.');
 

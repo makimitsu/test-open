@@ -5,16 +5,18 @@ import pathlib
 import sys
 import numpy as np
 
-date = '240622'
-first_shot = 1 #計算したい最初のショットの番号
-last_shot = 48 #計算したい最後のショットの番号
+date = '240621'
+first_shot = 16 #計算したい最初のショットの番号
+last_shot = 55 #計算したい最後のショットの番号
+
+checkpoint_dir = './training_checkpoints'
 
 shot_list = list(map(str, list(range(first_shot, last_shot+1))))
 N_projection = 50
 N_grid = 91
 
 base_path = '/Users/shohgookazaki/Library/CloudStorage/GoogleDrive-shohgo-okazaki@g.ecc.u-tokyo.ac.jp/My Drive/OnoLab/data/SXR_data/'
-save_base_path = '/Users/shohgookazaki/Library/CloudStorage/GoogleDrive-shohgo-okazaki@g.ecc.u-tokyo.ac.jp/My Drive/OnoLab/data/result_matrix'
+save_base_path = '/Users/shohgookazaki/Library/CloudStorage/GoogleDrive-shohgo-okazaki@g.ecc.u-tokyo.ac.jp/My Drive/OnoLab/data/result_matrix/cGAN/'
 
 def get_sorted_file_list(dataset_path, pattern):
     file_list = list(dataset_path.glob(pattern))
@@ -184,12 +186,9 @@ def save_images(model, index, sxr1, sxr2, sxr3, sxr4, savePATH):
       'EE4': EE4
   }
 
-  # Save the data to a .mat file
-  savedir = savePATH + '/cGAN/' + date + '/' + 'shot' + shot 
-  
-  if not os.path.exists(savedir):
-    os.makedirs(savedir)
-  savefile = savedir + '/' + f'{index}.mat'
+  if not os.path.exists(savePATH):
+    os.makedirs(savePATH)
+  savefile = savePATH + '/' + f'{index}.mat'
   scipy.io.savemat(savefile, data_dict)
 
 # The facade training set consist of 400 images
@@ -205,7 +204,7 @@ discriminator = Discriminator()
 generator_optimizer = tf.keras.optimizers.Adam(2e-5, beta_1=0.5)
 discriminator_optimizer = tf.keras.optimizers.Adam(2e-5, beta_1=0.5)
 
-checkpoint_dir = './training_checkpoints'
+
 checkpoint_prefix = os.path.join(checkpoint_dir, "ckpt")
 checkpoint = tf.train.Checkpoint(generator_optimizer=generator_optimizer,
                                  discriminator_optimizer=discriminator_optimizer,
@@ -218,7 +217,7 @@ checkpoint.restore(tf.train.latest_checkpoint(checkpoint_dir))
 
 for shot in shot_list:
   PATH = pathlib.Path(base_path + date + '/shot' + shot)
-  savePATH = save_base_path + '/cGAN/' + date + '/' + 'shot' + shot
+  savePATH = save_base_path + date + '/' + 'shot' + shot
   
   input_files = get_sorted_file_list(PATH, '*.mat')
   input_dataset = tf.data.Dataset.from_tensor_slices([str(f) for f in input_files])
