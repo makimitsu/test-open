@@ -35,8 +35,8 @@ end
 if exist('doFilter','var')
     definput{5} = num2str(doFilter);
 end
-if exist('doNLR','var')
-    definput{6} = num2str(doNLR);
+if exist('ReconMethod','var')
+    definput{6} = num2str(ReconMethod);
 end
 if exist('docGAN', 'var')
     definput{7} = num2str(docGAN);
@@ -52,12 +52,12 @@ IDXlist = str2num(cell2mat(answer(2)));
 a039 = str2num(cell2mat(answer(3)));
 doSave = logical(str2num(cell2mat(answer(4))));
 doFilter = logical(str2num(cell2mat(answer(5))));
-doNLR = logical(str2num(cell2mat(answer(6))));
+ReconMethod = str2num(str2num(cell2mat(answer(6))));
 docGAN = logical(str2num(cell2mat(answer(7))));
 
 SXR.doSave = doSave;
 SXR.doFilter = doFilter;
-SXR.doNLR = doNLR;
+SXR.ReconMethod = ReconMethod;
 SXR.docGAN = docGAN;
 
 %-----------スプレッドシートからデータ抜き取り--------------------%

@@ -10,7 +10,7 @@ show_localmax = SXR.show_localmax;
 % interval = SXR.interval;
 doSave = SXR.doSave;
 doFilter = SXR.doFilter;
-doNLR = SXR.doNLR;
+ReconMethod = SXR.ReconMethod;
 docGAN = SXR.docGAN;
 % SXRfilename = SXR.SXRfilename;
 
@@ -289,17 +289,26 @@ drawnow;
 if doSave
     pathname_png = getenv('SXR_RECONSTRUCTED_DIR');
     pathname_fig = getenv('SXR_RECONSTRUCTED_FIG_DIR');
-    if doFilter & doNLR
-        directory = '/NLF_NLR/';
-    elseif ~doFilter & doNLR
-        directory = '/LF_NLR/';
-    elseif doFilter & ~doNLR
-        directory = '/NLF_LR/';
+    if doFilter 
+        if ReconMethod == 0
+            directory = '/NLF_TP/';
+        elseif ReconMethod == 1
+            directory = '/NLF_MFI/';
+        elseif ReconMethod == 2
+            directory = '/NLF_MEM';
+        end
+    elseif ~doFilter
+        if ReconMethod == 0
+            directory = '/LF_TP/';
+        elseif ReconMethod == 1
+            directory = '/LF_MFI/';
+        elseif ReconMethod == 2
+            directory = '/LF_MEM';
+        end
     elseif docGAN
-        directory = '/cGAN_large/';
-    else
-        directory = '/LF_LR/';
+        directory = '/cGAN/';
     end
+
     foldername_png = strcat(pathname_png,directory,'/',num2str(date),'/shot',num2str(shot));
     foldername_fig = strcat(pathname_fig,directory,'/',num2str(date),'/shot',num2str(shot));
     if exist(foldername_png,'dir') == 0

@@ -7,7 +7,7 @@ num_images = 5000; % 決める
 newProjectionNumber = 50; %投影数＝視線数の平方根
 newGridNumber = 90; %グリッド数（再構成結果の画素数の平方根）
 
-output_dir = 'output_images';
+output_dir = 'test_output_images';
 
 if evalin('base', 'exist(''N_projection'', ''var'')')
     NP = evalin('base', 'N_projection');
@@ -100,11 +100,7 @@ for i = 1:num_images
             r_0 = 1 - 2 * rand();        % Random r-position
         end
         
-        if mod(num_images, 50) == 0
-            intensity = rand()*10;
-        else
-            intensity = rand()*0.1; % Random intensity multiplier
-        end
+        intensity = rand(); % Random intensity multiplier
 
         sigma = rand() * 0.1;     % Random size of the source
         
@@ -126,9 +122,7 @@ for i = 1:num_images
     %EE = EE + background_intensity;
     
     %正規化
-    % EE = EE./max(max(EE));
-    %EE = fliplr(rot90(EE)); %rが縦、zが横、右下最小
-
+    EE = EE./max(max(EE)); %学習は[-1,1]を出力するから
     
     
     %2D matrix is transformed to 1D transversal vector

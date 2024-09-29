@@ -1,4 +1,4 @@
-function EE = get_distribution(M,K,gm2d,U,s,v,VectorImage,plot_flag,NL)
+function EE = get_distribution(M,K,gm2d,U,s,v,VectorImage,plot_flag,ReconMethod)
 
 Z=U'*VectorImage.';
 
@@ -41,8 +41,37 @@ E = zeros(1,K);
 %     E(i)=sum(E1);
 % end
 % EE = reshape(E,sqrt(K),sqrt(K)); %ここで縦がr、横がzで左下が最小になる
+if ReconMethod == 3
+    % 与えられた観測データ g
+    g = VectorImage.'; 
+    
+    % 既知の行列 H
+    H = gm2d; 
+    
+    % カーネルのハイパーパラメータ
+    length_scale = 1.0;
+    sigma_f = 1.0;
+    sigma_n = 0.3; % 観測ノイズの標準偏差
+    
+    % 座標 (画素のインデックス) X
+    X = (1:size(gm2d,2))'; % Nは画素数
+    
+    % RBFカーネルの共分散行列 Kを計算
+    k = rbf_kernel(X, X, length_scale, sigma_f);
+    
+    % 観測モデルのノイズを考慮した共分散行列
+    K_obs = H * k * H' + sigma_n^2 * eye(size(H, 1));
+    
+    % 事後分布の平均 (再構成された f)
+    f_post_mean = k * H' * (K_obs \ g);
+    
+    % 事後分布の分散 (不確実性)
+    f_post_cov = k - k * H' * (K_obs \ (H * k));
 
-if NL %最大エントロピー
+
+    EE = reshape(f_post_mean.',sqrt(K),sqrt(K));
+
+elseif ReconMethod == 2
     gamma = 10^(lg_gamma(gamma_index));%GCVも考え直さないと→計算時間やばくなりそう
     L = gm2d; %Lf=g
     Lt = L.';
@@ -123,9 +152,7 @@ if NL %最大エントロピー
     E = exp(f);
 
     EE = reshape(E.',sqrt(K),sqrt(K));
-
-%{
-if NL % 最小フィッシャー
+elseif ReconMethod == 1 % 最小フィッシャー
     tic
     gamma = 10^(lg_gamma(gamma_index));
     C = Laplacian(sqrt(K)-1);
@@ -157,7 +184,7 @@ if NL % 最小フィッシャー
     EE = reshape(EE, sqrt(K), sqrt(K));
     toc
 %}
-else
+elseif ReconMethod == 0
     for i=1:K
         if M>K
             v_1 = [v(i,:) zeros(1,M-K)];
@@ -200,4 +227,12 @@ for i=1:1:k
         end
     end
 end
+end
+
+function K = rbf_kernel(X1, X2, length_scale, sigma_f)
+    % X1, X2は座標のベクトル
+    % length_scaleはカーネルの長さスケール
+    % sigma_fは関数の振幅
+    sqdist = pdist2(X1, X2).^2;
+    K = sigma_f^2 * exp(-0.5 * sqdist / length_scale^2);
 end

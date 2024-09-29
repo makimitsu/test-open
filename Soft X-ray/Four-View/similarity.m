@@ -20,23 +20,19 @@ matpath = getenv('SXR_MATRIX_DIR');
 sxrpath = getenv('SXR_DATA_DIR');
 
 
-for shotnum = [6:6]
-    for matnum = 7:7
+for shotnum = 4%[1:2, 4:22, 24:55]
+    for matnum = 2
         shot = num2str(shotnum);
         mat = num2str(matnum);
 
         matrixPath_cGAN = strcat(matpath, '/cGAN/', date, '/shot', shot, '/', mat, '.mat');
-        matrixPath_cGAN_large = strcat(matpath, '/cGAN_large/', date, '/shot', shot, '/', mat, '.mat');
         matrixPath_LF_LR = strcat(matpath, '/LF_LR/', date, '/shot', shot, '/', mat, '.mat');
 
         sxrPath = strcat(sxrpath,'/', date, '/shot', shot, '/', mat, '.mat');
         load(sxrPath, 'sxr1');
 
         load(matrixPath_cGAN,'EE1');
-        cGANsim = simi(gm2d1,N_projection,EE1,sxr1);
-
-        load(matrixPath_cGAN_large,'EE1');
-        cGAN_largesim = simi(gm2d1,N_projection,EE1,sxr1);
+        cGAN_sim = simi(gm2d1,N_projection,EE1,sxr1);
         
         cGAN_sxr = gm2d1*EE1(:);
 
@@ -48,8 +44,7 @@ for shotnum = [6:6]
 
         load(matrixPath_LF_LR,'EE1');
         LF_LRsim = simi(gm2d1,N_projection,EE1,sxr1);
-        
-        
+
         LF_LR_sxr = gm2d1*EE1(:);
         LF_LR_sxr_cal = zeros(n_p);
         LF_LR_sxr_cal(k) = LF_LR_sxr;
@@ -60,27 +55,24 @@ for shotnum = [6:6]
         plot(x, cGAN_sxr_cal,'g', x, LF_LR_sxr_cal, 'b--o');
         
         
-        %results = [results; {shot, mat, cGANsim, cGAN_largesim, LF_LRsim}];
+        results = [results; {shot, mat, cGAN_sim, LF_LRsim}];
     end
 end
 % Convert results cell array to table
-%resultsTable = cell2table(results, 'VariableNames', {'Shot', 'Mat', 'cGANsim', 'cGAN_largesim', 'LF_LRsim'});
+resultsTable = cell2table(results, 'VariableNames', {'Shot', 'Mat','cGAN_normsim', 'LF_LRsim'});
 
 % Write table to CSV file
-%writetable(resultsTable, 'SSIM_results.csv');
+writetable(resultsTable, 'SSIM_results.csv');
+
 function sim = simi(gm2d,N_projection,EE, sxr)
 
     EE = EE(:);
     
     sxr_cal = gm2d*EE;
     
-    n_p = N_projection;
-    sxr_calcal = zeros(n_p);
-    k=FindCircle(n_p/2);
-    sxr_calcal(k) = sxr_cal;
+    sxr_calcal = getCircleData(sxr_cal,N_projection);
     
     sxr = double(sxr);
-    sxr_calcal = double(sxr_calcal);
 
     [ssimval, ssimimage] = ssim(sxr, sxr_calcal);
         

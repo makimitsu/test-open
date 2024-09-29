@@ -9,21 +9,29 @@ start = SXR.start;
 interval = SXR.interval;
 doSave = SXR.doSave;
 doFilter = SXR.doFilter;
-doNLR = SXR.doNLR;
+ReconMethod = SXR.ReconMethod;
 docGAN = SXR.docGAN;
 SXRfilename = SXR.SXRfilename;
 
 addpath '/Users/shohgookazaki/Documents/GitHub/test-open/Soft X-ray/Machine_Learning/code'; %getMDSdata.mとcoeff200ch.xlsxのあるフォルダへのパス
 
 
-if doFilter & doNLR
-    options = 'NLF_NLR';
-elseif ~doFilter & doNLR
-    options = 'LF_NLR';
-elseif doFilter & ~doNLR
-    options = 'NLF_LR';
-else
-    options = 'LF_LR';
+if doFilter
+    if ReconMethod == 0
+        options = 'NLF_TP';
+    elseif ReconMethod == 1
+        options = 'NLF_MFI';
+    elseif ReconMethod == 2
+        options = 'NLF_MEM';
+    end
+elseif ~doFilter
+    if ReconMethod == 0
+        options = 'LF_TP';
+    elseif ReconMethod == 1
+        options = 'LF_MFI';
+    elseif ReconMethod == 2
+        options = 'LF_MEM';
+    end
 end
 
 dirPath = getenv('SXR_MATRIX_DIR');
@@ -115,10 +123,10 @@ for t = times
 
 %         再構成計算
 
-        EE1 = get_distribution(M,K,gm2d1,U1,s1,v1,VectorImage1,doPlot,doNLR);
-        EE2 = get_distribution(M,K,gm2d2,U2,s2,v2,VectorImage2,doPlot,doNLR);
-        EE3 = get_distribution(M,K,gm2d3,U3,s3,v3,VectorImage3,doPlot,doNLR);
-        EE4 = get_distribution(M,K,gm2d4,U4,s4,v4,VectorImage4,doPlot,doNLR);
+        EE1 = get_distribution(M,K,gm2d1,U1,s1,v1,VectorImage1,doPlot,ReconMethod);
+        EE2 = get_distribution(M,K,gm2d2,U2,s2,v2,VectorImage2,doPlot,ReconMethod);
+        EE3 = get_distribution(M,K,gm2d3,U3,s3,v3,VectorImage3,doPlot,ReconMethod);
+        EE4 = get_distribution(M,K,gm2d4,U4,s4,v4,VectorImage4,doPlot,ReconMethod);
         
 %         再構成結果を保存するファイルを作成、保存
         
@@ -142,7 +150,7 @@ for t = times
     SXRdata.t = t;
     SXRdata.range = range;
 
-    % plot_save_sxr(grid2D,data2D,range,date,shot,t,EE,show_localmax,show_xpoint,doSave,doFilter,doNLR);
+    % plot_save_sxr(grid2D,data2D,range,date,shot,t,EE,show_localmax,show_xpoint,doSave,doFilter,ReconMethod);
     if ~docGAN
         SXRdata.EE = EE;
         plot_save_sxr(PCBdata,SXR,SXRdata);

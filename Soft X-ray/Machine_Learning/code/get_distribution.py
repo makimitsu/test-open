@@ -5,8 +5,15 @@ import pathlib
 import sys
 import numpy as np
 
+gpus = tf.config.list_physical_devices('GPU')
+if gpus:
+    for gpu in gpus:
+        print(f"GPU found: {gpu}")
+else:
+    print("No GPU found")
+
 date = '240621'
-first_shot = 16 #計算したい最初のショットの番号
+first_shot = 1 #計算したい最初のショットの番号
 last_shot = 55 #計算したい最後のショットの番号
 
 checkpoint_dir = './training_checkpoints'
@@ -17,6 +24,17 @@ N_grid = 91
 
 base_path = '/Users/shohgookazaki/Library/CloudStorage/GoogleDrive-shohgo-okazaki@g.ecc.u-tokyo.ac.jp/My Drive/OnoLab/data/SXR_data/'
 save_base_path = '/Users/shohgookazaki/Library/CloudStorage/GoogleDrive-shohgo-okazaki@g.ecc.u-tokyo.ac.jp/My Drive/OnoLab/data/result_matrix/cGAN/'
+def normalize(x):
+    return (x - tf.reduce_min(x)) / (tf.reduce_max(x) - tf.reduce_min(x))
+
+def denormalize(x, original_min, original_max):
+    original_min = tf.convert_to_tensor(original_min, dtype=x.dtype)
+    original_max = tf.convert_to_tensor(original_max, dtype=x.dtype)
+    # Expand dimensions to match x if necessary
+    if len(x.shape) > 1:
+        original_min = tf.reshape(original_min, [-1] + [1] * (len(x.shape) - 1))
+        original_max = tf.reshape(original_max, [-1] + [1] * (len(x.shape) - 1))
+    return x * (original_max - original_min) + original_min
 
 def get_sorted_file_list(dataset_path, pattern):
     file_list = list(dataset_path.glob(pattern))
@@ -30,25 +48,36 @@ def load_mat_files(input_path):
 def load_data(input_data):
     sxr1, sxr2, sxr3, sxr4 = load_mat_files(input_data)
     
-    sxr1 = tf.expand_dims(sxr1, -1)
-    sxr2 = tf.expand_dims(sxr2, -1)
-    sxr3 = tf.expand_dims(sxr3, -1)
-    sxr4 = tf.expand_dims(sxr4, -1)
+    # Calculate min and max for each tensor
+    min1, max1 = tf.reduce_min(sxr1), tf.reduce_max(sxr1)
+    min2, max2 = tf.reduce_min(sxr2), tf.reduce_max(sxr2)
+    min3, max3 = tf.reduce_min(sxr3), tf.reduce_max(sxr3)
+    min4, max4 = tf.reduce_min(sxr4), tf.reduce_max(sxr4)
+    
+    # Store these values for later use in denormalization
+    original_min = tf.stack([min1, min2, min3, min4])
+    original_max = tf.stack([max1, max2, max3, max4])
+    
+    # Normalize the data
+    sxr1 = normalize(tf.expand_dims(sxr1, -1))
+    sxr2 = normalize(tf.expand_dims(sxr2, -1))
+    sxr3 = normalize(tf.expand_dims(sxr3, -1))
+    sxr4 = normalize(tf.expand_dims(sxr4, -1))
     
     sxr1 = tf.cast(sxr1, tf.float32)
     sxr2 = tf.cast(sxr2, tf.float32)
     sxr3 = tf.cast(sxr3, tf.float32)
     sxr4 = tf.cast(sxr4, tf.float32)
     
-    sxr1 = tf.image.flip_up_down(sxr1)
-    sxr2 = tf.image.flip_up_down(sxr2)
-    sxr3 = tf.image.flip_up_down(sxr3)
-    sxr4 = tf.image.flip_up_down(sxr4)
+    #sxr1 = tf.image.flip_up_down(sxr1)
+    #sxr2 = tf.image.flip_up_down(sxr2)
+    #sxr3 = tf.image.flip_up_down(sxr3)
+    #sxr4 = tf.image.flip_up_down(sxr4)
 
-    return sxr1, sxr2, sxr3, sxr4
+    return sxr1, sxr2, sxr3, sxr4, original_min, original_max
 
 def tf_load_data(input_data):
-    return tf.py_function(func=load_data, inp=[input_data], Tout=[tf.float32, tf.float32, tf.float32, tf.float32])
+    return tf.py_function(func=load_data, inp=[input_data], Tout=[tf.float32, tf.float32, tf.float32, tf.float32, tf.float64, tf.float64])
 
 def downsample(filters, size, apply_batchnorm=True):
   initializer = tf.random_normal_initializer(0., 0.02)
@@ -134,6 +163,7 @@ def Generator():
   
   x = tf.keras.layers.Lambda(lambda x: tf.image.resize(x, size=(N_grid, N_grid)))(x)
   x = last(x)
+  x = (x + 1) * 25 #だから、ここで[0,50]に変換している
 
   return tf.keras.Model(inputs=inputs, outputs=x)
 
@@ -165,18 +195,23 @@ def Discriminator():
 
   return tf.keras.Model(inputs=[inp, tar], outputs=last)
 
-def save_images(model, index, sxr1, sxr2, sxr3, sxr4, savePATH):
+def save_images(model, index, sxr1, sxr2, sxr3, sxr4, original_min, original_max, savePATH):
   
   EE1 = np.squeeze(model(sxr1, training=True))
   EE2 = np.squeeze(model(sxr2, training=True))
   EE3 = np.squeeze(model(sxr3, training=True))
   EE4 = np.squeeze(model(sxr4, training=True))
   
+  # Reverse normalization for each tensor
+  EE1 = denormalize(tf.convert_to_tensor(EE1), original_min[0][0].numpy(), original_max[0][0].numpy()).numpy()
+  EE2 = denormalize(tf.convert_to_tensor(EE2), original_min[0][1].numpy(), original_max[0][1].numpy()).numpy()
+  EE3 = denormalize(tf.convert_to_tensor(EE3), original_min[0][2].numpy(), original_max[0][2].numpy()).numpy()
+  EE4 = denormalize(tf.convert_to_tensor(EE4), original_min[0][3].numpy(), original_max[0][3].numpy()).numpy()
+  
   EE1 = tf.cast(EE1, tf.float64)
   EE2 = tf.cast(EE2, tf.float64)
   EE3 = tf.cast(EE3, tf.float64)
   EE4 = tf.cast(EE4, tf.float64)
-     
   
   # Create a dictionary to hold the data
   data_dict = {
@@ -200,10 +235,8 @@ OUTPUT_CHANNELS = 1
 
 generator = Generator()
 discriminator = Discriminator()
-
 generator_optimizer = tf.keras.optimizers.Adam(2e-5, beta_1=0.5)
 discriminator_optimizer = tf.keras.optimizers.Adam(2e-5, beta_1=0.5)
-
 
 checkpoint_prefix = os.path.join(checkpoint_dir, "ckpt")
 checkpoint = tf.train.Checkpoint(generator_optimizer=generator_optimizer,
@@ -211,8 +244,6 @@ checkpoint = tf.train.Checkpoint(generator_optimizer=generator_optimizer,
                                  generator=generator,
                                  discriminator=discriminator)
 
-  
-# Restoring the latest checkpoint in checkpoint_dir
 checkpoint.restore(tf.train.latest_checkpoint(checkpoint_dir))
 
 for shot in shot_list:
@@ -225,5 +256,5 @@ for shot in shot_list:
   input_dataset = input_dataset.batch(BATCH_SIZE)
 
   # Run the trained model on a few examples from the test set
-  for index, (sxr1, sxr2, sxr3, sxr4) in enumerate(input_dataset):
-    save_images(generator,index+1, sxr1, sxr2, sxr3, sxr4, savePATH)
+  for index, (sxr1, sxr2, sxr3, sxr4, original_min, originial_max) in enumerate(input_dataset):
+    save_images(generator,index+1, sxr1, sxr2, sxr3, sxr4, original_min, originial_max, savePATH)

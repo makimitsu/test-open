@@ -1,4 +1,5 @@
  addpath '/Users/shohgookazaki/Documents/GitHub/test-open/pcb_experiment';
+ addpath '/Users/shohgookazaki/Documents/MATLAB/inputsdlg_v2.3.2'
 
 %%%%%%%%%%%%%%%%%%%%%%%%
 %200ch用新規pcbプローブのみでの磁気面（Bz）
@@ -23,45 +24,53 @@ dataType = 1;
 PCB.chtype = 1;
 
 %%%%実験オペレーションの取得
-prompt = {'Date:','Shot number:','a039(not necessary)','doCheck:','Restart:'};
-definput = {'','','','',''};
-if exist('date','var')
-    definput{1} = num2str(date);
-end
-if exist('IDXlist','var')
-    definput{2} = num2str(IDXlist);
-end
-if exist('a039','var')
-    definput{3} = num2str(a039);
-end
-if exist('doCheck','var')
-    definput{4} = num2str(doCheck);
-end
-if exist('PCB.restart', 'var') % doCalculationを強制的に
-    definput{5} = num2str(PCB.restart);
-end
-dlgtitle = 'Input';
-dims = [1 35];
+name = 'Input';
+prompt = {'Date:', 'Shot number:', 'a039(not necessary)', 'doCheck:', 'Restart:', 'Data type:'};
+formats = struct('type', {}, 'style', {}, 'items', {}, 'format', {}, 'limits', {}, 'size', {});
 
-answer = inputdlg(prompt,dlgtitle,dims,definput);
+formats(1,1).type = 'edit';
+formats(1,1).format = 'integer';
+formats(1,1).size = [100 20];
+
+formats(2,1).type = 'edit';
+formats(2,1).format = 'integer';
+formats(2,1).size = [100 20];
+
+formats(3,1).type = 'edit';
+formats(3,1).format = 'integer';
+formats(3,1).size = [100 20];
+
+formats(4,1).type = 'list';
+formats(4,1).style = 'popupmenu';
+formats(4,1).items = {'false', 'true'};
+formats(4,1).format = 'integer';  % Change to integer
+formats(4,1).size = [100 20];
+
+formats(5,1).type = 'list';
+formats(5,1).style = 'popupmenu';
+formats(5,1).items = {'false', 'true'};
+formats(5,1).format = 'integer';  % Change to integer
+formats(5,1).size = [100 20];
+
+formats(6,1).type = 'list';
+formats(6,1).style = 'popupmenu';
+formats(6,1).items = {'psi', 'Bz', 'Bt', 'Jt', 'Et', 'Br', 'Ep'};
+formats(6,1).format = 'integer';  % Change to integer
+formats(6,1).size = [100 20];
+
+[answer, canceled] = inputsdlg(prompt, name, formats);
+
 if isempty(answer)
     return
 end
-date = str2double(cell2mat(answer(1)));
-IDXlist = str2num(cell2mat(answer(2)));
-a039 = str2num(cell2mat(answer(3)));
 
-doCheck = logical(str2num(cell2mat(answer(4))));
-PCB.restart = logical(str2num(cell2mat(answer(5))));
+date = answer{1};  % Already an integer
+IDXlist = answer{2};  % Already an integer
+a039 = answer{3};  % Already an integer
 
-if ~doCheck
-    % Data type options for pulldown menu
-    dataTypeOptions = {'psi', 'Bz', 'Bt', 'Jt', 'Et','Br', 'Ep'};
-    dataType = listdlg('PromptString', 'Select data type:', 'SelectionMode', 'single', 'ListString', dataTypeOptions);
-
-    % chTypeOptions = {'280ch', '200ch'};
-    % PCB.chtype =  listdlg('PromptString', 'Select data type:', 'SelectionMode', 'single', 'ListString', chTypeOptions);
-end
+doCheck = answer{4}-1;  % Check if 'true' was selected (index 1)
+PCB.restart = answer{5}-1;  % Check if 'true' was selected (index 1)
+dataType = answer{6};  % Already an integer corresponding to the selected item
 
 DOCID='1wG5fBaiQ7-jOzOI-2pkPAeV6SDiHc_LrOdcbWlvhHBw';%スプレッドシートのID
 T=getTS6log(DOCID);
