@@ -52,7 +52,7 @@ IDXlist = str2num(cell2mat(answer(2)));
 a039 = str2num(cell2mat(answer(3)));
 doSave = logical(str2num(cell2mat(answer(4))));
 doFilter = logical(str2num(cell2mat(answer(5))));
-ReconMethod = str2num(str2num(cell2mat(answer(6))));
+ReconMethod = str2num(cell2mat(answer(6)));
 docGAN = logical(str2num(cell2mat(answer(7))));
 
 SXR.doSave = doSave;

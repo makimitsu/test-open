@@ -20,8 +20,8 @@ matpath = getenv('SXR_MATRIX_DIR');
 sxrpath = getenv('SXR_DATA_DIR');
 
 
-for shotnum = 4%[1:2, 4:22, 24:55]
-    for matnum = 2
+for shotnum = 5%[1:2, 4:22, 24:55]
+    for matnum = 5
         shot = num2str(shotnum);
         mat = num2str(matnum);
 

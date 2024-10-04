@@ -41,6 +41,7 @@ E = zeros(1,K);
 %     E(i)=sum(E1);
 % end
 % EE = reshape(E,sqrt(K),sqrt(K)); %ここで縦がr、横がzで左下が最小になる
+
 if ReconMethod == 3
     % 与えられた観測データ g
     g = VectorImage.'; 
@@ -50,8 +51,8 @@ if ReconMethod == 3
     
     % カーネルのハイパーパラメータ
     length_scale = 1.0;
-    sigma_f = 1.0;
-    sigma_n = 0.3; % 観測ノイズの標準偏差
+    sigma_f = 50.0;
+    sigma_n = 5; % 観測ノイズの標準偏差
     
     % 座標 (画素のインデックス) X
     X = (1:size(gm2d,2))'; % Nは画素数
@@ -183,7 +184,7 @@ elseif ReconMethod == 1 % 最小フィッシャー
 
     EE = reshape(EE, sqrt(K), sqrt(K));
     toc
-%}
+
 elseif ReconMethod == 0
     for i=1:K
         if M>K

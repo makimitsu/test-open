@@ -12,11 +12,11 @@ if evalin('base', 'exist(''N_projection'', ''var'')')
     NP = evalin('base', 'N_projection');
     if NP ~= newProjectionNumber
         [gm2d1, gm2d2, gm2d3, gm2d4, U1, U2, U3, U4, ...
-                  s1, s2, s3, s4, v1, v2, v3, v4, M, K, range, N_projection, N_grid] = parametercheck(newProjectionNumber, newGridNumber);
+                  s1, s2, s3, s4, v1, v2, v3, v4, M, K, range, N_projection, N_grid,gm3d] = parametercheck(newProjectionNumber, newGridNumber);
     end
 else
     [gm2d1, gm2d2, gm2d3, gm2d4, U1, U2, U3, U4, ...
-              s1, s2, s3, s4, v1, v2, v3, v4, M, K, range, N_projection, N_grid] = parametercheck(newProjectionNumber, newGridNumber);
+              s1, s2, s3, s4, v1, v2, v3, v4, M, K, range, N_projection, N_grid, gm3d] = parametercheck(newProjectionNumber, newGridNumber);
 end
 
 % number = (t-start)/interval+1;
