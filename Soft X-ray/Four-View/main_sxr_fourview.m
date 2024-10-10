@@ -18,7 +18,7 @@ pathname.pre_processed_directory_path = getenv('pre_processed_directory_path');%
 PCB.restart = 0; % 今だけ
 
 %%%%実験オペレーションの取得
-prompt = {'Date:','Shot number:','a039(not necessary):','doSave:','doFilter:','doNLR:', 'docGAN:'};
+prompt = {'Date:','Shot number:','a039(not necessary):','doSave:','doFilter:','ReconMethod(0:TP,1:MFI,2:MEM):', 'docGAN:'};
 definput = {'','','','','','',''};
 if exist('date','var')
     definput{1} = num2str(date);

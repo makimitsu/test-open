@@ -50,7 +50,7 @@ for m=1:16 %図示する時間
             colorLabel = 'J_t (A/m^2)';
         case 5
             contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Et(:,:,i),20,'LineStyle','none');
-            clim([-0.75e-3,0.75e-3]);
+            clim([-4e-4,4e-4]);
             dataTypeName = 'Et';
             colorLabel = 'E_t (V/m)';
         case  6
@@ -60,7 +60,7 @@ for m=1:16 %図示する時間
             colorLabel = 'B_r (T)';
         case  7
             contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Et(:,:,i),20,'LineStyle','none'); %計算が合ってるかはわからない
-            clim([-0.75e-3,0.75e-3]);
+            clim([-4e-4,4e-4]);
             dataTypeName = 'Ep';
             colorLabel = 'E_p (V/m)';
     end

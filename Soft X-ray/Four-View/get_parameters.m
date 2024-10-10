@@ -18,55 +18,57 @@ gm2d4 = LineProjection(l4,N_grid,zmin1,zmax1,rmin,rmax,false,false);
 
 % plot_overlapping_rays(l1,l2,l3,l4,5);
 l = {l1,l2,l3,l4};
-N_grid3d = 25;
+%l = {l1,l2,l4};
+N_grid3d = 15;
 N_grid_x = N_grid3d; N_grid_y = 2*N_grid3d; N_grid_z = N_grid3d;
 zmin3d = -400; zmax3d = 400; ymin3d = -400; ymax3d = 100; xmin3d = -100; xmax3d = 50;
-gm3d = LineProjection3D(l, N_grid_x, N_grid_y, N_grid_z, xmin3d, xmax3d, ymin3d, ymax3d, zmin3d, zmax3d, false);
+gm3d = LineProjection3D(l, N_grid_x, N_grid_y, N_grid_z, xmin3d, xmax3d, ymin3d, ymax3d, zmin3d, zmax3d, true);
 
-disp('Calculation for TP starting...')
-% ラプラシアン行列の計算と特異値分解
-C = Laplacian(N_grid);
-C3d = Laplacian_3D(N_grid3d);
-[U1,S1,V1]=svd(gm2d1*(C^(-1)),'econ');
-[U2,S2,V2]=svd(gm2d2*(C^(-1)),'econ');
-[U3,S3,V3]=svd(gm2d3*(C^(-1)),'econ');
-[U4,S4,V4]=svd(gm2d4*(C^(-1)),'econ');
-[U3d,S3d,V3d] = svd(gm3d*(C3d^(-1)), 'econ');
-% [U1,S1,V1]=svd(gm2d1*(C^(-1)));
-% [U2,S2,V2]=svd(gm2d2*(C^(-1)));
-% [U3,S3,V3]=svd(gm2d3*(C^(-1)));
-% [U4,S4,V4]=svd(gm2d4*(C^(-1)));
-v1=(C^(-1)*V1);
-v2=(C^(-1)*V2);
-v3=(C^(-1)*V3);
-v4=(C^(-1)*V4);
-v3d = (C3d^(-1)*V3d);
-
-[M,K] = size(gm2d1);
-[M3d,K3d] = size(gm3d);
-if K>M
-    v1 = v1(:,1:M);
-    v2 = v2(:,1:M);
-    v3 = v3(:,1:M);
-    v4 = v4(:,1:M);
-    v3d = v3d(:,1,M3d);
-end
-s1 = (diag(S1)).';
-s2 = (diag(S2)).';
-s3 = (diag(S3)).';
-s4 = (diag(S4)).';
-s3d = (diag(S3d)).';
-if M>K
-    s1 = [s1 zeros(1,M-K)];
-    s2 = [s2 zeros(1,M-K)];
-    s3 = [s3 zeros(1,M-K)];
-    s4 = [s4 zeros(1,M-K)];
-    s3d = [s3d zeros(1,M3d-K3d)];
-end
-
-save(filepath,'gm2d1','gm2d2','gm2d3','gm2d4', ...
-    'U1','U2','U3','U4','s1','s2','s3','s4', ...
-    'v1','v2','v3','v4','M','K','range','N_projection','N_grid','gm3d','U3d','s3d','v3d','M3d','K3d','-v7.3');
+% disp('Calculation for TP starting...')
+% % ラプラシアン行列の計算と特異値分解
+% C = Laplacian(N_grid);
+% C3d = Laplacian_3D(N_grid3d);invC3d = C3d^(-1);
+% [U1,S1,V1]=svd(gm2d1*(C^(-1)),'econ');
+% [U2,S2,V2]=svd(gm2d2*(C^(-1)),'econ');
+% [U3,S3,V3]=svd(gm2d3*(C^(-1)),'econ');
+% [U4,S4,V4]=svd(gm2d4*(C^(-1)),'econ');
+% [U3d,S3d,V3d] = svd(gm3d*invC3d, 'econ');
+% 
+% % [U1,S1,V1]=svd(gm2d1*(C^(-1)));
+% % [U2,S2,V2]=svd(gm2d2*(C^(-1)));
+% % [U3,S3,V3]=svd(gm2d3*(C^(-1)));
+% % [U4,S4,V4]=svd(gm2d4*(C^(-1)));
+% v1=(C^(-1)*V1);
+% v2=(C^(-1)*V2);
+% v3=(C^(-1)*V3);
+% v4=(C^(-1)*V4);
+% v3d = (invC3d*V3d);
+% 
+% [M,K] = size(gm2d1);
+% [M3d,K3d] = size(gm3d);
+% if K>M
+%     v1 = v1(:,1:M);
+%     v2 = v2(:,1:M);
+%     v3 = v3(:,1:M);
+%     v4 = v4(:,1:M);
+%     v3d = v3d(:,1:M3d);
+% end
+% s1 = (diag(S1)).';
+% s2 = (diag(S2)).';
+% s3 = (diag(S3)).';
+% s4 = (diag(S4)).';
+% s3d = (diag(S3d)).';
+% if M>K
+%     s1 = [s1 zeros(1,M-K)];
+%     s2 = [s2 zeros(1,M-K)];
+%     s3 = [s3 zeros(1,M-K)];
+%     s4 = [s4 zeros(1,M-K)];
+%     s3d = [s3d zeros(1,M3d-K3d)];
+% end
+% 
+% save(filepath,'gm2d1','gm2d2','gm2d3','gm2d4', ...
+%     'U1','U2','U3','U4','s1','s2','s3','s4', ...
+%     'v1','v2','v3','v4','M','K','range','N_projection','N_grid','gm3d','U3d','s3d','v3d','M3d','K3d','-v7.3');
 
 end
 
@@ -523,40 +525,76 @@ function C = Laplacian_3D(N_grid)
     ny = 2 * N_grid + 1;  % y-dimension
     nz = N_grid + 1;      % z-dimension
     K = nx * ny * nz;     % Total number of grid points
-    C = sparse(K, K);     % Initialize sparse Laplacian matrix
-
+    
+    % Estimate the total number of non-zero elements (7 per grid point)
+    num_nonzeros = 7 * K;
+    
+    % Preallocate arrays for sparse matrix construction
+    row_idx = zeros(1, num_nonzeros);
+    col_idx = zeros(1, num_nonzeros);
+    values = zeros(1, num_nonzeros);
+    
+    count = 0;
+    
     for i = 1:nx
         for j = 1:ny
             for k = 1:nz
                 idx = (i-1)*ny*nz + (j-1)*nz + k;  % Linear index for the current point
                 
-                % Set the center value (-6 for 3D Laplacian)
-                C(idx, idx) = -6;
+                % Center value (-6 for 3D Laplacian)
+                count = count + 1;
+                row_idx(count) = idx;
+                col_idx(count) = idx;
+                values(count) = -6;
                 
                 % x-direction neighbors
                 if i+1 <= nx
-                    C(idx, (i)*ny*nz + (j-1)*nz + k) = 1;  % Forward x-direction
+                    count = count + 1;
+                    row_idx(count) = idx;
+                    col_idx(count) = (i)*ny*nz + (j-1)*nz + k;
+                    values(count) = 1;
                 end
                 if i-1 >= 1
-                    C(idx, (i-2)*ny*nz + (j-1)*nz + k) = 1;  % Backward x-direction
+                    count = count + 1;
+                    row_idx(count) = idx;
+                    col_idx(count) = (i-2)*ny*nz + (j-1)*nz + k;
+                    values(count) = 1;
                 end
                 
                 % y-direction neighbors
                 if j+1 <= ny
-                    C(idx, (i-1)*ny*nz + (j)*nz + k) = 1;  % Forward y-direction
+                    count = count + 1;
+                    row_idx(count) = idx;
+                    col_idx(count) = (i-1)*ny*nz + (j)*nz + k;
+                    values(count) = 1;
                 end
                 if j-1 >= 1
-                    C(idx, (i-1)*ny*nz + (j-2)*nz + k) = 1;  % Backward y-direction
+                    count = count + 1;
+                    row_idx(count) = idx;
+                    col_idx(count) = (i-1)*ny*nz + (j-2)*nz + k;
+                    values(count) = 1;
                 end
                 
                 % z-direction neighbors
                 if k+1 <= nz
-                    C(idx, (i-1)*ny*nz + (j-1)*nz + k + 1) = 1;  % Forward z-direction
+                    count = count + 1;
+                    row_idx(count) = idx;
+                    col_idx(count) = (i-1)*ny*nz + (j-1)*nz + k + 1;
+                    values(count) = 1;
                 end
                 if k-1 >= 1
-                    C(idx, (i-1)*ny*nz + (j-1)*nz + k - 1) = 1;  % Backward z-direction
+                    count = count + 1;
+                    row_idx(count) = idx;
+                    col_idx(count) = (i-1)*ny*nz + (j-1)*nz + k - 1;
+                    values(count) = 1;
                 end
             end
         end
     end
+    
+    % Create sparse matrix all at once
+    row_idx = row_idx(1:count);  % Trim the unused part of the preallocated arrays
+    col_idx = col_idx(1:count);
+    values = values(1:count);
+    C = sparse(row_idx, col_idx, values, K, K);
 end

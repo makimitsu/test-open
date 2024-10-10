@@ -1,16 +1,18 @@
 function Bt = get_B_troidal_test(date,shot,pathname)
 
-directory_rogo = strcat(pathname.fourier,'rogowski/');
+%directory_rogo = strcat(pathname.fourier,'rogowski/');
+% pathname =
+% '/Users/shohgookazaki/Documents/UTokyo/OnoLab/koala/mnt/fourier/rogowski/';
+directory_rogo = strcat(pathname);
 
 aquisition_rate = 10;
 offset = 0;
-rogowski(date,aquisition_rate,offset,shot,directory_rogo);
+Bt = rogowski(date,aquisition_rate,offset,shot,directory_rogo);
 
-Bt = NaN;
 
 end
 
-function return_data = rogowski(date,aquisition_rate,offset,shot,directory_rogo)
+function B_t = rogowski(date,aquisition_rate,offset,shot,directory_rogo)
 
 % input:
 %   integer: date, date of experiment. Example:(2019 Aug. 01->190801)
@@ -50,6 +52,10 @@ plot_rows = fix(length(channels)/plot_columns)+(rem(length(channels),plot_column
 % rgw2txt(date_str);
 
 rgw2txt_shot(date_str,shot_str,directory_rogo);
+
+desktop_path = '/Users/shohgookazaki/Desktop';
+path = strcat(desktop_path, '/', date_str, shot_str, '.txt');
+
 
 if ~isfile(path)
     disp(strcat('No such file: ',path));
@@ -173,15 +179,39 @@ end
 
 end
 
-function [] = rgw2txt_shot(date_str,shot_str,directory_rogo)
+% function [] = rgw2txt_shot(date_str,shot_str,directory_rogo)
+% 
+% % current_folder = strcat('/Users/shinjirotakeda/mountpoint/',date,'/');
+% current_folder = strcat(directory_rogo,date_str,'/');
+% filename = strcat(current_folder,date_str,shot_str,'.rgw');
+% rename = strcat(current_folder,date_str,shot_str,'.txt');
+% if isfile(rename)
+%     return
+% end
+% copyfile(filename,rename, 'f');
+% 
+% end
 
-% current_folder = strcat('/Users/shinjirotakeda/mountpoint/',date,'/');
-current_folder = strcat(directory_rogo,date_str,'/');
-filename = strcat(current_folder,date_str,shot_str,'.rgw');
-rename = strcat(current_folder,date_str,shot_str,'.txt');
-if isfile(rename)
-    return
-end
-copyfile(filename,rename);
+function [] = rgw2txt_shot(date_str, shot_str, directory_rogo)
+
+    % Define the current folder based on the provided directory and date
+    current_folder = strcat(directory_rogo, date_str, '/');
+    filename = strcat(current_folder, date_str, shot_str, '.rgw');
+
+    % Set the destination to your desktop
+    desktop_path = '/Users/shohgookazaki/Desktop';
+    rename = strcat(desktop_path, '/', date_str, shot_str, '.txt');
+
+    % Check if the file already exists on the desktop
+    if isfile(rename)
+        return; % If the file exists, do nothing
+    end
+
+    % Copy the file to the desktop
+    try
+        copyfile(filename, rename, 'f'); % Use 'f' to force overwrite
+    catch ME
+        disp(['Error copying file: ', ME.message]);
+    end
 
 end

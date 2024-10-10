@@ -44,6 +44,7 @@ if exist(excelFilePath, 'file') == 2
     if any(strcmp(sheetNames, sheetName))
         % シートを読み込み
         calibrationTable = readtable(excelFilePath, 'Sheet', sheetName);
+        disp(calibrationTable)
         disp(['Successfully loaded the content of sheet "', sheetName, '".']);
         centerX = reshape(calibrationTable.center_X,8,4).';
         centerY = reshape(calibrationTable.center_Y,8,4).';

@@ -1,5 +1,5 @@
 function proj = Assumption3d(N_projection, gm3d, plotflag)
-    N_grid3d = 25;
+    N_grid3d = 15;
     m = N_grid3d+1; % z dimension
     n = N_grid3d+1; % r dimension
     p = 2*N_grid3d+1; % y dimension
@@ -42,12 +42,12 @@ function proj = Assumption3d(N_projection, gm3d, plotflag)
     
     E = reshape(EE,1,[]);
     I = gm3d*(E)';
-    I = reshape(I,[],4);
     n = 10;
     Iwgn = awgn(I,10*log10(100/n), 'measured');
     Iwgn(Iwgn<0) = 0;
     
-    
+    I = reshape(I,[],4);
+    Iwgn = reshape(Iwgn,[],4);
     n_p = N_projection;
     II = zeros(n_p,n_p,4);
     IIwgn = zeros(n_p,n_p,4);
@@ -65,14 +65,34 @@ function proj = Assumption3d(N_projection, gm3d, plotflag)
         figure;
         for i = 1:4
             subplot(2, 2, i);       % 2行2列のグリッドにプロット
-            imagesc(II(:, :, i));    % i番目のスライスをプロット
+            imagesc(IIwgn(:, :, i));    % i番目のスライスをプロット
             colorbar;               % カラーバーを追加
             title(['Slice ', num2str(i)]);
         end
     end
-    
-    proj = cat(2, Iwgn(:,1),Iwgn(:,2),Iwgn(:,3),Iwgn(:,4));
 
+    if plotflag
+        x = 1:16;
+        y = 1:16;
+        z = 1:31;
+        [X, Y, Z] = meshgrid(x, y, z);
+        figure;
+        slice(X, Y, Z, EE, [5,10], [5,10], [10,20]); % Example slice positions along Z
+        
+        % Add labels and title
+        xlabel('X-axis');
+        ylabel('Y-axis');
+        zlabel('Z-axis');
+        title('3D Visualization of EE');
+        
+        % Adjust color and viewing angle
+        colormap(jet); % Use jet colormap
+        colorbar;      % Add a color bar
+        view(3);       % Set to 3D view
+    
+    end
+
+    proj = cat(1, Iwgn(:,1),Iwgn(:,2),Iwgn(:,3),Iwgn(:,4));
 
 end
 

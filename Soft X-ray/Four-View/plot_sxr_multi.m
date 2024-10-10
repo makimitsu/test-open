@@ -24,7 +24,7 @@ if doFilter
     elseif ReconMethod == 2
         options = 'NLF_MEM';
     end
-elseif ~doFilter
+else
     if ReconMethod == 0
         options = 'LF_TP';
     elseif ReconMethod == 1
@@ -45,22 +45,23 @@ else
     doCalculation = false; 
 end
 
+newProjectionNumber = 50;
+newGridNumber = 90;
 % 再構成計算に必要なパラメータを計算するなら読み込む
 parameterFile = 'parameters.mat';
 if doCalculation
     disp('No matrix data -- Start calculation');
-    newProjectionNumber = 50;
-    newGridNumber = 90;
+    
     
     if evalin('base', 'exist(''N_projection'', ''var'')')
         NP = evalin('base', 'N_projection');
         if NP ~= newProjectionNumber
             [gm2d1, gm2d2, gm2d3, gm2d4, U1, U2, U3, U4, ...
-                      s1, s2, s3, s4, v1, v2, v3, v4, M, K, range, N_projection, N_grid] = parametercheck(newProjectionNumber, newGridNumber);
+                      s1, s2, s3, s4, v1, v2, v3, v4, M, K, range, N_projection, N_grid, gm3d,U3d,s3d, v3d, M3d, K3d] = parametercheck(newProjectionNumber, newGridNumber);
         end
     else
         [gm2d1, gm2d2, gm2d3, gm2d4, U1, U2, U3, U4, ...
-                  s1, s2, s3, s4, v1, v2, v3, v4, M, K, range, N_projection, N_grid] = parametercheck(newProjectionNumber, newGridNumber);
+                  s1, s2, s3, s4, v1, v2, v3, v4, M, K, range, N_projection, N_grid, gm3d,U3d,s3d, v3d, M3d, K3d] = parametercheck(newProjectionNumber, newGridNumber);
     end
 
     % 生画像の取得
@@ -151,13 +152,14 @@ for t = times
     SXRdata.range = range;
 
     % plot_save_sxr(grid2D,data2D,range,date,shot,t,EE,show_localmax,show_xpoint,doSave,doFilter,ReconMethod);
-    if ~docGAN
-        SXRdata.EE = EE;
-        plot_save_sxr(PCBdata,SXR,SXRdata);
-    elseif docGAN
+    
+    if docGAN
         cGANPath = strcat(dirPath,'/cGAN_large/',num2str(date),'/shot',num2str(shot),'/',num2str(number),'.mat');
         load(cGANPath,'EE1','EE2','EE3','EE4');
         EE = cat(3,EE1,EE2,EE3,EE4);
+        SXRdata.EE = EE;
+        plot_save_sxr(PCBdata,SXR,SXRdata);
+    else    
         SXRdata.EE = EE;
         plot_save_sxr(PCBdata,SXR,SXRdata);
     end
@@ -169,7 +171,53 @@ if doSave
     close(f);
 end
 
+threed = true;
 
+for t = times
+    number = (t-start)/interval+1;
+    if threed
+        if evalin('base', 'exist(''N_projection'', ''var'')')
+            NP = evalin('base', 'N_projection');
+            if NP ~= newProjectionNumber
+                [~, ~, ~, ~, ~, ~, ~, ~, ...
+                          ~, ~, ~, ~, ~, ~, ~, ~, ~, ~, ~, N_projection, N_grid, gm3d,U3d,s3d, v3d, M3d, K3d] = parametercheck(newProjectionNumber, newGridNumber);
+            end
+        else
+            [~, ~, ~, ~, ~, ~, ~, ~, ...
+                          ~, ~, ~, ~, ~, ~, ~, ~, ~, ~, ~, N_projection, N_grid, gm3d,U3d,s3d, v3d, M3d, K3d] = parametercheck(newProjectionNumber, newGridNumber);
+        end
+    
+        rawImage = imread(SXRfilename);
+        [VectorImage1,VectorImage2, VectorImage3, VectorImage4] = get_sxr_image(date,number,newProjectionNumber,rawImage);
+    
+        l = cat(2,VectorImage1,VectorImage2,VectorImage4); %20240721ではVectorImage3はなし
+        N_grid_3d = 15;
+        EE = get_distribution_3d(M3d, K3d, U3d, s3d, v3d, l, N_grid_3d);
+    
+        x = 1:16;
+        y = 1:16;
+        z = 1:31;
+    
+        % Create a grid for the data
+        [X, Y, Z] = meshgrid(x, y, z);
+    
+        % Plot slices at specific positions along the Z-axis
+        figure;
+        slice(X, Y, Z, EE, [5,10], [5,10], [10,20]); % Example slice positions along Z
+    
+        % Add labels and title
+        xlabel('X-axis');
+        ylabel('Y-axis');
+        zlabel('Z-axis');
+        title('3D Visualization of E ');
+    
+        % Adjust color and viewing angle
+        colormap(jet); % Use jet colormap
+        colorbar;      % Add a color bar
+        view(3);       % Set to 3D view
+    end
+
+end
 end
 
 
