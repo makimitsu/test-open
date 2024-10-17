@@ -3,7 +3,7 @@
 clear
 % close all
 
-R = ones(1,3)*0.01;
+R = ones(1,3)*0.02;
 
 Bt = 0.1;
 Bp = [0.05,0.1,0.2].*Bt;
@@ -58,10 +58,17 @@ E_e = 0.5.*me.*v_e.^2./e;
 
 % Edge_thermal = Edge1;
 
+E_0 = 0.5.*me.*v_0.^2./e;
+[E_hist0,Edge0] = histcounts(E_0,'BinWidth',5);
+
 
 figure;
-semilogy(Edge1(2:end),E_hist1,Edge2(2:end),E_hist2,Edge3(2:end),E_hist3,Edge1,2.2120e+03.*exp(-Edge1./Te));
-ylim([1 1e4]);xlim([0 300]);
-legend({'エラー磁場5%','エラー磁場10%','エラー磁場20%','熱的分布'});
-xlabel('エネルギー [eV]');
-ylabel('スペクトル [a.u.]')
+% semilogy(Edge1(2:end),E_hist1,Edge2(2:end),E_hist2,Edge3(2:end),E_hist3,Edge1,2.2120e+03.*exp(-Edge1./Te));
+% loglog(Edge1(2:end),E_hist1,Edge2(2:end),E_hist2,Edge3(2:end),E_hist3,Edge1,2.2120e+03.*exp(-Edge1./Te));
+loglog(Edge1(2:end),E_hist1,Edge2(2:end),E_hist2,Edge3(2:end),E_hist3,Edge0(2:end),E_hist0,'LineWidth',2);
+ylim([5 1e4]);xlim([0 500]);
+ax = gca;
+ax.FontSize = 18;
+legend({'Bt/Bp = 20','Bt/Bp = 10','Bt/Bp = 5','Thermal'});
+xlabel('Electron energy [eV]');
+ylabel('Number of particles')

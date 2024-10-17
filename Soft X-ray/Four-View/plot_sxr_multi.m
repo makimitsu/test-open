@@ -65,7 +65,8 @@ if doCalculation
                 end
             end
             disp('Start calculation!');
-            get_parameters(newProjectionNumber,newGridNumber,parameterFile);
+            % get_parameters(newProjectionNumber,newGridNumber,parameterFile);
+            get_parameters_new(newProjectionNumber,newGridNumber,parameterFile);
             load(parameterFile,'gm2d1','gm2d2','gm2d3','gm2d4', ...
                     'U1','U2','U3','U4','s1','s2','s3','s4', ...
                     'v1','v2','v3','v4','M','K','range');
@@ -85,7 +86,8 @@ if doCalculation
             end
         end
         disp('Start calculation!');
-        get_parameters(newProjectionNumber,newGridNumber,parameterFile);
+        % get_parameters(newProjectionNumber,newGridNumber,parameterFile);
+        get_parameters_new(newProjectionNumber,newGridNumber,parameterFile);
         load(parameterFile,'gm2d1','gm2d2','gm2d3','gm2d4', ...
                 'U1','U2','U3','U4','s1','s2','s3','s4', ...
                 'v1','v2','v3','v4','M','K','range');
@@ -102,7 +104,7 @@ if doCalculation
     end
 else
     disp(strcat('Loading matrix from :',matrixFolder))
-    load(parameterFile,'range');
+    % load(parameterFile,'range');
 end
 
 
@@ -131,12 +133,21 @@ for t = times
 %         再構成結果を保存するファイルを作成、保存
         
         % matrixPath = strcat(matrixFolder,'/',num2str(number),'.mat');
-        save(matrixPath,'EE1','EE2','EE3','EE4');
+        save(matrixPath,'EE1','EE2','EE3','EE4','range');
         
     else
         % matrixPath = strcat(matrixFolder,'/',num2str(number),'.mat');
         % disp(strcat('Loading result matrix from ',which(matrixPath)));
-        load(matrixPath,'EE1','EE2','EE3','EE4');
+        varName = who('-file',matrixPath);
+        if ismember('range',varName)
+            load(matrixPath,'EE1','EE2','EE3','EE4','range');
+            % disp('1');
+        else
+            load(matrixPath,'EE1','EE2','EE3','EE4');
+            load(parameterFile,'range');
+            save(matrixPath,'EE1','EE2','EE3','EE4','range');
+            % disp('2');
+        end
     end
     
     EE = cat(3,EE1,EE2,EE3,EE4);

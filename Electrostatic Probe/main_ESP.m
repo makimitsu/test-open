@@ -31,6 +31,9 @@ node='date';
 T=searchlog(T,node,ESP.date);
 ESP.rlist=T.ESProbeRPosition_mm_(ESP.shotlist);%静電プローブr座標[mm]
 
+plot_Efield = false;
+trange = 460:480;
+
 ESPdata2D = cal_ESP(pathname,ESP);
-% plot_ESP(ESP,ESPdata2D)
-% movie_ESP(plot_Efield,trange,data2D)
+plot_ESP(ESP,ESPdata2D)
+% movie_ESP(plot_Efield,trange,ESPdata2D)

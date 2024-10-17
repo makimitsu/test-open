@@ -24,8 +24,8 @@ nShot_40_3 = 25; %or29
 nShot_40_4 = 12;
 
 mPath_25_1 = strcat(pathFirstHalf,num2str(nShot_25_1),pathLastHalf);
-mPath_25_2 = strcat(pathFirstHalf,num2str(nShot_25_2),'/2.mat');
-mPath_25_3 = strcat(pathFirstHalf,num2str(nShot_25_3),'/2.mat');
+mPath_25_2 = strcat(pathFirstHalf,num2str(nShot_25_2),'/3.mat');
+mPath_25_3 = strcat(pathFirstHalf,num2str(nShot_25_3),'/3.mat');
 mPath_25_4 = strcat(pathFirstHalf,num2str(nShot_25_4),pathLastHalf);
 mPath_30_1 = strcat(pathFirstHalf,num2str(nShot_30_1),pathLastHalf);
 mPath_30_2 = strcat(pathFirstHalf,num2str(nShot_30_2),pathLastHalf);
@@ -98,9 +98,10 @@ SXR.doFilter = false;
 SXR.doNLR = true;
 
 zhole1=40;zhole2=-40;                                  
-zmin1=-240;zmax1=320;zmin2=-320;zmax2=240;             
-rmin=55;rmax=375;
-
+% zmin1=-240;zmax1=320;zmin2=-320;zmax2=240;             
+% rmin=55;rmax=375;
+zmin1=-100;zmax1=180;zmin2=-180;zmax2=100;
+rmin=70;rmax=330;
 range = [zmin1,zmax1,zmin2,zmax2,rmin,rmax];
 t = 469;
 

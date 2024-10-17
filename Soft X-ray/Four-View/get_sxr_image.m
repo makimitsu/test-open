@@ -201,6 +201,11 @@ imageVector1 = imageVectors1(number,:);
 imageVector2 = imageVectors2(number,:);
 imageVector3 = imageVectors3(number,:);
 imageVector4 = imageVectors4(number,:);
+
+if date == 240828 %右下と左上の交換
+    imageVector2_new = imageVector4;
+    imageVector4 = imageVector2;
+    imageVector2 = imageVector2_new;
 end
 
 

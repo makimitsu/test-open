@@ -2,13 +2,14 @@ function [] = get_parameters_new(N_projection,N_grid,filepath)
 
 % filepath = '/Users/shinjirotakeda/Documents/GitHub/test-open/Soft X-ray/Four-View_Simulation/parameters.mat';
 
-plotFlagProjection = false;
 plotFlagLines = false;
+plotFlagProjection = false;
 
 % 視線の分布、重み行列の作成
 zhole1=40;zhole2=-40;                                  
-zmin1=-100;zmax1=180;zmin2=-180;zmax2=100;             
-rmin=70;rmax=330;
+% zmin1=-100;zmax1=180;zmin2=-180;zmax2=100;
+zmin1=-200;zmax1=200;zmin2=-200;zmax2=200;
+rmin=70;rmax=375;
 range = [zmin1,zmax1,zmin2,zmax2,rmin,rmax];            
 l1 = MCPLine(N_projection,zhole2,plotFlagLines,true);
 gm2d1 = LineProjection(l1,N_grid,zmin2,zmax2,rmin,rmax,plotFlagProjection,true); 
@@ -57,6 +58,7 @@ end
 
 function l = MCPLine(N_projection,Z_hole,plot_flag,up_flag)
 d_hole = 24.4; % distance between the hole and the MCP
+% d_hole = 14.4; % distance between the hole and the MCP
 r_mcp=10;  % radius of the MCP plate
 
 Y_hole = 413.24+12;
@@ -194,7 +196,8 @@ for i = 1:N_p
 end
 
 if plot_flag
-    figure;imagesc(FOV);clim([0 1]);
+    FOV(FOV==0)=-100;
+    figure;imagesc(FOV);clim([-100 100]);
 end
 
 end

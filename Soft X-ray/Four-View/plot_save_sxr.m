@@ -93,7 +93,7 @@ nameList = {'1um Al', '2.5um Al', '2um Mylar', '1um Mylar'};
 % cLimList = {[0 1],[0 1.8],[0 0.8],[0 0.2]};
 % cLimList = {[0 0.4],[0 1],[0 0.4],[0 0.2]};
 % cLimList = {[0 0.4],[0 6],[0 0.4],[0 0.2]};
-cLimList = {[0 1],[0 2],[0 0.3],[0 0.15]};
+% cLimList = {[0 1],[0 2],[0 0.3],[0 0.15]};
 % cLimList = {[0 1],[0 0.5],[0 0.3],[0 0.15]}; %240111
 % cLimList = {[0 1.5],[0 0.5],[0 1],[0 1.5]};
 % cLimList = {[0 0.3],[0 0.3],[0 0.3],[0 0.15]};
@@ -101,6 +101,10 @@ cLimList = {[0 1],[0 2],[0 0.3],[0 0.15]};
 % cLimList = {[0 1],[0 1],[0 1],[0 0.6]};
 % cLimList = {[0 2],[0 0.2],[0 0.2],[0 1.5]};%240621
 % cLimList = {[0 1],[0 1],[0 1],[0 0.5]};
+% cLimList = {[0 1],[0 0.5],[0 0.2],[0 0.5]}; %240111_new
+% cLimList = {[0 5],[0 1],[0 0.2],[0 0.5]};
+% cLimList = {[0 0.5],[0 0.2],[0 0.1],[0 0.1]};
+cLimList = {[0 0.2],[0 0.1],[0 0.1],[0 0.1]};
 
 % 負の要素を0で置換
 negativeEE = find(EE<0);
@@ -125,8 +129,17 @@ for i = 1:4
     % [~,h] = contourf(SXR_mesh_z,SXR_mesh_r,EE_plot,20);
 
     % [~,h] = contourf(psi_mesh_z,psi_mesh_r,EE_q(:,:,i),linspace(cRange(1),cRange(2),20));clim(cRange);
-    [~,h] = contourf(psi_mesh_z,psi_mesh_r,EE_q(:,:,i),20);
+    % [~,h] = contourf(psi_mesh_z,psi_mesh_r,EE_q(:,:,i),20);
 
+
+    if i == 1
+        % [~,h] = contourf(psi_mesh_z-0.02,psi_mesh_r,EE_q(:,:,i),linspace(cRange(1),cRange(2),20));clim(cRange);
+        [~,h] = contourf(psi_mesh_z-0.02,psi_mesh_r,EE_q(:,:,i),20);
+    else
+        % [~,h] = contourf(psi_mesh_z,psi_mesh_r,EE_q(:,:,i),linspace(cRange(1),cRange(2),20));clim(cRange);
+        [~,h] = contourf(psi_mesh_z,psi_mesh_r,EE_q(:,:,i),20);
+    end
+% 
     colormap('turbo');
     h.LineStyle = 'none';
     c=colorbar;c.Label.String='Intensity [a.u.]';c.FontSize=18;
@@ -150,10 +163,11 @@ for i = 1:4
     % % xlim([-0.02,0.02]);ylim([0.23,0.29]);
     % xlim([-0.07,0.07]);ylim([0.2,0.32]);
     % xlim([-0.03,0.03]);ylim([0.21,0.3]);
+    xlim([-0.15,0.15]);
     title(string(nameList(i)));
 end
 
-sgtitle(strcat(num2str(t),'us'));
+sgtitle(strcat(num2str(date),num2str(shot),'\_',num2str(t),'us'));
 drawnow;
 
 % subplot(2,2,1);

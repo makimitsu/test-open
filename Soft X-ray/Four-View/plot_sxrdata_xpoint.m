@@ -126,13 +126,18 @@ Istd = zeros(4,num_data);
 if strcmp(plotType,'TF_group')||strcmp(plotType,'GFR_group')
     cnt = zeros(1,4);
     for i = 1:n_data
+        if i <= 18
+            continue;
+        end
         if isnan(TFlist(i)) || TFlist(i) == 0
            continue 
         end
         k = find([2.5,3,3.5,4]==TFlist(i));
         for j = 1:4
-            Imax_tmp = max(xpointList(i).max(j,1:2));
-            Imean_tmp = max(xpointList(i).mean(j,1:2));
+            % Imax_tmp = max(xpointList(i).max(j,1:2));
+            % Imean_tmp = max(xpointList(i).mean(j,1:2));
+            Imax_tmp = max(xpointList(i).max(j,3));
+            Imean_tmp = max(xpointList(i).mean(j,3));
             Imax(j,k) = (Imax(j,k)*cnt(k)+Imax_tmp)/(cnt(k)+1);
             Imean(j,k) = (Imean(j,k)*cnt(k)+Imean_tmp)/(cnt(k)+1);
         end
@@ -154,7 +159,8 @@ else
                 continue
             end
         elseif date == 240111
-            if ~ismember(i,[7,11,15,19])
+            if i <= 18 || i == 21
+            % if ~ismember(i,[7,11,15,19])
                 continue
             end
         end
@@ -186,7 +192,7 @@ switch plotType
         x = idxList_sxr;
         spec = '*';
         label_x = 'shot number';
-    case 'Bt'
+    case 'TF'
         x = TF;
         spec = '*';
         label_x = 'troidal magnetic field [T]';
@@ -204,21 +210,25 @@ switch plotType
         label_x = 'guide field ratio';
     case 'GFR_group'
         x = GFR;
-        spec = '-*';
+        spec = 'k-*';
         label_x = 'guide field ratio';
 end
 x(x==0) = NaN;
 titlelist = {'~50eV','50~80eV','100eV~','200eV~'};
 figure;%hold on;
 for i = 1:4
-    subplot(4,1,i);
+    subplot(1,4,i);
     if plotMax
         plot(x,I_plot(i,:),spec);
     else
-        errorbar(x,I_plot(i,:),Istd(i,:),spec)
+        errorbar(x,I_plot(i,:),Istd(i,:),spec,'LineWidth',1)
     end
     title(titlelist(i));
     ylim([0 inf]);
+    if strcmp(plotType,'GFR_group')
+        xlim([2.5 4]);
+    end
+    yticks([]);
 end
 xlabel(label_x);
 sgtitle(label_y);
