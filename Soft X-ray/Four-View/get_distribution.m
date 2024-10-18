@@ -42,7 +42,7 @@ E = zeros(1,K);
 % end
 % EE = reshape(E,sqrt(K),sqrt(K)); %ここで縦がr、横がzで左下が最小になる
 
-if ReconMethod == 3
+if ReconMethod == 4 % ガウス過程再構成
     % 与えられた観測データ g
     g = VectorImage.'; 
     

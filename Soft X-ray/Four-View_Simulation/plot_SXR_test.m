@@ -1,8 +1,8 @@
 function plot_SXR_test()
 addpath '/Users/shohgookazaki/Documents/GitHub/test-open/Soft X-ray/Four-view';
 %ReconMethod = 0; %0:Tikhonov, 1:Fisher, 2:MEM
-plot_flag1 = false;
-plot_flag2 = true;
+plot_flag1 = true;
+plot_flag2 = false;
 
 % 再構成条件の定義
 newProjectionNumber = 50;%80; %投影数＝視線数の平方根
@@ -12,11 +12,11 @@ if evalin('base', 'exist(''N_projection'', ''var'')')
     NP = evalin('base', 'N_projection');
     if NP ~= newProjectionNumber
         [gm2d1, gm2d2, gm2d3, gm2d4, U1, U2, U3, U4, ...
-                  s1, s2, s3, s4, v1, v2, v3, v4, M, K, range, N_projection, N_grid,gm3d] = parametercheck(newProjectionNumber, newGridNumber);
+                  s1, s2, s3, s4, v1, v2, v3, v4, M, K, range, N_projection, N_grid] = parametercheck(newProjectionNumber, newGridNumber);
     end
 else
     [gm2d1, gm2d2, gm2d3, gm2d4, U1, U2, U3, U4, ...
-              s1, s2, s3, s4, v1, v2, v3, v4, M, K, range, N_projection, N_grid, gm3d] = parametercheck(newProjectionNumber, newGridNumber);
+              s1, s2, s3, s4, v1, v2, v3, v4, M, K, range, N_projection, N_grid] = parametercheck(newProjectionNumber, newGridNumber);
 end
 
 % number = (t-start)/interval+1;
@@ -79,7 +79,7 @@ sim_cell = cell(3, size(Iwgn1, 1)); % 構造的類似
 immse_cell = cell(3, size(Iwgn1, 1)); % 平均二乗誤差
 multissim_cell = cell(3, size(Iwgn1, 1)); % マルチスケール構造的類似
 
-for r = 4%1:3
+for r = 1:3
     ReconMethod = r-1;
     for i = 1:size(Iwgn1,1)
         Iwgn = Iwgn1{i};
@@ -99,7 +99,7 @@ for r = 4%1:3
         multissim_cell{r,i} = multissim(sxr_cal,I_cal);
         %ここまで-----------
         if plot_flag2
-            saveplot(EE1,r,i)
+            saveplot(EE1,r,i,range);
         end
     end
 end
@@ -109,7 +109,7 @@ immse_matrix = cell2mat(immse_cell);
 multissim_matrix = cell2mat(multissim_cell);
 
 % Save matrices to an Excel file
-filename = 'assumption_data/evaluation_results.xlsx';
+filename = 'assumption_data/evaluation_results_10%.xlsx';
 writematrix(sim_matrix, filename, 'Sheet', 1, 'Range', 'A1');
 writematrix(immse_matrix, filename, 'Sheet', 2, 'Range', 'A1');
 writematrix(multissim_matrix, filename, 'Sheet', 3, 'Range', 'A1');
@@ -127,7 +127,10 @@ EE4 = get_MFI_reconstruction(Iwgn4, gm2d4);
 % f.Units = 'normalized';
 % f.Position = [0.1,0.2,0.8,0.4];
 
-function saveplot(EE1,r,i)
+
+end
+
+function saveplot(EE1,r,i,range)
     % 表示範囲の設定に使うパラメータを取得
     range_1000 = range./1000;
     zmin = range_1000(1);
@@ -182,8 +185,6 @@ function saveplot(EE1,r,i)
     % グラフを画像として保存
     exportgraphics(gcf, filename);
     close all; % 図を閉じる
-end
-
 end
 
 function k = FindCircle(L)

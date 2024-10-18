@@ -28,8 +28,8 @@ for i=1:K3d
         E1 = (s3d./(s3d.^2+M3d*10^(lg_gamma(gamma_index)))).*v_1.*(Z.');
         E(i)=sum(E1);
 end
-EE = reshape(E,N_grid+1,2*N_grid+1,N_grid+1); %ここで縦がr、横がzで左下が最小になる
-EE = permute(EE, [1, 3, 2]);%なんか合わない
-
+EE = reshape(E,N_grid+1,N_grid+1,N_grid+1);
+negativeEE = find(EE<0);
+EE(negativeEE) = zeros(size(negativeEE));
 
 end

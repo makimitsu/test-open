@@ -1,8 +1,7 @@
-function proj = Assumption3d(N_projection, gm3d, plotflag)
-    N_grid3d = 15;
+function proj = Assumption3d(N_projection, gm3d, N_grid3d, plotflag)
     m = N_grid3d+1; % z dimension
     n = N_grid3d+1; % r dimension
-    p = 2*N_grid3d+1; % y dimension
+    p = N_grid3d+1; % y dimension
     
     z = linspace(-1, 1, m);
     r = linspace(-1, 1, n);
@@ -11,11 +10,14 @@ function proj = Assumption3d(N_projection, gm3d, plotflag)
     [r_space, z_space, y_space] = meshgrid(r, z, y); % 3D meshgrid
     
     % Define the centers and properties for the light sources in 3D
-    centers = [% Center of 3D light sources, with z_center, r_center, y_center, semi_major_axis, semi_minor_axis, intensity
-        0.3, -0.1, 0.1, 0.05, 0.05, 1.0;  % Example source
-        -0.5, 0.4, -0.3, 1, 1, 0.8;
-        0.0, 0.0, 0.0, 0.1, 0.05, 1.2;
-        -0.7, -0.3, 0.1, 2, 0.5, 0.5;
+    % centers = [% Center of 3D light sources, with z_center, r_center, y_center, semi_major_axis, semi_minor_axis, intensity
+    %     0, -0.7, -0.3, 0.2, 0.2, 0.8;% Example source
+    %     -0.7,-0.7,0,0.2,0.2,0.8;
+    %     ];
+
+    centers = [
+        0,-0.8,0,0.5,0.5,0.7;
+        0,0.8,0,0.3,0.3,0.4;
         ];
     % Add more configurations as needed
         
@@ -72,12 +74,13 @@ function proj = Assumption3d(N_projection, gm3d, plotflag)
     end
 
     if plotflag
-        x = 1:16;
-        y = 1:16;
-        z = 1:31;
+        EE = permute(EE, [2, 1, 3]);
+        x = 1:21;
+        y = 1:21;
+        z = 1:21;
         [X, Y, Z] = meshgrid(x, y, z);
         figure;
-        slice(X, Y, Z, EE, [5,10], [5,10], [10,20]); % Example slice positions along Z
+        slice(X, Y, Z, EE, [5,10], [10,20], [5,10]); % Example slice positions along Z
         
         % Add labels and title
         xlabel('X-axis');

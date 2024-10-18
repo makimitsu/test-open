@@ -11,7 +11,6 @@ show_localmax = SXR.show_localmax;
 doSave = SXR.doSave;
 doFilter = SXR.doFilter;
 ReconMethod = SXR.ReconMethod;
-docGAN = SXR.docGAN;
 % SXRfilename = SXR.SXRfilename;
 
 EE = SXRdata.EE;
@@ -107,13 +106,6 @@ cLimList = {[0 1],[0 1],[0 1], [0 1]};
 % cLimList = {[0 1],[0 1],[0 1],[0 0.6]};
 
 % 負の要素を0で置換
-if any(~isfinite(EE(:)))
-    error('EE contains non-finite values.');
-end
-if any(~isfinite(EE_q(:)))
-    error('EE_q contains non-finite values.');
-end
-
 negativeEE = find(EE<0);
 EE(negativeEE) = zeros(size(negativeEE));
 negativeEEq = find(EE_q<0);
@@ -304,9 +296,9 @@ if doSave
             directory = '/LF_MFI/';
         elseif ReconMethod == 2
             directory = '/LF_MEM';
+        elseif ReconMethod == 3
+            directory = '/cGAN/';
         end
-    elseif docGAN
-        directory = '/cGAN/';
     end
 
     foldername_png = strcat(pathname_png,directory,'/',num2str(date),'/shot',num2str(shot));
