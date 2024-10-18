@@ -75,13 +75,22 @@ function proj = Assumption3d(N_projection, gm3d, N_grid3d, plotflag)
 
     if plotflag
         EE = permute(EE, [2, 1, 3]);
-        x = 1:21;
-        y = 1:21;
-        z = 1:21;
-        [X, Y, Z] = meshgrid(x, y, z);
-        figure;
-        slice(X, Y, Z, EE, [5,10], [10,20], [5,10]); % Example slice positions along Z
+        rmin3d = 0; 
+        rmax3d = 375;
+        dmin3d = -375;
+        dmax3d = 375;
+        zmin3d = -300;
+        zmax3d = 300;
+        r = linspace(rmin3d, rmax3d, newGridNumber+1);
+        z = linspace(zmin3d, zmax3d, newGridNumber+1);
+        d = linspace(dmin3d, dmax3d, newGridNumber+1);
         
+        % Create a grid for the data
+        [Z, R, D] = meshgrid(z, r, d);
+        
+        figure;
+        slice(Z, R, D, EE, [-100,100], [100,200], [-100,100]); % Example slice positions along Z
+
         % Add labels and title
         xlabel('X-axis');
         ylabel('Y-axis');
@@ -96,6 +105,7 @@ function proj = Assumption3d(N_projection, gm3d, N_grid3d, plotflag)
     end
 
     proj = cat(1, Iwgn(:,1),Iwgn(:,2),Iwgn(:,3),Iwgn(:,4));
+    
 
 end
 

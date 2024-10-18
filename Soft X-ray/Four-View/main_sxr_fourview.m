@@ -51,6 +51,7 @@ doSave = logical(str2num(cell2mat(answer(4))));
 doFilter = logical(str2num(cell2mat(answer(5))));
 ReconMethod = str2num(cell2mat(answer(6)));
 
+
 SXR.doSave = doSave;
 SXR.doFilter = doFilter;
 SXR.ReconMethod = ReconMethod;

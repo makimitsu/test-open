@@ -1,4 +1,4 @@
-function EE = get_distribution_3d(M3d, K3d, U3d, s3d, v3d, VectorImage, N_grid)
+function EE = get_distribution_3d(M3d, K3d, U3d, s3d, v3d, VectorImage, N_grid, nolines)
 %TP
 Z=U3d'*VectorImage.';
 gmin=-15;gmax=15;
@@ -31,5 +31,6 @@ end
 EE = reshape(E,N_grid+1,N_grid+1,N_grid+1);
 negativeEE = find(EE<0);
 EE(negativeEE) = zeros(size(negativeEE));
+EE(nolines) = NaN;
 
 end

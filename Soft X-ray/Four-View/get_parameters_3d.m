@@ -15,7 +15,7 @@ l4 = MCPLine_down(N_projection,zhole1,false);
 l = {l1,l2,l4};
 rmin3d = 0; rmax3d = 375; dmin3d = -375; dmax3d = 375; zmin3d = -300; zmax3d = 300;
 
-gm3d = LineProjection3D(l, N_grid3d, zmin3d, zmax3d, dmin3d, dmax3d, rmin3d, rmax3d, true);
+[gm3d,nolines] = LineProjection3D(l, N_grid3d, zmin3d, zmax3d, dmin3d, dmax3d, rmin3d, rmax3d, true);
 C3d = Laplacian_3D(N_grid3d);invC3d = C3d^(-1);
 [U3d,S3d,V3d] = svd(gm3d*invC3d, 'econ');
 v3d = (invC3d*V3d);
@@ -27,7 +27,7 @@ s3d = (diag(S3d)).';
 if M3d>K3d
     s3d = [s3d zeros(1,M3d-K3d)];
 end
-save(filepath,'N_projection','N_grid3d','gm3d','U3d','s3d','v3d','M3d','K3d','-v7.3');
+save(filepath,'N_projection','N_grid3d','gm3d','U3d','s3d','v3d','M3d','K3d','nolines','-v7.3');
 
 end
 
@@ -257,7 +257,7 @@ function plot_overlapping_rays(l1, l2, l3, l4, threshold)
     legend;
 end
 
-function gm3d = LineProjection3D(l, N_grid3d, zmin, zmax, dmin, dmax, rmin, rmax, plot_flag)
+function [gm3d,nolines] = LineProjection3D(l, N_grid3d, zmin, zmax, dmin, dmax, rmin, rmax, plot_flag)
     % l : 光線データのセル配列 {l1, l2, l3, l4}
     % N_grid_x, N_grid_y, N_grid_z : X, Y, Z 方向のグリッド数
     % xmin, xmax, ymin, ymax, zmin, zmax : それぞれの座標範囲
@@ -286,6 +286,7 @@ function gm3d = LineProjection3D(l, N_grid3d, zmin, zmax, dmin, dmax, rmin, rmax
 
     % 光線データのインデックスを追跡
     idx = 1;  % 全体で何番目の光線かを追跡するインデックス
+    countzero = zeros(N_gz,N_gd,N_gr);
 
     % 各セル配列に対して処理を行う
     for n = 1:length(l)
@@ -323,11 +324,15 @@ function gm3d = LineProjection3D(l, N_grid3d, zmin, zmax, dmin, dmax, rmin, rmax
             end
             % 3次元グリッドを1次元に変換して `gm3d` に格納
             gm3d(idx, :) = reshape(gm_temp, 1, []);
+            %視線が通らないグリッドを抽出したい
+            countzero = countzero + gm_temp;
 
             % インデックスを次の光線に進める
             idx = idx + 1;
         end
     end
+    nolines = find(countzero == 0);
+
 end
 
 function C = Laplacian_3D(N_grid)

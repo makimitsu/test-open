@@ -174,25 +174,36 @@ end
 threed = true;
 newProjectionNumber3d = 30;
 newGridNumber3d = 20;
-for t = times
-    number = (t-start)/interval+1;
-    if threed
-        if evalin('base', 'exist(''N_projection'', ''var'')')
-            NP = evalin('base', 'N_projection');
-            if NP ~= newProjectionNumber3d
-                [N_projection, N_grid3d, gm3d,U3d,s3d, v3d, M3d, K3d] = parametercheck_3d(newProjectionNumber3d, newGridNumber3d);
-            end
-        else
-            [N_projection, N_grid3d, gm3d,U3d,s3d, v3d, M3d, K3d] = parametercheck_3d(newProjectionNumber3d, newGridNumber3d);
-        end
+
+
+if threed
     
-        rawImage = imread(SXRfilename);
+    if evalin('base', 'exist(''N_projection'', ''var'')')
+        NP = evalin('base', 'N_projection');
+        if NP ~= newProjectionNumber3d
+            [N_projection, N_grid3d, gm3d,U3d,s3d, v3d, M3d, K3d, nolines] = parametercheck_3d(newProjectionNumber3d, newGridNumber3d);
+        end
+    else
+        [N_projection, N_grid3d, gm3d,U3d,s3d, v3d, M3d, K3d, nolines] = parametercheck_3d(newProjectionNumber3d, newGridNumber3d);
+    end
+    rawImage = imread(SXRfilename);
+
+    % Define the number of time points and create a figure
+    numTimes = numel(times);
+    figure('Units', 'Normalized', 'OuterPosition', [0 0 1 1]); % Full-screen figure
+
+    for tIdx = 1:numTimes
+        t = times(tIdx);
+        number = (t-start)/interval+1;
+        
+    
+        
         [VectorImage1,VectorImage2, VectorImage3, VectorImage4] = get_sxr_image(date,number,newProjectionNumber3d,rawImage);
     
         l = cat(2,VectorImage1,VectorImage2,VectorImage4); %20240721ではVectorImage3はなし
         
-        EE = get_distribution_3d(M3d, K3d, U3d, s3d, v3d, l, N_grid3d);
-        EE = permute(EE, [2,1,3]);
+        EE = get_distribution_3d(M3d, K3d, U3d, s3d, v3d, l, N_grid3d, nolines);
+        EE = permute(EE, [3,2,1]);
 
 
         rmin3d = 0; 
@@ -206,22 +217,35 @@ for t = times
         d = linspace(dmin3d, dmax3d, newGridNumber3d+1);
     
         % Create a grid for the data
-        [Z, R, D] = meshgrid(z, r, d);
+        [Z, D, R] = meshgrid(z, d, r);
         
-        figure;
-        slice(Z, R, D, EE, [-100,100], [100,200], [-100,100]); % Example slice positions along Z
+        subplot(2, ceil(numTimes/2), tIdx); % Adjust the grid size as needed
+
+
+        h = slice(Z, D, R, EE, z, d, r); % Example slice positions along Z
+
+        
+        % 0以上の部分に対してカラーマップを設定
+        set(h, 'FaceColor', 'interp', 'EdgeColor', 'none', 'FaceAlpha', 0.075); % 透明度を設定
+
+        % カラーマップの調整
+        colormap(jet); % jetカラーマップを使用
+        cb = colorbar; % カラーバーを追加
+        %cb.Limits = [0, max(EE(:))]; % カラーバーの範囲を0から最大値に設定
+        %clim([0, max(EE(:))]); % カラーバーに表示する範囲を設定
+        cb.Limits = [0, 0.3];
+        clim([0,0.3]);
 
         xlabel('z軸');
-        ylabel('r軸');
-        zlabel('depth');
+        ylabel('depth');
+        zlabel('r軸');
         title(strcat('shot',num2str(shot),' at ',num2str(t),'s'));
     
-        % Adjust color and viewing angle
-        colormap(jet); % Use jet colormap
-        colorbar;      % Add a color bar
+        
         view(3);       % Set to 3D view
-    end
+        grid on;
 
+    end
 end
 end
 
