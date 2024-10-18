@@ -236,10 +236,33 @@ if threed
         cb.Limits = [0, 0.3];
         clim([0,0.3]);
 
+
+        % Z, D, Rの範囲を取得
+        zRange = [min(z), max(z)];
+        dRange = [min(d), max(d)];
+        rRange = [min(r), max(r)];
+        
+        % 各軸の中心と長さを計算
+        centerZ = mean(zRange);
+        centerD = mean(dRange);
+        centerR = mean(rRange);
+        
+        % 最小の長さを取得して、それに基づいて軸の制限を設定
+        lengthZ = zRange(2) - zRange(1);
+        lengthD = dRange(2) - dRange(1);
+        lengthR = rRange(2) - rRange(1);
+        maxLength = max([lengthZ, lengthD, lengthR]);
+        
+        % 各軸の制限を設定
+        xlim([centerZ - maxLength/2, centerZ + maxLength/2]);
+        ylim([centerD - maxLength/2, centerD + maxLength/2]);
+        zlim([centerR - maxLength/2, centerR + maxLength/2]);
+        
+
         xlabel('z軸');
         ylabel('depth');
         zlabel('r軸');
-        title(strcat('shot',num2str(shot),' at ',num2str(t),'s'));
+        title(strcat('shot',num2str(shot),' at ',num2str(t),'us'));
     
         
         view(3);       % Set to 3D view
