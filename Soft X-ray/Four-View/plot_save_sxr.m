@@ -60,7 +60,7 @@ Bp = sqrt(Bz.^2+Br.^2);
 
 psi_min = min(min(psi));
 psi_max = max(max(psi));
-contour_layer = linspace(psi_min,psi_max,50);
+contour_layer = linspace(psi_min,psi_max,20);
 
 [SXR_mesh_z1,SXR_mesh_r] = meshgrid(z_space_SXR1_plot,r_space_SXR_plot);
 [SXR_mesh_z2,~] = meshgrid(z_space_SXR2_plot,r_space_SXR_plot);
@@ -97,7 +97,8 @@ nameList = {'1um Al', '2.5um Al', '2um Mylar', '1um Mylar'};
 
 % cLimList = {[0 1],[0 2],[0 0.3],[0 0.15]};
 
-cLimList = {[0 1],[0 1],[0 1], [0 1]};
+%cLimList = {[0 6],[0 10],[0 10], [0 10]}; %241110
+cLimList = {[0 2],[0 2],[0 2], [0 2]}; 
 
 % cLimList = {[0 1],[0 0.5],[0 0.3],[0 0.15]};
 % cLimList = {[0 1.5],[0 0.5],[0 1],[0 1.5]};
@@ -111,9 +112,9 @@ EE(negativeEE) = zeros(size(negativeEE));
 negativeEEq = find(EE_q<0);
 EE_q(negativeEEq) = zeros(size(negativeEEq));
 
-for i = 1:4
+for i = 1%1:4
     p = positionList(i);
-    subplot(2,2,p);
+    %subplot(2,2,p);
     cRange = cell2mat(cLimList(i));
 
     if i <= 2
@@ -142,7 +143,7 @@ for i = 1:4
         localmax_pos_z = SXR_mesh_z(localmax_idx);
         plot(localmax_pos_z,localmax_pos_r,'r*');
     end
-    [~,hp]=contourf(psi_mesh_z,psi_mesh_r,psi,contour_layer,'white','Fill','off');axis([-0.12 0.12 0.06 0.33]);
+    [~,hp]=contourf(psi_mesh_z,psi_mesh_r,psi,contour_layer,'white','Fill','off');axis([-0.17 0.17 0.06 0.33]);%axis([-0.12 0.12 0.06 0.33]);
     % [~,hp]=contourf(psi_mesh_z,psi_mesh_r,psi,contour_layer,'-k','Fill','off');
     hp.LineWidth = 1.5;
     % plot(magAxisList.z(:,t_idx),magAxisList.r(:,t_idx),'wo','LineWidth',3);
@@ -151,10 +152,10 @@ for i = 1:4
     % xlim([-0.05,0.05]);ylim([0.18,0.32]);
     % xlim([-0.02,0.02]);ylim([0.23,0.29]);
     % % xlim([-0.03,0.03]);ylim([0.21,0.3]);
-    title(string(nameList(i)));
+    %title(string(nameList(i)));
 end
 
-sgtitle(strcat(num2str(t),'us'));
+%sgtitle(strcat(num2str(t),'us'));
 drawnow;
 
 % subplot(2,2,1);
@@ -288,6 +289,10 @@ if doSave
             directory = '/NLF_MFI/';
         elseif ReconMethod == 2
             directory = '/NLF_MEM';
+        elseif ReconMethod == 3
+            directory = '/NLF_cGAN/';
+        elseif ReconMethod == 4
+            directory = '/NLF_GPT/';
         end
     elseif ~doFilter
         if ReconMethod == 0
@@ -297,7 +302,9 @@ if doSave
         elseif ReconMethod == 2
             directory = '/LF_MEM';
         elseif ReconMethod == 3
-            directory = '/cGAN/';
+            directory = '/LF_cGAN/';
+        elseif ReconMethod == 4
+            directory = '/LF_GPT/';
         end
     end
 

@@ -33,7 +33,7 @@ formats(1,1).format = 'integer';
 formats(1,1).size = [100 20];
 
 formats(2,1).type = 'edit';
-formats(2,1).format = 'integer';
+formats(2,1).format = 'text';
 formats(2,1).size = [100 20];
 
 formats(3,1).type = 'edit';
@@ -54,7 +54,7 @@ formats(5,1).size = [100 20];
 
 formats(6,1).type = 'list';
 formats(6,1).style = 'popupmenu';
-formats(6,1).items = {'psi', 'Bz', 'Bt', 'Jt', 'Et', 'Br', 'Ep'};
+formats(6,1).items = {'psi', 'Bz', 'Bt', 'Jt', 'Et', 'Br', 'Bl'};
 formats(6,1).format = 'integer';  % Change to integer
 formats(6,1).size = [100 20];
 
@@ -65,7 +65,8 @@ if isempty(answer)
 end
 
 date = answer{1};  % Already an integer
-IDXlist = answer{2};  % Already an integer
+IDXlist_str = answer{2};
+IDXlist = str2num(IDXlist_str);  % Already an integer
 a039 = answer{3};  % Already an integer
 
 doCheck = answer{4}-1;  % Check if 'true' was selected (index 1)
@@ -117,8 +118,8 @@ for i=1:n_data
     if PCB.shot == PCB.tfshot
         PCB.tfshot = [0,0];
     end
-    PCB.i_EF=EFlist;
-    PCB.TF=TFlist;
+    PCB.i_EF=EFlist(i);
+    PCB.TF=TFlist(i);
     if doCheck
         check_signal(PCB, pathname);
     else

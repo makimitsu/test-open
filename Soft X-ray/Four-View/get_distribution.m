@@ -1,4 +1,4 @@
-function EE = get_distribution(M,K,gm2d,U,s,v,VectorImage,plot_flag,ReconMethod)
+function EE = get_distribution(M,K,gm2d,U,s,v,VectorImage,plot_flag,ReconMethod, N_projection)
 
 Z=U'*VectorImage.';
 
@@ -43,34 +43,91 @@ E = zeros(1,K);
 % EE = reshape(E,sqrt(K),sqrt(K)); %ここで縦がr、横がzで左下が最小になる
 
 if ReconMethod == 4 % ガウス過程再構成
-    % 与えられた観測データ g
-    g = VectorImage.'; 
+
+    % Define grid points for the input
+    [X_in, Y_in] = meshgrid(linspace(0, 1, N_projection), linspace(0, 1, N_projection));
+    X_train = [X_in(:), Y_in(:)];  % Flatten to get training input points
     
-    % 既知の行列 H
-    H = gm2d; 
+    % Define grid points for the output
+    N_grid = sqrt(K);
+    [X_out, Y_out] = meshgrid(linspace(0, 1, N_grid), linspace(0, 1, N_grid));
+    X_test = [X_out(:), Y_out(:)];  % Flatten to get test points
+
+    % Use the EE matrix as training outputs
     
-    % カーネルのハイパーパラメータ
-    length_scale = 1.0;
-    sigma_f = 50.0;
-    sigma_n = 5; % 観測ノイズの標準偏差
+    for i=1:K
+        if M>K
+            v_1 = [v(i,:) zeros(1,M-K)];
+        else
+            v_1 = v(i,:);
+        end
+        E1 = (s./(s.^2+M*10^(lg_gamma(gamma_index)))).*v_1.*(Z.');
+        E(i)=sum(E1);
+    end
+    EE_initial = reshape(E,sqrt(K),sqrt(K)); %ここで縦がr、横がzで左下が最小になる
+    VectorImage_pred = gm2d*EE_initial(:);
+    risidual = VectorImage - VectorImage_pred';
+    y_train = zeros(N_projection);
+    k = FindCircle(N_projection/2);
+    y_train(k) = risidual;
+    y_train = y_train(:);
+
+    % % Hyperparameters for the RBF kernel
+    % length_scale = 0.1;  % Adjust based on data
+    % variance = 1.0;      % Output variance
+    % noise_variance = 1e-4;  % Noise variance
+
+    % Initial guesses for [length_scale, variance, noise_variance]
+    initial_params = [0.1, 1.0, 1e-4];
     
-    % 座標 (画素のインデックス) X
-    X = (1:size(gm2d,2))'; % Nは画素数
+    % Set optimization options
+    options = optimoptions('fminunc', 'Algorithm', 'quasi-newton', 'Display', 'iter');
     
-    % RBFカーネルの共分散行列 Kを計算
-    k = rbf_kernel(X, X, length_scale, sigma_f);
+    % Optimize hyperparameters
+    [optimal_params, fval] = fminunc(@(params) negative_log_marginal_likelihood(params, X_train, y_train), initial_params, options);
     
-    % 観測モデルのノイズを考慮した共分散行列
-    K_obs = H * k * H' + sigma_n^2 * eye(size(H, 1));
-    
-    % 事後分布の平均 (再構成された f)
-    f_post_mean = k * H' * (K_obs \ g);
-    
-    % 事後分布の分散 (不確実性)
-    f_post_cov = k - k * H' * (K_obs \ (H * k));
+    % Extract optimized hyperparameters
+    length_scale = optimal_params(1);
+    variance = optimal_params(2);
+    noise_variance = optimal_params(3);
 
 
-    EE = reshape(f_post_mean.',sqrt(K),sqrt(K));
+
+    
+    % Kernel matrix for training data
+    K_train = rbf_kernel(X_train, X_train, length_scale, variance) + noise_variance * eye(size(X_train, 1));
+    
+    % Cholesky decomposition for numerical stability
+    L = chol(K_train, 'lower');
+    % Solve for alpha (posterior mean)
+    alpha = L' \ (L \ y_train);
+
+    % Compute kernel between training and test points
+    K_s = rbf_kernel(X_train, X_test, length_scale, variance);
+    
+    % Posterior mean (predicted values for the output grid)
+    y_pred_mean = K_s' * alpha;
+    
+    % Reshape predicted mean into a matrix
+    EE = reshape(y_pred_mean, [N_grid, N_grid]);
+
+        
+    % Compute kernel matrix for test points
+    K_test = rbf_kernel(X_test, X_test, length_scale, variance);
+    
+    % Compute variance of the posterior distribution
+    v = L \ K_s;
+    y_pred_var = diag(K_test - v' * v);
+
+    % Plot the reconstructed matrix
+    % imagesc(EE);
+    % colorbar;
+    % title('Reconstructed Soft X-ray Image using GP');
+    % 
+    % % Optional: Plot the uncertainty
+    % imagesc(reshape(sqrt(y_pred_var), [N_grid, N_grid]));
+    % title('Prediction Uncertainty');
+
 
 elseif ReconMethod == 2
     gamma = 10^(lg_gamma(gamma_index));%GCVも考え直さないと→計算時間やばくなりそう
@@ -230,10 +287,27 @@ for i=1:1:k
 end
 end
 
-function K = rbf_kernel(X1, X2, length_scale, sigma_f)
+function K = rbf_kernel(X1, X2, length_scale, variance)
     % X1, X2は座標のベクトル
     % length_scaleはカーネルの長さスケール
     % sigma_fは関数の振幅
     sqdist = pdist2(X1, X2).^2;
-    K = sigma_f^2 * exp(-0.5 * sqdist / length_scale^2);
+    K = variance * exp(-0.5 * sqdist / length_scale^2);
+end
+
+function nlml = negative_log_marginal_likelihood(params, X_train, y_train)
+    % Extract hyperparameters
+    length_scale = params(1);
+    variance = params(2);
+    noise_variance = params(3);
+    
+    % Compute the covariance matrix
+    K_train = rbf_kernel(X_train, X_train, length_scale, variance) + noise_variance * eye(size(X_train, 1));
+    
+    % Cholesky decomposition for numerical stability
+    L = chol(K_train, 'lower');
+    
+    % Compute the negative log marginal likelihood
+    alpha = L' \ (L \ y_train);  % Solve for alpha
+    nlml = 0.5 * (y_train' * alpha) + sum(log(diag(L))) + 0.5 * numel(y_train) * log(2 * pi);
 end

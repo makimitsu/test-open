@@ -97,7 +97,7 @@ if doCalculation
     
     for i=1:length(ch)
         b(:,i) = filter(bb,aa,b(:,i));
-        b(:,i) = b(:,i) - mean(b(1:40,i));
+        b(:,i) = b(:,i) - mean(b(580:600,i));
         if rem(ch(i),2)==1
             bz(:,ceil(ch(i)/2))=b(:,i);
             ok_bz(ceil(ch(i)/2))=ok(i);
@@ -162,11 +162,12 @@ if doCalculation
         'Bz',zeros(size(grid2D.rq,1),size(grid2D.rq,2),size(trange,2)),...
         'Bt',zeros(size(grid2D.rq,1),size(grid2D.rq,2),size(trange,2)),...
         'Br',zeros(size(grid2D.rq,1),size(grid2D.rq,2),size(trange,2)),...
+        'Bl',zeros(size(grid2D.rq,1),size(grid2D.rq,2),size(trange,2)),...
         'Jt',zeros(size(grid2D.rq,1),size(grid2D.rq,2),size(trange,2)),...
         'Jz',zeros(size(grid2D.rq,1),size(grid2D.rq,2),size(trange,2)),...
         'Jr',zeros(size(grid2D.rq,1),size(grid2D.rq,2),size(trange,2)),...
         'Et',zeros(size(grid2D.rq,1),size(grid2D.rq,2),size(trange,2)),...
-        'Ep',zeros(size(grid2D.rq,1),size(grid2D.rq,2),size(trange,2)),...
+        'Er',zeros(size(grid2D.rq,1),size(grid2D.rq,2),size(trange,2)),...
         'Lambda',zeros(size(grid2D.rq,1),size(grid2D.rq,2),size(trange,2)),...
         'trange',trange);
     
@@ -187,12 +188,13 @@ if doCalculation
         data2D.Br(:,:,i)=-data2D.Br(:,:,i)./(2.*pi.*grid2D.rq);
         data2D.Bz(:,:,i)=data2D.Bz(:,:,i)./(2.*pi.*grid2D.rq);
         data2D.Bt(:,:,i)=B_t;
+        data2D.Bl(:,:,i)=sqrt(data2D.Bz(:,:,i).^2+data2D.Br(:,:,i).^2+data2D.Bt(:,:,i).^2);
         data2D.Jt(:,:,i)= curl(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bz(:,:,i),data2D.Br(:,:,i))./(4*pi*1e-7);
 
         if i>1
             data2D.Et(:,:,i) = -1*(data2D.psi(:,:,i)-data2D.psi(:,:,i-1))./(2*pi()*grid2D.rq);
-            data2D.Ep(:,:,i) = -1*(data2D.psi(:,:,i)-data2D.psi(:,:,i-1))./(2*pi()*grid2D.zq); %正しいかはわからない
         end
+
     end
 else
     load(filename,'data2D','grid2D');

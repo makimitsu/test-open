@@ -18,8 +18,8 @@ pathname.pre_processed_directory_path = getenv('pre_processed_directory_path');%
 PCB.restart = 0; % 今だけ
 
 %%%%実験オペレーションの取得
-prompt = {'Date:','Shot number:','a039(not necessary):','doSave:','doFilter:','ReconMethod(0:TP,1:MFI,2:MEM,3:cGAN):'};
-definput = {'','','','','',''};
+prompt = {'Date:','Shot number:','a039(not necessary):','doSave:','doFilter:','ReconMethod(0:TP,1:MFI,2:MEM,3:cGAN):', 'buffer'};
+definput = {'','','','','','',''};
 if exist('date','var')
     definput{1} = num2str(date);
 end
@@ -118,7 +118,6 @@ for i=1:n_data
     TF=TFlist(i);
     SXR.start = startlist(i);
     SXR.interval = intervallist(i);
-    % [PCBdata.grid2D,PCBdata.data2D] = process_PCBdata_280ch(date, shot, tfshot, pathname, n,i_EF,trange);
     % [PCBdata.grid2D,PCBdata.data2D] = process_PCBdata_280ch(PCB,pathname);
     [PCBdata.grid2D,PCBdata.data2D] = process_PCBdata_200ch(PCB,pathname); %process_PCBdata_200ch.mに行く
     SXR.date = date;

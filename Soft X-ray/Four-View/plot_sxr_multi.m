@@ -15,7 +15,7 @@ SXRfilename = SXR.SXRfilename;
 addpath '/Users/shohgookazaki/Documents/GitHub/test-open/Soft X-ray/Machine_Learning/code'; %getMDSdata.mとcoeff200ch.xlsxのあるフォルダへのパス
 
 
-if doFilter == 0
+if doFilter == 1
     if ReconMethod == 0
         options = 'NLF_TP';
     elseif ReconMethod == 1
@@ -24,6 +24,8 @@ if doFilter == 0
         options = 'NLF_MEM';
     elseif ReconMethod == 3
         options  = 'NLF_cGAN';
+    elseif ReconMethod == 4
+        options = 'NLF_GPT';
     end
 else
     if ReconMethod == 0
@@ -34,6 +36,8 @@ else
         options = 'LF_MEM';
     elseif ReconMethod == 3
         options  = 'LF_cGAN';
+    elseif ReconMethod == 4
+        options = 'LF_GPT';
     end
 end
 
@@ -51,7 +55,7 @@ end
 newProjectionNumber = 30;
 newGridNumber = 50;
 % 再構成計算に必要なパラメータを計算するなら読み込む
-parameterFile = 'parameters.mat';
+parameterFile = sprintf('parameters%d%d.mat', newProjectionNumber, newGridNumber);
 if doCalculation
     disp('No matrix data -- Start calculation');
     
@@ -124,10 +128,10 @@ for t = times
 
 %         再構成計算
 
-        EE1 = get_distribution(M,K,gm2d1,U1,s1,v1,VectorImage1,doPlot,ReconMethod);
-        EE2 = get_distribution(M,K,gm2d2,U2,s2,v2,VectorImage2,doPlot,ReconMethod);
-        EE3 = get_distribution(M,K,gm2d3,U3,s3,v3,VectorImage3,doPlot,ReconMethod);
-        EE4 = get_distribution(M,K,gm2d4,U4,s4,v4,VectorImage4,doPlot,ReconMethod);
+        EE1 = get_distribution(M,K,gm2d1,U1,s1,v1,VectorImage1,doPlot,ReconMethod, N_projection);
+        EE2 = get_distribution(M,K,gm2d2,U2,s2,v2,VectorImage2,doPlot,ReconMethod, N_projection);
+        EE3 = get_distribution(M,K,gm2d3,U3,s3,v3,VectorImage3,doPlot,ReconMethod, N_projection);
+        EE4 = get_distribution(M,K,gm2d4,U4,s4,v4,VectorImage4,doPlot,ReconMethod, N_projection);
         
 %         再構成結果を保存するファイルを作成、保存
         
@@ -171,10 +175,10 @@ if doSave
     close(f);
 end
 
-threed = true;
+threed = false;
 newProjectionNumber3d = 30;
 newGridNumber3d = 20;
-
+pathname_fig = getenv('SXR_RECONSTRUCTED_FIG_DIR');
 
 if threed
     
@@ -268,7 +272,12 @@ if threed
         view(3);       % Set to 3D view
         grid on;
 
+        
     end
+    % Save the figure to a file without displaying it
+    savepath = fullfile(pathname_fig,'/3D/LF_TP/',num2str(date), strcat('shot',num2str(shot),'.fig'));
+    saveas(gcf,savepath);
+
 end
 end
 

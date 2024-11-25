@@ -50,7 +50,7 @@ for m=1:16 %図示する時間
             colorLabel = 'J_t (A/m^2)';
         case 5
             contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Et(:,:,i),100,'LineStyle','none');
-            clim([-4e-4,4e-4]);
+        clim([-8e-4,8e-4]);
             dataTypeName = 'Et';
             colorLabel = 'E_t (V/m)';
         case  6
@@ -59,10 +59,10 @@ for m=1:16 %図示する時間
             dataTypeName = 'Br';
             colorLabel = 'B_r (T)';
         case  7
-            contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Et(:,:,i),20,'LineStyle','none'); %計算が合ってるかはわからない
-            clim([-4e-4,4e-4]);
-            dataTypeName = 'Ep';
-            colorLabel = 'E_p (V/m)';
+            contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bl(:,:,i),20,'LineStyle','none'); %計算が合ってるかはわからない
+            clim([0,0.1]);
+            dataTypeName = 'lBl';
+            colorLabel = 'B_l (T)';
     end
     colormap(jet)
     axis image
@@ -79,6 +79,14 @@ for m=1:16 %図示する時間
 end
 
 sgtitle(strcat(dataTypeName, ' diagram of shot', num2str(shot), ', on', num2str(date), ':', num2str(IDXlist(1))));
+
+pathname_fig = getenv('savedata_path');
+foldername_fig = strcat(pathname_fig,'/',num2str(date));
+if exist(foldername_fig,'dir') == 0
+    mkdir(foldername_fig);
+end
+savepath = fullfile(foldername_fig, strcat('shot', num2str(IDXlist(1)),'(',dataTypeName,')','.png'));
+saveas(gcf,savepath);
 
 end
 
