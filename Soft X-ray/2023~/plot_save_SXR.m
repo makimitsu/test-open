@@ -145,7 +145,7 @@ hold off
 drawnow
 
 if save
-    pathname = '/Users/shinjirotakeda/OneDrive - The University of Tokyo/Documents/ReconstructionResults/';
+    pathname = [getenv('SXR_RECONSTRUCTED_DIR'),'/'];
     if filter & NL
         directory = '/NLF_NLR/';
     elseif ~filter & NL

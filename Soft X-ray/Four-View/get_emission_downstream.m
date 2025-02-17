@@ -77,7 +77,8 @@ for i = 1:8
     if ~isnan(x_r)
         for j = 1:4
             % x点の左下・右下にあたる範囲をインデックスで取得したい
-            r_idx = knnsearch(r_space_SXR.',x_r);
+            % r_idx = knnsearch(r_space_SXR.',x_r);
+            r_idx = knnsearch(r_space_SXR.',0.2);
             if j <= 2
                 z_idx = knnsearch(z_space_SXR2.',x_z);
             else
@@ -86,7 +87,7 @@ for i = 1:8
             % 左下の切り出し
             EE_l = EE(1:r_idx,1:z_idx,j);
             % 右下
-            EE_r = EE(r_idx:end,z_idx:end,j);
+            EE_r = EE(1:r_idx,z_idx:end,j);
             IdData.max_l(j,i) = max(EE_l,[],'all');
             IdData.mean_l(j,i) = mean(EE_l,'all');
             IdData.std_l(j,i) = std(EE_l,0,'all');

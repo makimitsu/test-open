@@ -106,7 +106,8 @@ if doCalculation
     
     for i=1:length(ch)
         b(:,i) = filter(bb,aa,b(:,i));
-        b(:,i) = b(:,i) - mean(b(1:40,i));
+        % b(:,i) = b(:,i) - mean(b(1:40,i));
+        b(:,i) = b(:,i) - mean(b(580:600,i));
         b_TF(:,i) = filter(bb,aa,b_TF(:,i));
         b_TF(:,i) = b_TF(:,i) - mean(b_TF(1:40,i));
         if rem(ch(i),2)==1

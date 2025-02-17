@@ -6,7 +6,7 @@ clear
 R = ones(1,3)*0.02;
 
 Bt = 0.1;
-Bp = [0.05,0.1,0.2].*Bt;
+Bp = Bt./[20,10,5];
 
 Et = 250; %V/m
 me = 9.11e-31; %kg
@@ -51,6 +51,16 @@ E_e_hist(E_e_hist<=1) = 1;
 E_e_hist_log = log10(E_e_hist);
 % figure;surf(E_e_hist_log);
 
+figure;
+[V_hist1,VEdge1] = histcounts(v_e(1,:),'NumBins',100);
+[V_hist2,VEdge2] = histcounts(v_e(2,:),'NumBins',100);
+[V_hist3,VEdge3] = histcounts(v_e(3,:),'NumBins',100);
+[V_hist0,VEdge0] = histcounts(v_0,'NumBins',100);
+% loglog(VEdge1(2:end),V_hist1,VEdge2(2:end),V_hist2,VEdge3(2:end),V_hist3,'LineWidth',2);
+semilogy(VEdge1(2:end),V_hist1,VEdge2(2:end),V_hist2,VEdge3(2:end),V_hist3,VEdge0(2:end),V_hist0,'LineWidth',2);
+xlabel('Electron velocity [km/m]');
+ylabel('Number of particles');
+
 E_e = 0.5.*me.*v_e.^2./e;
 [E_hist1,Edge1] = histcounts(E_e(1,:),'BinWidth',5);
 [E_hist2,Edge2] = histcounts(E_e(2,:),'BinWidth',5);
@@ -69,6 +79,6 @@ loglog(Edge1(2:end),E_hist1,Edge2(2:end),E_hist2,Edge3(2:end),E_hist3,Edge0(2:en
 ylim([5 1e4]);xlim([0 500]);
 ax = gca;
 ax.FontSize = 18;
-legend({'Bt/Bp = 20','Bt/Bp = 10','Bt/Bp = 5','Thermal'});
+legend({['Bt/Bp=',num2str(Bt/Bp(1))],['Bt/Bp=',num2str(Bt/Bp(2))],['Bt/Bp=',num2str(Bt/Bp(3))],'Thermal'});
 xlabel('Electron energy [eV]');
-ylabel('Number of particles')
+ylabel('Number of particles');

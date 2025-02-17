@@ -101,10 +101,10 @@ nameList = {'1um Al', '2.5um Al', '2um Mylar', '1um Mylar'};
 % cLimList = {[0 1],[0 1],[0 1],[0 0.6]};
 % cLimList = {[0 2],[0 0.2],[0 0.2],[0 1.5]};%240621
 % cLimList = {[0 1],[0 1],[0 1],[0 0.5]};
-% cLimList = {[0 1],[0 0.5],[0 0.2],[0 0.5]}; %240111_new
+cLimList = {[0 1],[0 0.5],[0 0.2],[0 0.5]}; %240111_new
 % cLimList = {[0 5],[0 1],[0 0.2],[0 0.5]};
 % cLimList = {[0 0.5],[0 0.2],[0 0.1],[0 0.1]};
-cLimList = {[0 0.2],[0 0.1],[0 0.1],[0 0.1]};
+% cLimList = {[0 0.2],[0 0.1],[0 0.1],[0 0.1]};
 
 % 負の要素を0で置換
 negativeEE = find(EE<0);
@@ -133,11 +133,11 @@ for i = 1:4
 
 
     if i == 1
-        % [~,h] = contourf(psi_mesh_z-0.02,psi_mesh_r,EE_q(:,:,i),linspace(cRange(1),cRange(2),20));clim(cRange);
-        [~,h] = contourf(psi_mesh_z-0.02,psi_mesh_r,EE_q(:,:,i),20);
+        [~,h] = contourf(psi_mesh_z-0.02,psi_mesh_r,EE_q(:,:,i),linspace(cRange(1),cRange(2),20));clim(cRange);
+        % [~,h] = contourf(psi_mesh_z-0.02,psi_mesh_r,EE_q(:,:,i),20);
     else
-        % [~,h] = contourf(psi_mesh_z,psi_mesh_r,EE_q(:,:,i),linspace(cRange(1),cRange(2),20));clim(cRange);
-        [~,h] = contourf(psi_mesh_z,psi_mesh_r,EE_q(:,:,i),20);
+        [~,h] = contourf(psi_mesh_z,psi_mesh_r,EE_q(:,:,i),linspace(cRange(1),cRange(2),20));clim(cRange);
+        % [~,h] = contourf(psi_mesh_z,psi_mesh_r,EE_q(:,:,i),20);
     end
 % 
     colormap('turbo');

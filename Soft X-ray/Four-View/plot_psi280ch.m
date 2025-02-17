@@ -208,30 +208,52 @@ figure('Position', [0 0 1500 1500],'visible','on');
 dt = PCB.dt;
 %  t_start=470+start;
 Et_t = zeros(1,16);
+% PCB.type = 0;
 times = start+dt:dt:start+dt*16;
  for m=1:16 %図示する時間
      i=start+m.*dt; %end
      t=trange(i);
-     subplot(4,4,m)
+     subplot(4,4,m);
      switch(PCB.type)
-         case 1
-             contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.psi(:,:,i),40,'LineStyle','none');clim([-5e-3,5e-3])%psi
-         case 2
-             contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bz(:,:,i),30,'LineStyle','none');clim([-0.1,0.1])%Bz
-         case 3
-             % contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bt(:,:,i),40,'LineStyle','none');clim([0,0.3])%Bt
-             contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bt(:,:,i),-100e-3:0.5e-3:100e-3,'LineStyle','none')
-         case 4
-             contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Br(:,:,i),30,'LineStyle','none');clim([-0.1,0.1])%Br
-         case 5
-             contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Et(:,:,i),20,'LineStyle','none');clim([-500,400])%Et
-             % 時刻iにおけるx点の[r,z]座標（インデックス）を取得
-             idxR = knnsearch(grid2D.rq(:,1),xPointList.r(i));
-             idxZ = knnsearch(grid2D.zq(1,:).',xPointList.z(i));
-             % ±3程度の範囲でEtの平均を計算
-             Et_t(m) = mean(data2D.Et(max(1,idxR-3):min(idxR+3,numel(grid2D.rq(:,1))),max(1,idxZ-3):min(numel(grid2D.zq(1,:)),idxZ+3),i),'all');
-         case 6
-             contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Jt(:,:,i),30,'LineStyle','none');clim([-0.8*1e+6,0]);%clim([-0.8*1e+6,0.8*1e+6]) %jt%カラーバーの軸の範囲
+        case 0
+            contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),10,'black','LineWidth',2);
+        case 1
+            contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.psi(:,:,i),40,'LineStyle','none');clim([-5e-3,5e-3])%psi
+        case 2
+            contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bz(:,:,i),30,'LineStyle','none');clim([-0.1,0.1])%Bz
+        case 3
+            % contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bt(:,:,i),40,'LineStyle','none');clim([0,0.3])%Bt
+            % contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bt(:,:,i),-100e-3:0.5e-3:100e-3,'LineStyle','none')
+            contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Bt_th(:,:,i),-100e-3:0.5e-3:100e-3,'LineStyle','none')
+        case 4
+            contourf(grid2D.zq(1,:),grid2D.rq(:,1),data2D.Br(:,:,i),30,'LineStyle','none');clim([-0.1,0.1])%Br
+        case 5
+            contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Et(:,:,i),20,'LineStyle','none');clim([-500,400])%Et
+            % 時刻iにおけるx点の[r,z]座標（インデックス）を取得
+            idxR = knnsearch(grid2D.rq(:,1),xPointList.r(i));
+            idxZ = knnsearch(grid2D.zq(1,:).',xPointList.z(i));
+            % ±3程度の範囲でEtの平均を計算
+            Et_t(m) = mean(data2D.Et(max(1,idxR-1):min(idxR+1,numel(grid2D.rq(:,1))),max(1,idxZ-1):min(numel(grid2D.zq(1,:)),idxZ+1),i),'all');
+        case 6
+            contourf(grid2D.zq(1,:),grid2D.rq(:,1),-1.*data2D.Jt(:,:,i),30,'LineStyle','none');clim([-0.8*1e+6,0.8*1e+6]);%clim([-0.8*1e+6,0]) %jt%カラーバーの軸の範囲
+        case 7
+            Bp = sqrt(data2D.Bz(:,:,i).^2+data2D.Br(:,:,i).^2);
+            GFR = data2D.Bt_th(:,:,i)./Bp;
+            contourf(grid2D.zq(1,:),grid2D.rq(:,1),GFR,30,'LineStyle','none');clim([0,20]);%GFR
+            % disp(max(max(GFR)));
+            % 時刻iにおけるx点の[r,z]座標（インデックス）を取得
+            idxR = knnsearch(grid2D.rq(:,1),xPointList.r(i));
+            idxZ = knnsearch(grid2D.zq(1,:).',xPointList.z(i));
+            % ±3程度の範囲でGFRの平均（最大？）を計算
+            maxGFR = max(GFR(max(1,idxR-3):min(idxR+3,numel(grid2D.rq(:,1))),max(1,idxZ-3):min(numel(grid2D.zq(1,:)),idxZ+3)),[],'all');
+            disp(maxGFR);
+        case 8
+            Bp = sqrt(data2D.Bz(:,:,i).^2+data2D.Br(:,:,i).^2);
+            contourf(grid2D.zq(1,:),grid2D.rq(:,1),Bp,30,'LineStyle','none');clim([0 0.1]);%Bp
+        case 9
+            B = sqrt(data2D.Bz(:,:,i).^2+data2D.Br(:,:,i).^2+data2D.Bt_th(:,:,i).^2);
+            contourf(grid2D.zq(1,:),grid2D.rq(:,1),B,30,'LineStyle','none');clim([0 1]);%Bp
+        
      end
 
      % ポロイダル磁場ベースでのプロット
@@ -265,7 +287,9 @@ times = start+dt:dt:start+dt*16;
     hold on
 %     plot(grid2D.zq(1,squeeze(mid(:,:,i))),grid2D.rq(:,1))
 %     contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),20,'black')
-    contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),20,'black')
+
+    % contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),20,'black')
+
     % contour(grid2D.zq(1,:),grid2D.rq(:,1),squeeze(data2D.psi(:,:,i)),[-20e-3:0.2e-3:40e-3],'black','LineWidth',1)
 %     plot(grid2D.zq(1,squeeze(mid(opoint(:,:,i),:,i))),grid2D.rq(opoint(:,:,i),1),"bo")
 %     plot(grid2D.zq(1,squeeze(mid(xpoint(:,:,i),:,i))),grid2D.rq(xpoint(:,:,i),1),"bx")
@@ -275,9 +299,13 @@ times = start+dt:dt:start+dt*16;
     % [magaxis,xpoint] = get_axis_x(grid2D,data2D,t);
     % plot(magaxis.z,magaxis.r,'ro');
     % plot(xpoint.z,xpoint.r,'rx');
-    plot(magAxisList.z(:,i),magAxisList.r(:,i),'ko');
-    plot(xPointList.z(i),xPointList.r(i),'kx');
 
+    % plot(magAxisList.z(:,i),magAxisList.r(:,i),'ko');
+    % plot(xPointList.z(i),xPointList.r(i),'kx');
+
+    if PCB.type == 7
+        xlim([-0.1,0.1]);ylim([0.2,0.32]);
+    end
     hold off
     title(string(t)+' us')
 %     xlabel('z [m]')

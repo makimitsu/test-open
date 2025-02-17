@@ -1,4 +1,4 @@
-function [I_TF,x,aquisition_rate] = get_TF_current(PCB,pathname)
+function [rgwData] = get_rgw_data(PCB,pathname)
 
 directory_rogo = strcat(pathname.fourier,'rogowski/');
 
@@ -22,9 +22,9 @@ time_step = 1;%0.2; % us; time step of plot; must be an integer times of time st
 %calibration = [1, -1516.4, 1, 1, 1533.2, 80, 140, 480, 1, 1,]; % calibration for each channel. I'm not sure about the exact calibration coefficient.
 % calibration = [1, -1, 1, 1, 1, 1, 1, 1, 1, 1,]; % calibration for each channel. I'm not sure about the exact calibration coefficient.
 % calibration = [116.6647, -1, 1, 1, 1, 1, 63.9568, 1, 1, 1,]; % calibration for each channel. I'm not sure about the exact calibration coefficient.
-calibration = 116.6647; % calibration factor for TF coil
+% calibration = 116.6647; % calibration factor for external TF coil
 
-[date_str,shot_str,path] = directory_generation_Rogowski(date,shot,directory_rogo);
+[date_str,shot_str,~] = directory_generation_Rogowski(date,shot,directory_rogo);
 
 % transfer all rgw file to txt file; do nothing if there is no rgw file in the folder
 % rgw2txt(date_str,'mag_probe');
@@ -50,8 +50,20 @@ end
 data = readmatrix(path,"FileType","text");
 step = aquisition_rate * time_step;
 x = t_start * aquisition_rate : step : t_end * aquisition_rate;
-I_TF = data(x,2+2)*calibration;
-figure;plot(x,I_TF);
+% I_TF = data(x,1+2)*calibration;
+ch_plot= [2,9:16]+2;
+V_plot= data(x,ch_plot).';
+legend_plot = {'external TF','FCPF1','FCPF2','FCTF1','FCTF2','FCPF1 in vessel','FCPF2 in vessel','FCTF1 in vessel','FCTF2 in vessel'};
+rgwData.ch = ch_plot;
+rgwData.t = x;
+rgwData.legend = legend_plot;
+rgwData.V = V_plot;
+
+figure;hold on;
+for i = 1:numel(legend_plot)
+    plot(x,V_plot(i,:));
+end
+legend(legend_plot);
 
 end
 

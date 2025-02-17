@@ -1,7 +1,7 @@
 function [imageVector1,imageVector2] = get_sxr_image_new(date,number,SXRfilename, filter)
 
 rawImage = imread(SXRfilename);
-projectionNumber = 80;
+projectionNumber = 40;%80
 doCheck = false;
 
 if filter

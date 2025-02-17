@@ -16,7 +16,9 @@ for i = 1:numel(ESP.shotlist)
     idx_r = find(r_probe==ESP.rlist(i)*1E-3);
     cnt_r(idx_r) = cnt_r(idx_r) + 1;
     filename = sprintf("%s%03d%s",[pathname.ESP '/' num2str(ESP.date) '/ES_' num2str(ESP.date)], ESP.shotlist(i), '.csv');
-    ESPdata = readmatrix(filename,'Range',sprintf('B%d:V%d',ESP.trange(1)*10+2,ESP.trange(end)*10+2));
+    ESPdata_full = readmatrix(filename);
+    ESPdata = ESPdata_full(ismember(round(ESPdata_full(:,1),1),ESP.trange),2:end);
+    % ESPdata = readmatrix(filename,'Range',sprintf('B%d:V%d',ESP.trange(1)*10+2,ESP.trange(end)*10+2));
     phi(:,:,idx_r) = (phi(:,:,idx_r)*(cnt_r(idx_r)-1) + ESPdata)/cnt_r(idx_r);
 end
 phi(:,ng_ch,:) = [];%死んだCHを除去

@@ -2,7 +2,7 @@ function [] = get_parameters(N_projection,N_grid,filepath)
 
 % filepath = '/Users/shinjirotakeda/Documents/GitHub/test-open/Soft X-ray/Four-View_Simulation/parameters.mat';
 
-plotFlagProjection = false;
+plotFlagProjection = true;
 plotFlagLines = false;
 
 % 視線の分布、重み行列の作成
@@ -310,8 +310,9 @@ for i = 1:N_p
     z=l(i).z;
     r=sqrt(x.^2+y.^2);
     if plot_flag
-        figure(f1);plot(z,r);
-        hold on;grid on;
+        figure(f1);plot(z,r,'r','LineWidth',3);
+        hold on;
+        % grid on;
         xlabel('Z [mm]');ylabel('R [mm]');
     end
     

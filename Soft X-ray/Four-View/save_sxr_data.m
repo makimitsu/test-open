@@ -84,6 +84,7 @@ sxrDataDir = pathname.SXRDATA;
 sxrDataFile = strcat(sxrDataDir,filesep,num2str(date),'_',options,'.mat');
 doX = false;
 doDown = false;
+doSep = false;
 if exist(sxrDataFile,'file')
     % load(sxrDataFile,'idxList','xpointList');
     load(sxrDataFile)

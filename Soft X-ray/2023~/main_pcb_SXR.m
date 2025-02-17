@@ -25,7 +25,7 @@ pat = 230316;
 date = pat;
 T=searchlog(T,node,pat);
 % IDXlist=[23,24,26,27,32,35:40,42:51,53:59,61:69];%[4:6 8:11 13 15:19 21:23 24:30 33:37 39:40 42:51 53:59 61:63 65:69 71:74];
-IDXlist = 7:14;
+IDXlist = [7:14,18:26,28:35];
 n_data=numel(IDXlist);%計測データ数
 shotlist=T.a039(IDXlist);
 tfshotlist=T.a039_TF(IDXlist);
@@ -57,7 +57,7 @@ show_localmax = false;
 % interval = 5;
 save = true;
 filter = false;
-NL = false;
+NL = true;
 
 for i=1:n_data
     PCB.idx = IDXlist(i);
@@ -83,7 +83,8 @@ for i=1:n_data
     [grid2D,data2D] = process_PCBdata_200ch(PCB,pathname);
     shot_SXR = IDXlist(i);
     % shot_SXR = 14;
-    SXRfilename = strcat('/Users/shinjirotakeda/OneDrive - The University of Tokyo/Documents/SXR_Images/',num2str(date),'/shot',num2str(shot_SXR,'%03i'),'.tif');
+    % SXRfilename = strcat('/Users/shinjirotakeda/OneDrive - The University of Tokyo/Documents/SXR_Images/',num2str(date),'/shot',num2str(shot_SXR,'%03i'),'.tif');
+    SXRfilename = strcat(getenv('SXR_IMAGE_DIR'),'/',num2str(date),'/shot',num2str(shot_SXR,'%03i'),'.tif');
     % [EE_high,EE_low] = plot_SXR_at_t(grid2D,data2D,date,shot_SXR,t,show_xpoint,show_localmax,start,interval,save,SXRfilename,filter,NL);
     plot_SXR_multi(grid2D,data2D,date,shot_SXR,show_xpoint,show_localmax,start,interval,save,SXRfilename,filter,NL);
     % Brec = clc_Breconnection(grid2D,data2D);

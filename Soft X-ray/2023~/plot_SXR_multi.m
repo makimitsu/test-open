@@ -37,7 +37,7 @@ elseif filter & ~NL
 else
     options = 'LF_LR';
 end
-savefolder = strcat('/Users/shinjirotakeda/OneDrive - The University of Tokyo/Documents/result_matrix/',options,'/',num2str(date),'/shot',num2str(shot));
+savefolder = strcat(getenv('SXR_MATRIX_DIR'),'/',options,'/',num2str(date),'/shot',num2str(shot));
 if exist(savefolder,'dir') == 0
     clc_flag = true;
     mkdir(savefolder);
@@ -48,8 +48,8 @@ end
 % 再構成計算に必要なパラメータを計算するなら読み込む
 filepath = '/Users/shinjirotakeda/Documents/GitHub/test-open/Soft X-ray/2023~/parameters.mat';
 if clc_flag
-    N_projection_new = 80;
-    N_grid_new = 100;
+    N_projection_new = 40;%80
+    N_grid_new = 50;%100
     if isfile(filepath)
         load(filepath, 'gm2d1', 'gm2d2', 'U1', 'U2', 's1', 's2', 'v1', 'v2', 'M', 'K', 'range','N_projection', 'N_grid');
         if N_projection_new ~= N_projection || N_grid_new ~= N_grid
